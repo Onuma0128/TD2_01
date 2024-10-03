@@ -49,6 +49,7 @@ void GameScene::initialize()
 
 	/*==================== ゲームオブジェクト ====================*/
 
+	player_ = std::make_unique<Player>();
 }
 
 void GameScene::poped()
@@ -67,11 +68,13 @@ void GameScene::begin()
 void GameScene::update()
 {
 	camera3D_->update();
+	player_->Update();
 }
 
 void GameScene::begin_rendering()
 {
 	camera3D_->update_matrix();
+	player_->Begin_Rendering(camera3D_.get());
 }
 
 void GameScene::late_update()
@@ -81,6 +84,8 @@ void GameScene::late_update()
 void GameScene::draw() const
 {
 	RenderPathManager::BeginFrame();
+
+	player_->Draw();
 
 	DirectXCore::ShowGrid(*camera3D_);
 
@@ -93,4 +98,6 @@ void GameScene::debug_update()
 	ImGui::Begin("Camera3D");
 	camera3D_->debug_gui();
 	ImGui::End();
+
+	player_->Debug_Update();
 }

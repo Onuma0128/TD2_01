@@ -256,11 +256,11 @@
     <Filter Include="MainGame\Scene">
       <UniqueIdentifier>{bfd5fdf8-a6a3-4414-a54d-556be72ba3b0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainGame\GameCharacter">
+      <UniqueIdentifier>{55d2f639-f87c-4485-a455-5ffcbd3e99f8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\WinApp.cpp">
       <Filter>Engine\WinApp</Filter>
     </ClCompile>
@@ -471,8 +471,14 @@
     <ClCompile Include="Engine\Render\RenderNode\Particle\ParticleNode.cpp">
       <Filter>Engine\Render\RenderNode\Particle</Filter>
     </ClCompile>
-    <ClCompile Include="GameScene.cpp">
+    <ClCompile Include="MainGame\Scene\GameScene.cpp">
+      <Filter>MainGame\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="MainGame\GameCharacter\Player.cpp">
+      <Filter>MainGame\GameCharacter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -707,8 +713,11 @@
     <ClInclude Include="Engine\Render\RenderNode\Particle\ParticleNode.h">
       <Filter>Engine\Render\RenderNode\Particle</Filter>
     </ClInclude>
-    <ClInclude Include="GameScene.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="MainGame\Scene\GameScene.h">
+      <Filter>MainGame\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="MainGame\GameCharacter\Player.h">
+      <Filter>MainGame\GameCharacter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
