@@ -259,6 +259,9 @@
     <Filter Include="MainGame\GameCharacter">
       <UniqueIdentifier>{55d2f639-f87c-4485-a455-5ffcbd3e99f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainGame\GameObject">
+      <UniqueIdentifier>{67b72cfd-9c82-4761-ab04-8de85fa0d146}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\WinApp.cpp">
@@ -479,6 +482,9 @@
     </ClCompile>
     <ClCompile Include="MainGame\GameCharacter\Player.cpp">
       <Filter>MainGame\GameCharacter</Filter>
+    </ClCompile>
+    <ClCompile Include="MainGame\GameObject\PlayerBullet.cpp">
+      <Filter>MainGame\GameObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -718,6 +724,9 @@
     </ClInclude>
     <ClInclude Include="MainGame\GameCharacter\Player.h">
       <Filter>MainGame\GameCharacter</Filter>
+    </ClInclude>
+    <ClInclude Include="MainGame\GameObject\PlayerBullet.h">
+      <Filter>MainGame\GameObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

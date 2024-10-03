@@ -4,6 +4,8 @@
 #include "Engine/Module/GameObject/GameObject.h"
 #include "Engine/Module/Camera/Camera3D.h"
 
+#include "MainGame/GameObject/PlayerBullet.h"
+
 class Player : public GameObject 
 {
 public:
@@ -29,5 +31,7 @@ public:
 private:
 
 	std::unique_ptr<GameObject> playerObject_ = nullptr;
+
+	std::vector<std::unique_ptr<PlayerBullet>> bullets_;
 
 };
