@@ -1,4 +1,5 @@
 #include "SceneDemo.h"
+#include "GameScene.h"
 
 #include "Engine/Module/Camera/Camera3D.h"
 #include "Engine/Module/GameObject/GameObject.h"
@@ -169,10 +170,10 @@ void SceneDemo::on_collision_exit(const BaseCollider* const, Color* object) {
 void SceneDemo::debug_update() {
 	ImGui::Begin("DemoScene");
 	if (ImGui::Button("StackScene")) {
-		SceneManager::SetSceneChange(std::make_unique<SceneDemo>(), 1, true);
+		SceneManager::SetSceneChange(std::make_unique<GameScene>(), 1, true);
 	}
 	if (ImGui::Button("ChangeScene")) {
-		SceneManager::SetSceneChange(std::make_unique<SceneDemo>(), 1, false);
+		SceneManager::SetSceneChange(std::make_unique<GameScene>(), 1, false);
 	}
 	if (ImGui::Button("PopScene")) {
 		SceneManager::PopScene(1);

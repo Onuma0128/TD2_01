@@ -253,6 +253,9 @@
     <Filter Include="Engine\Utility\Bitflag">
       <UniqueIdentifier>{cdec1912-a0be-4583-a333-c3b8f0648587}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainGame\Scene">
+      <UniqueIdentifier>{bfd5fdf8-a6a3-4414-a54d-556be72ba3b0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -467,6 +470,9 @@
     </ClCompile>
     <ClCompile Include="Engine\Render\RenderNode\Particle\ParticleNode.cpp">
       <Filter>Engine\Render\RenderNode\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="GameScene.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -700,6 +706,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Render\RenderNode\Particle\ParticleNode.h">
       <Filter>Engine\Render\RenderNode\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

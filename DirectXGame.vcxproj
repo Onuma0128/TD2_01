@@ -181,6 +181,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Utility\BackgroundLoader\BackgroundLoader.cpp" />
     <ClCompile Include="Engine\Utility\Utility.cpp" />
     <ClCompile Include="Engine\WinApp.cpp" />
+    <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TestCode\SceneDemo.cpp" />
   </ItemGroup>
@@ -261,6 +262,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Utility\TimedCall\TimedCall.h" />
     <ClInclude Include="Engine\Utility\Utility.h" />
     <ClInclude Include="Engine\WinApp.h" />
+    <ClInclude Include="GameScene.h" />
     <ClInclude Include="TestCode\SceneDemo.h" />
   </ItemGroup>
   <ItemGroup>
