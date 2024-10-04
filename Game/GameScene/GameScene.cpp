@@ -5,6 +5,7 @@
 #include "Engine/Render/RenderPath/RenderPath.h"
 #include "Engine/Render/RenderPathManager/RenderPathManager.h"
 #include "Engine/DirectX/DirectXCore.h"
+#include "Engine/Module/PolygonMesh/PolygonMeshManager.h"
 
 #include "imgui.h"
 
@@ -14,6 +15,7 @@ GameScene::~GameScene() = default;
 
 void GameScene::load()
 {
+	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models", "Sphere.obj");
 }
 
 void GameScene::initialize()
@@ -34,11 +36,9 @@ void GameScene::initialize()
 	object3dNode_->initialize();
 	object3dNode_->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 
-	using RTGConfig = BaseRenderTargetGroup::RTGConfing;
-
 	spriteNode_ = std::make_unique<SpriteNode>();
 	spriteNode_->initialize();
-	spriteNode_->set_rt_config(eps::to_bitflag(RTGConfig::ContinueDrawAfter) | RTGConfig::ContinueDrawBefore);
+	spriteNode_->set_config(eps::to_bitflag(RenderNodeConfig::ContinueDrawAfter) | RenderNodeConfig::ContinueDrawBefore);
 	spriteNode_->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 
 	RenderPath path{};
