@@ -7,6 +7,7 @@
 
 #include "Engine/Module/Camera/Camera3D.h"
 #include "Engine/Module/GameObject/GameObject.h"
+#include "Game/GameScene/Enemy/BaseEnemy.h"
 
 class GameScene : public BaseScene
 {
@@ -34,6 +35,8 @@ public:
 private:
 
 	std::unique_ptr<Camera3D> camera3D_ = nullptr;
+
+	std::unique_ptr<BaseEnemy> enemy = nullptr;
 
 	std::shared_ptr<Object3DNode> object3dNode_ = nullptr;
 	std::shared_ptr<SpriteNode> spriteNode_ = nullptr;

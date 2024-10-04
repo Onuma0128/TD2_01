@@ -28,7 +28,7 @@ private: // Structs
 	};
 	struct ApproachBehaviorWork {
 		float attackDistance;
-		float speed; // Speed
+		float speed;
 	};
 	struct AttackBehaviorWork {
 		std::shared_ptr<SphereCollider> attackCollider;
@@ -71,6 +71,7 @@ private: // BehaviorFunctions
 private: // Member values
 	bool isDead;
 	int32_t hitpoint; // HP
+	std::shared_ptr<SphereCollider> collider;
 
 	EnemyBehavior behavior;
 	std::variant<
@@ -87,5 +88,5 @@ private: // Member values
 	std::vector<std::function<void(void)>> behaviorInitFunc;
 
 public: // Static value
-	inline static const Player* const targetPlayer = nullptr;
+	inline static const Player* targetPlayer = nullptr;
 };

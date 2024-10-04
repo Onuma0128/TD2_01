@@ -4,7 +4,7 @@
 
 void BaseEnemy::initialize() {
 	hitpoint = 10;
-	behavior = EnemyBehavior::Spawn;
+	behaviorRequest = EnemyBehavior::Spawn;
 	behaviorInitFunc = {
 		std::bind(&BaseEnemy::spawn_initialize, this),
 		std::bind(&BaseEnemy::approach_initialize, this),
@@ -21,6 +21,7 @@ void BaseEnemy::initialize() {
 		std::bind(&BaseEnemy::damaged_update, this),
 		std::bind(&BaseEnemy::despawn_update, this),
 	};
+	reset_object("Sphere.obj");
 }
 
 void BaseEnemy::update() {
@@ -29,7 +30,7 @@ void BaseEnemy::update() {
 		behavior = std::move(behaviorRequest.value());
 		// 初期化処理
 		behaviorInitFunc[static_cast<int32_t>(behavior)]();
-		//behaviorRequest = std::nullopt;
+		behaviorRequest = std::nullopt;
 	}
 
 	// 更新処理
@@ -64,6 +65,7 @@ void BaseEnemy::approach_update() {
 		return;
 	}
 	ApproachBehaviorWork& value = std::get<ApproachBehaviorWork>(behaviorValue);
+	// プレイヤーとの距離を算出
 	//Vector3 distance = targetPlayer->world_position() - world_position();
 	Vector3 distance = CVector3::BASIS_Z * 3;
 
@@ -76,6 +78,8 @@ void BaseEnemy::approach_update() {
 	// velocity算出
 	Vector3 velocity = distance.normalize_safe() * value.speed;
 	transform->plus_translate(velocity * GameTimer::DeltaTime());
+	// player方向を向く
+	//look_at(*targetPlayer);
 }
 
 // ---------- 攻撃処理 ----------

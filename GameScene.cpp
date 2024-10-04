@@ -49,6 +49,11 @@ void GameScene::initialize()
 
 	/*==================== ゲームオブジェクト ====================*/
 
+
+	enemy = std::make_unique<BaseEnemy>();
+	enemy->initialize();
+
+	BaseEnemy::targetPlayer = nullptr;
 }
 
 void GameScene::poped()
@@ -62,20 +67,24 @@ void GameScene::finalize()
 
 void GameScene::begin()
 {
+	enemy->begin();
 }
 
 void GameScene::update()
 {
 	camera3D_->update();
+	enemy->update();
 }
 
 void GameScene::begin_rendering()
 {
 	camera3D_->update_matrix();
+	enemy->begin_rendering(*camera3D_);
 }
 
 void GameScene::late_update()
 {
+	enemy->late_update();
 }
 
 void GameScene::draw() const
@@ -83,6 +92,7 @@ void GameScene::draw() const
 	RenderPathManager::BeginFrame();
 
 	DirectXCore::ShowGrid(*camera3D_);
+	enemy->draw();
 
 	RenderPathManager::Next();
 	RenderPathManager::Next();
