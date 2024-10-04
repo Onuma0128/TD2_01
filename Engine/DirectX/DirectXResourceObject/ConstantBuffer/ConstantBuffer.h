@@ -16,6 +16,7 @@ public:
 public:
 	const T* const get_data() const noexcept;
 	T* const get_data() noexcept;
+	void unmap();
 
 protected:
 	T* data;
@@ -27,6 +28,7 @@ inline ConstantBuffer<T>::ConstantBuffer() noexcept(false) {
 	memorySize = sizeof(T);
 	resource = CreateBufferResource(memorySize);
 	resource->Map(0, nullptr, reinterpret_cast<void**>(&data));
+	*data = T{};
 }
 
 template<typename T>
@@ -36,9 +38,7 @@ inline ConstantBuffer<T>::ConstantBuffer(const T& data_) noexcept(false) : Const
 
 template<typename T>
 inline ConstantBuffer<T>::~ConstantBuffer() noexcept {
-	if (resource) {
-		resource->Unmap(0, nullptr);
-	}
+	unmap();
 }
 
 template<typename T>
@@ -49,4 +49,11 @@ inline const T* const ConstantBuffer<T>::get_data() const noexcept {
 template<typename T>
 inline T* const ConstantBuffer<T>::get_data() noexcept {
 	return data;
+}
+
+template<typename T>
+inline void ConstantBuffer<T>::unmap() {
+	if (resource) {
+		resource->Unmap(0, nullptr);
+	}
 }

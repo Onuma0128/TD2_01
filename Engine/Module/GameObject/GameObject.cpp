@@ -38,14 +38,6 @@ GameObject::GameObject(GameObject&&) noexcept = default;
 
 GameObject& GameObject::operator=(GameObject&&) noexcept = default;
 
-Transform3D& GameObject::get_transform() noexcept {
-	return *transform;
-}
-
-const Transform3D& GameObject::get_transform() const noexcept {
-	return *transform;
-}
-
 void GameObject::begin() {
 }
 
@@ -137,6 +129,27 @@ void GameObject::default_material() {
 		}
 		materialData.emplace_back(meshMaterials[i].color, meshMaterials[i].uvTransform);
 	}
+}
+
+void GameObject::look_at(const GameObject& rhs, const Vector3& upwards) noexcept {
+	look_at(rhs.world_position(), upwards);
+}
+
+// 既知の不具合 : 特定環境でlook_atが正しくならない場合がある
+void GameObject::look_at(const Vector3& point, const Vector3& upwards) noexcept {
+	Matrix4x4 parentInversedWorldMatrix = hierarchy->parent_matrix().inverse();
+	Vector3 rhsObjectCoordinatePosition = Transform3D::Homogeneous(point, parentInversedWorldMatrix);
+	Vector3 forward = (rhsObjectCoordinatePosition - transform->get_translate()).normalize_safe();
+	Vector3 localUpwards = Transform3D::HomogeneousVector(upwards, parentInversedWorldMatrix);
+	transform->set_rotate(Quaternion::LookForward(forward, localUpwards));
+}
+
+Transform3D& GameObject::get_transform() noexcept {
+	return *transform;
+}
+
+const Transform3D& GameObject::get_transform() const noexcept {
+	return *transform;
 }
 
 const Matrix4x4& GameObject::world_matrix() const {
