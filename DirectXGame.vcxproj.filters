@@ -256,11 +256,14 @@
     <Filter Include="MainGame\Scene">
       <UniqueIdentifier>{bfd5fdf8-a6a3-4414-a54d-556be72ba3b0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MainGame\GameCharacter">
-      <UniqueIdentifier>{55d2f639-f87c-4485-a455-5ffcbd3e99f8}</UniqueIdentifier>
+    <Filter Include="MainGame\Scene\GameScene">
+      <UniqueIdentifier>{d5a67fac-6b12-4461-9f92-0de10c685149}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MainGame\GameObject">
-      <UniqueIdentifier>{67b72cfd-9c82-4761-ab04-8de85fa0d146}</UniqueIdentifier>
+    <Filter Include="MainGame\Scene\GameScene\Enemy">
+      <UniqueIdentifier>{b84a95a5-7b14-4966-a4c2-a1030024e6d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainGame\Scene\GameScene\Player">
+      <UniqueIdentifier>{1ebeb71e-a634-4e9f-b962-a407cd50604e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -474,17 +477,20 @@
     <ClCompile Include="Engine\Render\RenderNode\Particle\ParticleNode.cpp">
       <Filter>Engine\Render\RenderNode\Particle</Filter>
     </ClCompile>
-    <ClCompile Include="MainGame\Scene\GameScene.cpp">
-      <Filter>MainGame\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="MainGame\GameCharacter\Player.cpp">
-      <Filter>MainGame\GameCharacter</Filter>
+    <ClCompile Include="Game\GameScene\Enemy\BaseEnemy.cpp">
+      <Filter>MainGame\Scene\GameScene\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="MainGame\GameObject\PlayerBullet.cpp">
-      <Filter>MainGame\GameObject</Filter>
+      <Filter>MainGame\Scene\GameScene\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="MainGame\GameCharacter\Player.cpp">
+      <Filter>MainGame\Scene\GameScene\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="MainGame\Scene\GameScene.cpp">
+      <Filter>MainGame\Scene\GameScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -719,14 +725,17 @@
     <ClInclude Include="Engine\Render\RenderNode\Particle\ParticleNode.h">
       <Filter>Engine\Render\RenderNode\Particle</Filter>
     </ClInclude>
-    <ClInclude Include="MainGame\Scene\GameScene.h">
-      <Filter>MainGame\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="MainGame\GameCharacter\Player.h">
-      <Filter>MainGame\GameCharacter</Filter>
+    <ClInclude Include="Game\GameScene\Enemy\BaseEnemy.h">
+      <Filter>MainGame\Scene\GameScene\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="MainGame\GameObject\PlayerBullet.h">
-      <Filter>MainGame\GameObject</Filter>
+      <Filter>MainGame\Scene\GameScene\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="MainGame\GameCharacter\Player.h">
+      <Filter>MainGame\Scene\GameScene\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="MainGame\Scene\GameScene.h">
+      <Filter>MainGame\Scene\GameScene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
