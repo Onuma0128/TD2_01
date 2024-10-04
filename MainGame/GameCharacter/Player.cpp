@@ -3,6 +3,7 @@
 #include "Engine/Application/Input/Input.h"
 #include "Engine/Application/Input/InputEnum.h"
 #include "Engine/Math/Definition.h"
+#include "Engine/Application/GameTimer/GameTimer.h"
 
 #include "imgui.h"
 
@@ -16,6 +17,8 @@ void Player::Initialize()
 	playerObject_ = std::make_unique<GameObject>();
 	playerObject_->reset_object("Sphere.obj");
 
+	// 弾の初期化
+	// 弾の数を指定
 	uint32_t bulletIndex = 10;
 	for (uint32_t i = 0; i < bulletIndex; ++i) {
 		Vector3 bulletPos = playerObject_->get_transform().get_translate() +
@@ -74,28 +77,29 @@ void Player::Debug_Update()
 
 void Player::Move()
 {
-	float verocity = 0.03f;
+	float speed = 3.0f;
+	if (Input::StickL().x != 0 && Input::StickL().y != 0) {
+		velocity_ = Input::StickL();
+	}
+	Vector2 velocity = Input::StickL();
+
 	Vector3 translate = playerObject_->get_transform().get_translate();
 
-	// 仮の動き
-	if (Input::IsPressKey(KeyID::A)) {
-		translate.x -= verocity;
-	}
-	if (Input::IsPressKey(KeyID::D)) {
-		translate.x += verocity;
-	}
-	if (Input::IsPressKey(KeyID::S)) {
-		translate.z -= verocity;
-	}
-	if (Input::IsPressKey(KeyID::W)) {
-		translate.z += verocity;}
+	translate.x += velocity.x * speed * GameTimer::DeltaTime();
+	translate.z += velocity.y * speed * GameTimer::DeltaTime();
 
 	playerObject_->get_transform().set_translate(translate);
 }
 
 void Player::Attack()
 {
-	if (Input::IsTriggerKey(KeyID::Space)) {
-
+	if (Input::IsTriggerPad(PadID::A)) {
+		for (auto& bullet : bullets_) {
+			if (bullet->GetIsAttack() == false) {
+				bullet->SetIsAttack(true);
+				bullet->SetVelocity(velocity_);
+				break;
+			}
+		}
 	}
 }

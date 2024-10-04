@@ -31,6 +31,7 @@ public:
 private:
 
 	std::unique_ptr<GameObject> playerObject_ = nullptr;
+	Vector2 velocity_ = { 0,1 };
 
 	std::vector<std::unique_ptr<PlayerBullet>> bullets_;
 

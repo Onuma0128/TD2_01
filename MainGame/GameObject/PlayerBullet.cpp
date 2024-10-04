@@ -1,5 +1,6 @@
 #include "PlayerBullet.h"
 #include "MainGame/GameCharacter/Player.h"
+#include "Engine/Application/GameTimer/GameTimer.h"
 #include "imgui.h"
 
 void PlayerBullet::Initialize(const Vector3& position)
@@ -26,14 +27,27 @@ void PlayerBullet::Update(const Vector3& position)
 	Vector3 scale = { scaleValue, scaleValue, scaleValue };
 	bulletObject_->get_transform().set_scale(scale);
 
-	Vector3 translate = Vector3{
-		cosf(theta_) * 1.5f,
-		0.0f,
-		sinf(theta_) * 1.5f
-	};
-	theta_ += 0.01f;
+	// 攻撃処理が始まってなければプレイヤーの周りを回転
+	if (!isAttack_) {
+		Vector3 translate = Vector3{
+			cosf(theta_) * 1.5f,
+			0.0f,
+			sinf(theta_) * 1.5f
+		};
+		theta_ += 0.01f;
 
-	bulletObject_->get_transform().set_translate(translate + position);
+		bulletObject_->get_transform().set_translate(translate + position);
+	}
+	//攻撃処理がされたらプレイヤーのVelocityに飛んでいく
+	if (isAttack_) {
+		float speed = 10.0f;
+		Vector3 translate = bulletObject_->get_transform().get_translate();
+
+		translate.x += velocity_.x * speed * GameTimer::DeltaTime();
+		translate.z += velocity_.y * speed * GameTimer::DeltaTime();
+
+		bulletObject_->get_transform().set_translate(translate);
+	}
 }
 
 void PlayerBullet::Begin_Rendering(Camera3D* camera)

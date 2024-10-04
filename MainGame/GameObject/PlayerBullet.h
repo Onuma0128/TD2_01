@@ -21,6 +21,7 @@ public:
 	void Debug_Update();
 
 
+	void SetVelocity(const Vector2& velocity) { velocity_ = velocity; }
 	void SetTheta(float theta) { theta_ = theta; }
 
 	bool GetIsAttack() { return isAttack_; }
@@ -29,6 +30,7 @@ public:
 private:
 
 	std::unique_ptr<GameObject> bulletObject_;
+	Vector2 velocity_{};
 
 	// 脈拍の速さ
 	float heartbeatSpeed_;
@@ -36,9 +38,10 @@ private:
 	float heartbeatAmplitude_;
 	// 基本のスケール値
 	float baseScale_;
-
+	// プレイヤーの周りを回転
 	float theta_ = 0;
 
+	// 攻撃したか
 	bool isAttack_ = false;
 };
 
