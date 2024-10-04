@@ -181,11 +181,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Utility\BackgroundLoader\BackgroundLoader.cpp" />
     <ClCompile Include="Engine\Utility\Utility.cpp" />
     <ClCompile Include="Engine\WinApp.cpp" />
-    <ClCompile Include="MainGame\Scene\GameScene.cpp" />
     <ClCompile Include="Game\GameScene\Enemy\BaseEnemy.cpp" />
+    <ClCompile Include="Game\GameScene\GameScene.cpp" />
+    <ClCompile Include="Game\GameScene\Player\Player.cpp" />
+    <ClCompile Include="Game\GameScene\Player\PlayerBullet.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MainGame\GameCharacter\Player.cpp" />
-    <ClCompile Include="MainGame\GameObject\PlayerBullet.cpp" />
     <ClCompile Include="TestCode\SceneDemo.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -265,9 +265,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Utility\TimedCall\TimedCall.h" />
     <ClInclude Include="Engine\Utility\Utility.h" />
     <ClInclude Include="Engine\WinApp.h" />
-    <ClInclude Include="MainGame\Scene\GameScene.h" />
-    <ClInclude Include="MainGame\GameCharacter\Player.h" />
-    <ClInclude Include="MainGame\GameObject\PlayerBullet.h" />
+    <ClInclude Include="Game\GameScene\GameScene.h" />
+    <ClInclude Include="Game\GameScene\Player\Player.h" />
+    <ClInclude Include="Game\GameScene\Player\PlayerBullet.h" />
     <ClInclude Include="Game\GameScene\Enemy\BaseEnemy.h" />
     <ClInclude Include="TestCode\SceneDemo.h" />
   </ItemGroup>

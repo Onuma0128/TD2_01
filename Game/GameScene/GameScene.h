@@ -9,7 +9,7 @@
 #include "Engine/Module/GameObject/GameObject.h"
 #include "Game/GameScene/Enemy/BaseEnemy.h"
 
-#include "MainGame/GameCharacter/Player.h"
+#include "Game/GameScene/Player/Player.h"
 
 class GameScene : public BaseScene
 {

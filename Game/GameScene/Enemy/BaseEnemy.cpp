@@ -2,6 +2,8 @@
 
 #include <Engine/Application/GameTimer/GameTimer.h>
 
+#include "Game/GameScene/Player/Player.h"
+
 void BaseEnemy::initialize() {
 	hitpoint = 10;
 	behaviorRequest = EnemyBehavior::Spawn;
@@ -66,8 +68,7 @@ void BaseEnemy::approach_update() {
 	}
 	ApproachBehaviorWork& value = std::get<ApproachBehaviorWork>(behaviorValue);
 	// プレイヤーとの距離を算出
-	//Vector3 distance = targetPlayer->world_position() - world_position();
-	Vector3 distance = CVector3::BASIS_Z * 3;
+	Vector3 distance = targetPlayer->world_position() - world_position();
 
 	// distanceより近かったら攻撃に移行
 	if (distance.length() <= value.attackDistance) {

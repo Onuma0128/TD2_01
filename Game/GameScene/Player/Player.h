@@ -4,7 +4,7 @@
 #include "Engine/Module/GameObject/GameObject.h"
 #include "Engine/Module/Camera/Camera3D.h"
 
-#include "MainGame/GameObject/PlayerBullet.h"
+#include "Game/GameScene/Player/PlayerBullet.h"
 
 class Player : public GameObject 
 {

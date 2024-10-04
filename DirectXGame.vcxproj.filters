@@ -483,13 +483,13 @@
     <ClCompile Include="Game\GameScene\Enemy\BaseEnemy.cpp">
       <Filter>MainGame\Scene\GameScene\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="MainGame\GameObject\PlayerBullet.cpp">
+    <ClCompile Include="Game\GameScene\Player\Player.cpp">
       <Filter>MainGame\Scene\GameScene\Player</Filter>
     </ClCompile>
-    <ClCompile Include="MainGame\GameCharacter\Player.cpp">
+    <ClCompile Include="Game\GameScene\Player\PlayerBullet.cpp">
       <Filter>MainGame\Scene\GameScene\Player</Filter>
     </ClCompile>
-    <ClCompile Include="MainGame\Scene\GameScene.cpp">
+    <ClCompile Include="Game\GameScene\GameScene.cpp">
       <Filter>MainGame\Scene\GameScene</Filter>
     </ClCompile>
   </ItemGroup>
@@ -728,13 +728,13 @@
     <ClInclude Include="Game\GameScene\Enemy\BaseEnemy.h">
       <Filter>MainGame\Scene\GameScene\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="MainGame\GameObject\PlayerBullet.h">
+    <ClInclude Include="Game\GameScene\Player\Player.h">
       <Filter>MainGame\Scene\GameScene\Player</Filter>
     </ClInclude>
-    <ClInclude Include="MainGame\GameCharacter\Player.h">
+    <ClInclude Include="Game\GameScene\Player\PlayerBullet.h">
       <Filter>MainGame\Scene\GameScene\Player</Filter>
     </ClInclude>
-    <ClInclude Include="MainGame\Scene\GameScene.h">
+    <ClInclude Include="Game\GameScene\GameScene.h">
       <Filter>MainGame\Scene\GameScene</Filter>
     </ClInclude>
   </ItemGroup>
