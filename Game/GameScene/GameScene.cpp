@@ -73,7 +73,7 @@ void GameScene::begin()
 
 void GameScene::update()
 {
-	camera3D_->update();
+	//camera3D_->update();
 	player_->Update();
 	enemy->update();
 }
@@ -81,8 +81,8 @@ void GameScene::update()
 void GameScene::begin_rendering()
 {
 	camera3D_->update_matrix();
-	player_->Begin_Rendering(camera3D_.get());
-	enemy->begin_rendering(*camera3D_);
+	player_->Begin_Rendering();
+	enemy->begin_rendering();
 }
 
 void GameScene::late_update()
@@ -93,10 +93,14 @@ void GameScene::late_update()
 void GameScene::draw() const
 {
 	RenderPathManager::BeginFrame();
-
+	camera3D_->set_command(1);
 	player_->Draw();
+#ifdef _DEBUG
+	camera3D_->debug_draw();
+#endif // _DEBUG
 
-	DirectXCore::ShowGrid(*camera3D_);
+
+	DirectXCore::ShowGrid();
 	enemy->draw();
 
 	RenderPathManager::Next();

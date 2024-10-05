@@ -46,12 +46,12 @@ void Player::Update()
 	}
 }
 
-void Player::Begin_Rendering(Camera3D* camera)
+void Player::Begin_Rendering()
 {
-	playerObject_->begin_rendering(*camera);
+	playerObject_->begin_rendering();
 
 	for (auto& bullet : bullets_) {
-		bullet->Begin_Rendering(camera);
+		bullet->Begin_Rendering();
 	}
 }
 

@@ -78,7 +78,7 @@ void BaseEnemy::approach_update() {
 
 	// velocity算出
 	Vector3 velocity = distance.normalize_safe() * value.speed;
-	transform->plus_translate(velocity * GameTimer::DeltaTime());
+	transform.plus_translate(velocity * GameTimer::DeltaTime());
 	// player方向を向く
 	//look_at(*targetPlayer);
 }
@@ -86,7 +86,7 @@ void BaseEnemy::approach_update() {
 // ---------- 攻撃処理 ----------
 void BaseEnemy::attack_initialize() {
 	auto&& collider = std::make_shared<SphereCollider>();
-	collider->get_hierarchy().set_parent(*hierarchy);
+	collider->get_hierarchy().set_parent(hierarchy);
 	behaviorValue = AttackBehaviorWork{
 		collider,
 		{ [&] { behaviorRequest = EnemyBehavior::Approach; }, 3 }
@@ -101,7 +101,7 @@ void BaseEnemy::attack_update() {
 // ---------- 鼓動同期時処理 ----------
 void BaseEnemy::beating_initialize() {
 	auto&& collider = std::make_shared<SphereCollider>();
-	collider->get_hierarchy().set_parent(*hierarchy);
+	collider->get_hierarchy().set_parent(hierarchy);
 	behaviorValue = BeatingBehaviorWork{
 		collider
 	};

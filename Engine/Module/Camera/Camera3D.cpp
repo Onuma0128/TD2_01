@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "Engine/WinApp.h"
+#include "Engine/DirectX/DirectXCommand/DirectXCommand.h"
 
 #ifdef _DEBUG
 #include <imgui.h>
@@ -15,47 +16,64 @@ void Camera3D::initialize() {
 		static_cast<float>(WinApp::GetClientWidth()) / static_cast<float>(WinApp::GetClientHight()),
 		0.1f, 1000
 	);
-
-	update_matrix();
+	WorldInstance::initialize();
 
 #ifdef _DEBUG
-	reset_object("Frustum.obj");
 	isVaildDebugCamera = false;
 	debugCamera = std::make_unique<GameObject>();
 	debugCameraCenter = std::make_unique<GameObject>("CameraAxis.obj");
-	debugCameraCenter->begin_rendering(*this);
+	//debugCameraCenter->begin_rendering();
 	debugCamera->set_parent(debugCameraCenter->get_hierarchy());
+	frustum = std::make_unique<GameObject>("Frustum.obj");
+	frustum->set_parent(hierarchy);
 #endif // _DEBUG
+
+	update_matrix();
 }
 
 void Camera3D::update_matrix() {
+	// カメラそのもののMatrix更新
+	WorldInstance::update_matrix();
 #ifdef _DEBUG
 	if (isVaildDebugCamera) {
-		debugCameraCenter->begin_rendering(*this);
-		debugCamera->begin_rendering(*this);
+		// デバッグ表示に使用するモデルのWorldMatrixの更新
+		debugCameraCenter->begin_rendering();
+		debugCamera->begin_rendering();
+		// ViewMatirxの更新
+		debugViewMatrix = debugCamera->world_matrix().inverse();
 	}
 #endif // _DEBUG
-	
-	// カメラそのもののMatrix更新
-	this->begin_rendering(*this);
-	// それを下にViewMatrixを更新
+
+	// カメラ位置をもとにViewMatrixを更新
 	make_view_matrix();
 	make_perspectivefov_matrix();
-	vpMatrix = viewMatrix * perspectiveFovMatrix;
 
 
 #ifdef _DEBUG
-	debugVpMatrix = debugViewMatrix * perspectiveFovMatrix;
+	// 外部参照用Matrix
+	vpMatrix = viewMatrix * perspectiveFovMatrix;
+	// 描画用
 	if (isVaildDebugCamera) {
-		// デバッグ表示に使用するモデルのWVPMatrixを更新するために、2回描画前準備を行う
-		this->begin_rendering(*this);
-		debugCameraCenter->begin_rendering(*this);
+		*vpMatrixBuffer.get_data() = debugViewMatrix * perspectiveFovMatrix;
 	}
+	else {
+		*vpMatrixBuffer.get_data() = vpMatrix;
+}
+#else
+	// リリースビルド時は参照用と描画用が必ず同じになるのでこの実装
+	* vpMatrixBuffer.get_data() = viewMatrix * perspectiveFovMatrix;
 #endif // _DEBUG
 }
 
+void Camera3D::set_command(uint32_t index) {
+	auto& commandList = DirectXCommand::GetCommandList();
+	commandList->SetGraphicsRootConstantBufferView(
+		index, vpMatrixBuffer.get_resource()->GetGPUVirtualAddress()
+	);
+}
+
 void Camera3D::set_transform(const Transform3D& transform_) noexcept {
-	transform->copy(transform_);
+	transform.copy(transform_);
 }
 
 void Camera3D::set_perspective_fov_info(float fovY_, float aspectRatio_, float nearClip_, float farClip_) noexcept {
@@ -66,15 +84,15 @@ void Camera3D::set_perspective_fov_info(float fovY_, float aspectRatio_, float n
 }
 
 const Matrix4x4& Camera3D::vp_matrix() const {
+#ifdef _DEBUG
 	return vpMatrix;
+#else
+	return *vpMatrixBuffer.get_data();
+#endif // _DEBUG
 }
 
 void Camera3D::make_view_matrix() {
 	viewMatrix = world_matrix().inverse();
-#ifdef _DEBUG
-	if (isVaildDebugCamera)
-		debugViewMatrix = debugCamera->world_matrix().inverse();
-#endif // _DEBUG
 }
 
 void Camera3D::make_perspectivefov_matrix() {
@@ -89,7 +107,7 @@ void Camera3D::make_perspectivefov_matrix() {
 
 #ifdef _DEBUG
 void Camera3D::debug_gui() {
-	transform->debug_gui();
+	transform.debug_gui();
 	ImGui::Separator();
 	ImGui::Checkbox("DebugCamera", &isVaildDebugCamera);
 	if (isVaildDebugCamera) {
@@ -140,12 +158,9 @@ void Camera3D::debug_camera() {
 void Camera3D::debug_draw() const {
 	if (isVaildDebugCamera) {
 		debugCameraCenter->draw();
-		this->draw();
+		frustum->begin_rendering();
+		frustum->draw();
 	}
-}
-
-const Matrix4x4& Camera3D::vp_matrix_draw() const {
-	return isVaildDebugCamera ? debugVpMatrix : vpMatrix;
 }
 
 #endif // _DEBUG

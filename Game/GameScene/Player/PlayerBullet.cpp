@@ -50,9 +50,9 @@ void PlayerBullet::Update(const Vector3& position)
 	}
 }
 
-void PlayerBullet::Begin_Rendering(Camera3D* camera)
+void PlayerBullet::Begin_Rendering()
 {
-	bulletObject_->begin_rendering(*camera);
+	bulletObject_->begin_rendering();
 }
 
 void PlayerBullet::Draw()

@@ -1,8 +1,13 @@
 #pragma once
 
-#include "Engine/Module/GameObject/GameObject.h"
+#include "Engine/DirectX/DirectXResourceObject/ConstantBuffer/ConstantBuffer.h"
+#include "Engine/Module/WorldInstance/WorldInstance.h"
 
-class Camera3D : public GameObject {
+#ifdef _DEBUG
+#include "Engine/Module/GameObject/GameObject.h"
+#endif // _DEBUG
+
+class Camera3D : public WorldInstance {
 public:
 	Camera3D() = default;
 	virtual ~Camera3D() = default;
@@ -14,6 +19,8 @@ public:
 	virtual void initialize();
 
 	void update_matrix();
+	
+	void set_command(uint32_t index);
 
 public:
 	void set_transform(const Transform3D& transform) noexcept;
@@ -31,14 +38,13 @@ public:
 	virtual void debug_gui();
 	void debug_camera();
 	void debug_draw() const;
-	const Matrix4x4& vp_matrix_draw() const;
 #endif // _DEBUG
 
 private:
 	Matrix4x4 viewMatrix;
 	Matrix4x4 perspectiveFovMatrix;
 
-	Matrix4x4 vpMatrix;
+	ConstantBuffer<Matrix4x4> vpMatrixBuffer;
 
 	float fovY;
 	float aspectRatio;
@@ -46,11 +52,12 @@ private:
 	float farClip;
 
 #ifdef _DEBUG
+	Matrix4x4 vpMatrix;
 	Matrix4x4 debugViewMatrix;
-	Matrix4x4 debugVpMatrix;
 	bool isVaildDebugCamera;
 	std::unique_ptr<GameObject> debugCameraCenter;
 	std::unique_ptr<GameObject> debugCamera;
+	std::unique_ptr<GameObject> frustum;
 	Vector3 offset;
 	Vector2 preMousePos;
 #endif // _DEBUG

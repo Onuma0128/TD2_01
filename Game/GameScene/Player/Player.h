@@ -15,7 +15,7 @@ public:
 
 	void Update();
 
-	void Begin_Rendering(Camera3D* camera);
+	void Begin_Rendering();
 
 	void Draw();
 
