@@ -2,7 +2,6 @@
 #include <memory>
 
 #include "Engine/Module/GameObject/GameObject.h"
-#include "Engine/Module/Camera/Camera3D.h"
 
 #include "Game/GameScene/Player/PlayerBullet.h"
 
@@ -11,13 +10,13 @@ class Player : public GameObject
 public:
 	Player();
 
-	void Initialize();
+	void initialize();
 
-	void Update();
+	void update()override;
 
-	void Begin_Rendering();
+	void begin_rendering() noexcept override;
 
-	void Draw();
+	void draw() const override;
 
 	void Debug_Update();
 

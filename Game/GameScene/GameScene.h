@@ -6,7 +6,6 @@
 #include "Engine/Application/Scene/BaseScene.h"
 
 #include "Engine/Module/Camera/Camera3D.h"
-#include "Engine/Module/GameObject/GameObject.h"
 #include "Game/GameScene/Enemy/BaseEnemy.h"
 
 #include "Game/GameScene/Player/Player.h"

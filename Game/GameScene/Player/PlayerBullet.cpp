@@ -1,68 +1,74 @@
 #include "PlayerBullet.h"
-#include "Game/GameScene/Player/Player.h"
+
+#include "Engine/Math/Definition.h"
 #include "Engine/Application/GameTimer/GameTimer.h"
-#include "imgui.h"
 
-void PlayerBullet::Initialize(const Vector3& position)
-{
-	bulletObject_ = std::make_unique<GameObject>();
-	bulletObject_->reset_object("Sphere.obj");
-	bulletObject_->get_transform().set_scale({ 0.2f,0.2f,0.2f });
-	bulletObject_->get_transform().set_translate(position);
+#include "Game/WorldSystemValue.h"
 
+void PlayerBullet::initialize(const WorldInstance& parent) {
+	reset_object("Sphere.obj");
 	// 脈拍の速さ
-	heartbeatSpeed_ = 0.0f;
+	hartbeatTimer = 0.0f;
 	// スケールの振幅
 	heartbeatAmplitude_ = 0.05f;
 	// 基本のスケール値
 	baseScale_ = 0.2f;
+
+	this->set_parent(parent.get_hierarchy());
 }
 
-void PlayerBullet::Update(const Vector3& position)
-{
+void PlayerBullet::update() {
+	constexpr float hartbeatCycle = 0.5f;
+
 	// 脈拍のようなスケール変化
-	heartbeatSpeed_ += 0.1f;
+	hartbeatTimer += GameTimer::DeltaTime();
+	hartbeatTimer = std::fmod(hartbeatTimer, hartbeatCycle);
+	float parametric = hartbeatTimer / hartbeatCycle;
 	// 時間に基づいてスケールが脈打つように変化する
-	float scaleValue = baseScale_ + heartbeatAmplitude_ * sinf(heartbeatSpeed_);
+	float scaleValue = baseScale_ + heartbeatAmplitude_ * (parametric - std::floor(parametric));
 	Vector3 scale = { scaleValue, scaleValue, scaleValue };
-	bulletObject_->get_transform().set_scale(scale);
+	get_transform().set_scale(scale);
 
 	// 攻撃処理が始まってなければプレイヤーの周りを回転
-	if (!isAttack_) {
-		Vector3 translate = Vector3{
-			cosf(theta_) * 1.5f,
-			0.0f,
-			sinf(theta_) * 1.5f
-		};
-		theta_ += 0.01f;
-
-		bulletObject_->get_transform().set_translate(translate + position);
+	constexpr float angleLapCycle = 6.0f;
+	angleTimer += GameTimer::DeltaTime();
+	angleTimer = std::fmod(angleTimer, angleLapCycle);
+	parametric = angleTimer / angleLapCycle;
+	switch (state) {
+	case PlayerBullet::State::Follow:
+	{
+		angle = parametric * PI2;
+		Vector3 translate = distanceOffset * Quaternion::AngleAxis(CVector3::BASIS_Y, angle + angleOffset);
+		get_transform().set_translate(translate);
+		break;
 	}
-	//攻撃処理がされたらプレイヤーのVelocityに飛んでいく
-	if (isAttack_) {
-		float speed = 10.0f;
-		Vector3 translate = bulletObject_->get_transform().get_translate();
-
-		translate.x += velocity_.x * speed * GameTimer::DeltaTime();
-		translate.z += velocity_.y * speed * GameTimer::DeltaTime();
-
-		bulletObject_->get_transform().set_translate(translate);
+	case PlayerBullet::State::Attacking:
+		velocity += GRAVITY * GameTimer::DeltaTime();
+		transform.plus_translate(velocity * GameTimer::DeltaTime());
+		if (transform.get_translate().y <= 0) {
+			state = State::OnGround;
+			transform.set_translate_y(0);
+		}
+		break;
+	case PlayerBullet::State::OnGround:
+		// どうしようね～～～
+		break;
+	case PlayerBullet::State::Attach:
+		
+		break;
+	case PlayerBullet::State::Comeback:
+		break;
+	default:
+		break;
 	}
 }
 
-void PlayerBullet::Begin_Rendering()
-{
-	bulletObject_->begin_rendering();
-}
-
-void PlayerBullet::Draw()
-{
-	bulletObject_->draw();
-}
-
-void PlayerBullet::Debug_Update()
-{
-	ImGui::Begin("Bullet");
-	bulletObject_->debug_gui();
-	ImGui::End();
+void PlayerBullet::attack(const Vector3& worldPosition, const Vector3& velocityDirection) {
+	hierarchy.reset_parent();
+	float StartOffset = 1.5f;
+	float Speed = 6.0f;
+	transform.set_translate(worldPosition + velocityDirection * StartOffset + Vector3{0,0.5f,0});
+	velocity = velocityDirection * Speed;
+	velocity.y = 1.0f;
+	state = State::Attacking;
 }

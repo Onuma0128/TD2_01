@@ -7,86 +7,79 @@
 
 #include "imgui.h"
 
-Player::Player()
-{
-	Initialize();
+Player::Player() {
+	initialize();
 }
 
-void Player::Initialize()
-{
+void Player::initialize() {
+	// 描画オブジェクトを設定
 	reset_object("Sphere.obj");
 
 	// 弾の初期化
 	// 弾の数を指定
 	uint32_t bulletIndex = 10;
 	for (uint32_t i = 0; i < bulletIndex; ++i) {
-		float theta = PI2 * (i + 1) / bulletIndex;
-		Vector3 offset = Vector3{ std::cos(theta), 0.0f, std::sin(theta), };
-		Vector3 bulletPos = world_position() + offset * 1.5f;
 		std::unique_ptr<PlayerBullet> bullet = std::make_unique<PlayerBullet>();
-		bullet->Initialize(bulletPos);
-		bullet->SetTheta(PI2 * ((float)i + 1) / (float)bulletIndex);
-		bullets_.push_back(std::move(bullet));
+		float parametric = static_cast<float>(i) / bulletIndex;
+		bullet->initialize(*this);
+		bullet->set_angle_offset(PI2 * parametric);
+		bullets_.emplace_back(std::move(bullet));
 	}
 }
 
-void Player::Update()
-{
+void Player::update() {
 	Move();
 
 	Attack();
 
 	// 弾の座標更新
 	for (auto& bullet : bullets_) {
-		bullet->Update(world_position());
+		bullet->update();
 	}
 }
 
-void Player::Begin_Rendering()
-{
-	begin_rendering();
+void Player::begin_rendering() noexcept {
+	GameObject::begin_rendering();
 
 	for (auto& bullet : bullets_) {
-		bullet->Begin_Rendering();
+		bullet->begin_rendering();
 	}
 }
 
-void Player::Draw() {
+void Player::draw() const {
 	GameObject::draw();
 
 	for (auto& bullet : bullets_) {
-		bullet->Draw();
+		bullet->draw();
 	}
 }
 
-void Player::Debug_Update()
-{
+void Player::Debug_Update() {
 	ImGui::Begin("Player");
 	GameObject::debug_gui();
 	ImGui::End();
-
-	for (auto& bullet : bullets_) {
-		//bullet->Debug_Update();
-	}
 }
 
-void Player::Move()
-{
+void Player::Move() {
 	float speed = 3.0f;
 	input = CVector2::ZERO;
 	Vector2 input = Input::StickL();
 	velocity = { input.x, 0, input.y };
 
-	get_transform().plus_translate(velocity * speed * GameTimer::DeltaTime());
+	transform.plus_translate(velocity * speed * GameTimer::DeltaTime());
+
+	if (velocity != CVector3::ZERO) {
+		const Quaternion& quaternion = transform.get_quaternion();
+		const Quaternion target = Quaternion::LookForward(velocity.normalize());
+		transform.set_rotate(Quaternion::Slerp(quaternion, target, 0.2f));
+	}
 }
 
-void Player::Attack()
-{
+void Player::Attack() {
 	if (Input::IsTriggerPad(PadID::A)) {
 		for (auto& bullet : bullets_) {
-			if (bullet->GetIsAttack() == false) {
-				bullet->SetIsAttack(true);
-				//bullet->SetVelocity(velocity_);
+			if (bullet->get_state() == PlayerBullet::State::Follow) {
+				bullet->attack(world_position(), CVector3::BASIS_Z * transform.get_quaternion());
 				break;
 			}
 		}

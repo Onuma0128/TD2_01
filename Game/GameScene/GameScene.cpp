@@ -74,14 +74,14 @@ void GameScene::begin()
 void GameScene::update()
 {
 	//camera3D_->update();
-	player_->Update();
+	player_->update();
 	enemy->update();
 }
 
 void GameScene::begin_rendering()
 {
 	camera3D_->update_matrix();
-	player_->Begin_Rendering();
+	player_->begin_rendering();
 	enemy->begin_rendering();
 }
 
@@ -94,7 +94,7 @@ void GameScene::draw() const
 {
 	RenderPathManager::BeginFrame();
 	camera3D_->set_command(1);
-	player_->Draw();
+	player_->draw();
 #ifdef _DEBUG
 	camera3D_->debug_draw();
 #endif // _DEBUG

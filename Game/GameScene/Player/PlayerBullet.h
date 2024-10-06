@@ -1,47 +1,47 @@
 #pragma once
-#include <memory>
 
 #include "Engine/Module/GameObject/GameObject.h"
-#include "Engine/Module/Camera/Camera3D.h"
 
 class Player;
 
-class PlayerBullet : public GameObject
-{
+class PlayerBullet : public GameObject {
 public:
+	enum class State {
+		Follow,
+		Attacking,
+		OnGround,
+		Attach,
+		Comeback,
+	};
 
-	void Initialize(const Vector3& position);
+public:
+	void initialize(const WorldInstance& parent);
 
-	void Update(const Vector3& position);
+	void update() override;
 
-	void Begin_Rendering();
+	void attack(const Vector3& worldPosition, const Vector3& velocityDirection);
 
-	void Draw();
-
-	void Debug_Update();
-
-
-	void SetVelocity(const Vector2& velocity) { velocity_ = velocity; }
-	void SetTheta(float theta) { theta_ = theta; }
-
-	bool GetIsAttack() { return isAttack_; }
-	void SetIsAttack(bool isAttack) { isAttack_ = isAttack; }
+public:
+	void set_angle_offset(float offset) { angleOffset = offset; };
+	State get_state() const { return state; };
 
 private:
-
-	std::unique_ptr<GameObject> bulletObject_;
-	Vector2 velocity_{};
+	Vector3 velocity;
 
 	// 脈拍の速さ
-	float heartbeatSpeed_;
+	float hartbeatTimer;
 	// スケールの振幅
 	float heartbeatAmplitude_;
 	// 基本のスケール値
 	float baseScale_;
 	// プレイヤーの周りを回転
-	float theta_ = 0;
+	float angleTimer= 0;
+	float angle= 0;
+
+	float angleOffset;
+	Vector3 distanceOffset{ 0,0,1.5f };
 
 	// 攻撃したか
-	bool isAttack_ = false;
+	State state;
 };
 

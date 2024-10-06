@@ -764,6 +764,9 @@
     <ClInclude Include="Game\GameScene\GameScene.h">
       <Filter>Game\Scene\GameScene</Filter>
     </ClInclude>
+    <ClInclude Include="Game\WorldSystemValue.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="EngineResources\HLSL\FullscreenShader.hlsl">
