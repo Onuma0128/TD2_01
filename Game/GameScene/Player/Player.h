@@ -29,9 +29,8 @@ public:
 
 
 private:
-
-	std::unique_ptr<GameObject> playerObject_ = nullptr;
-	Vector2 velocity_ = { 0,1 };
+	Vector2 input = CVector2::ZERO;
+	Vector3 velocity = CVector3::ZERO;
 
 	std::vector<std::unique_ptr<PlayerBullet>> bullets_;
 

@@ -113,5 +113,9 @@ void GameScene::debug_update()
 	camera3D_->debug_gui();
 	ImGui::End();
 
+	ImGui::Begin("GameTimer");
+	GameTimer::DebugGui();
+	ImGui::End();
+
 	player_->Debug_Update();
 }
