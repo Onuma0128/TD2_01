@@ -1,8 +1,6 @@
 #include "DSVDescriptorHeap.h"
 
-#include <format>
-
-#include "Engine/Utility/Utility.h"
+#include "Engine/Debug/Output.h"
 #include "Engine/DirectX/DirectXDevice/DirectXDevice.h"
 
 // ダブルバッファのみで使用するため2
@@ -20,7 +18,7 @@ void DSVDescriptorHeap::Initialize() {
 
 const std::uint32_t DSVDescriptorHeap::UseHeapIndex() noexcept {
 	auto useIndex = GetInstance().use_heap_index();
-	Log(std::format("[DSVDescriptorHeap] Use RSV index. Index-\'{}\'\n", useIndex));
+	Console("[DSVDescriptorHeap] Use RSV index. Index-\'{}\'\n", useIndex);
 	return useIndex;
 }
 
@@ -29,7 +27,7 @@ const D3D12_CPU_DESCRIPTOR_HANDLE DSVDescriptorHeap::GetCPUHandle(std::uint32_t 
 }
 
 void DSVDescriptorHeap::ReleaseHeapIndex(std::uint32_t index) {
-	Log(std::format("[DSVDescriptorHeap] Release RSV index. Index-\'{}\'\n", index));
+	Console("[DSVDescriptorHeap] Release RSV index. Index-\'{}\'\n", index);
 	GetInstance().release_heap(index);
 }
 

@@ -1,10 +1,9 @@
 #include "AudioResource.h"
 
 #include <fstream>
-#include <format>
 #include <array>
 
-#include <Engine/Utility/Utility.h>
+#include "Engine/Debug/Output.h"
 
 bool IsEqualArrayChunkId(const std::array<char, 4>& read, std::string&& id) {
 	return std::strncmp(read.data(), id.c_str(), 4) == 0;
@@ -25,7 +24,7 @@ bool AudioResource::load(const std::string& directoryPath, const std::string& fi
 		WAVEFORMATEXTENSIBLE format;
 	};
 
-	Log("[AudioResource] Start load .wave file. file-\'" + directoryPath + "/" + fileName + "\'\n");
+	Console("[AudioResource] Start load .wave file. file-\'{}/{}\'\n", directoryPath, fileName);
 
 	// ファイル読み込み
 	std::ifstream file;
@@ -33,7 +32,7 @@ bool AudioResource::load(const std::string& directoryPath, const std::string& fi
 
 	// 失敗したら何もしない
 	if (!file.is_open()) {
-		Log(std::format("[AudioResource] Can't open file. \'{}\'\n", fileName));
+		Console("[AudioResource] Can't open file. \'{}\'\n", fileName);
 		return false;
 	}
 
@@ -43,13 +42,13 @@ bool AudioResource::load(const std::string& directoryPath, const std::string& fi
 
 	// RIFFじゃなかったらエラー処理
 	if (!IsEqualArrayChunkId(riff.header.id, "RIFF")) {
-		Log(std::format("[AudioResource] File \'{}\' is not RIFF chunk.\n", fileName));
+		Console("[AudioResource] File \'{}\' is not RIFF chunk.\n", fileName);
 		return false;
 	}
 
 	// WAVEフォーマットじゃなかったらエラー処理
 	if (!IsEqualArrayChunkId(riff.type, "WAVE")) {
-		Log(std::format("[AudioResource] File \'{}\' is not .WAVE format_.\n", fileName));
+		Console("[AudioResource] File \'{}\' is not .WAVE format_.\n", fileName);
 		return false;
 	}
 
@@ -95,7 +94,7 @@ bool AudioResource::load(const std::string& directoryPath, const std::string& fi
 
 	// dataチャンクがなかったらエラー
 	if (!IsEqualArrayChunkId(data.id, "data")) {
-		Log(std::format("[AudioResource] \'data\' chunk is not found. File-\'{}/{}\'\n", directoryPath, fileName));
+		Console("[AudioResource] \'data\' chunk is not found. File-\'{}/{}\'\n", directoryPath, fileName);
 		return false;
 	}
 
@@ -106,7 +105,7 @@ bool AudioResource::load(const std::string& directoryPath, const std::string& fi
 	bufferSize_ = data.size;
 	file.close();
 
-	Log("[AudioResource] Success\n");
+	Console("[AudioResource] Success\n");
 	return true;
 }
 

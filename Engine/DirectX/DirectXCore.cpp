@@ -1,6 +1,5 @@
 #include "Engine/DirectX/DirectXCore.h"
 
-#include <format>
 #include <memory>
 
 #include <dxgidebug.h>
@@ -12,7 +11,7 @@
 #include "Engine/Debug/ImGuiManager/ImGuiManager.h"
 #endif // _DEBUG
 
-#include "Engine/Utility/Utility.h"
+#include "Engine/Debug/Output.h"
 #include "Engine/Utility/BackgroundLoader/BackgroundLoader.h"
 #include "Engine/Module/TextureManager/TextureManager.h"
 #include "Engine/Module/PolygonMesh/PolygonMeshManager.h"
@@ -138,7 +137,7 @@ void DirectXCore::initialize() {
 	gridMesh = std::make_unique<GameObject>("Grid.obj");
 
 	// オールコンプリート
-	Log("[Engine] Complete create DirectXObjects\n");
+	Console("[Engine] Complete create DirectXObjects\n");
 }
 
 void DirectXCore::begin_frame() {
@@ -170,6 +169,9 @@ void DirectXCore::end_frame() {
 }
 
 #ifdef _DEBUG
+
+#include <format>
+
 void DirectXCore::show_debug_tools() {
 	ImGuiID debugDock = ImGui::GetID("DebugDock");
 

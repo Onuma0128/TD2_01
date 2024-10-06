@@ -1,11 +1,9 @@
 #include "RenderPathManager.h"
 
-#include <format>
-
 #include "Engine/DirectX/DirectXSwapChain/DirectXSwapChain.h"
 #include "Engine/Render/RenderNode/Object3DNode/Object3DNode.h"
 #include "Engine/Render/RenderPath/RenderPath.h"
-#include "Engine/Utility/Utility.h"
+#include "Engine/Debug/Output.h"
 
 RenderPathManager::RenderPathManager() = default;
 
@@ -24,18 +22,18 @@ void RenderPathManager::Initialize() {
 
 void RenderPathManager::RegisterPath(const std::string& name, RenderPath&& path) {
 	if (!GetInstance().renderingPath.contains(name)) {
-		Log(std::format("[RenderPathManager] Register path. Name-\'{}\' Address-\'{}\'\n", name, (void*)&path));
+		Console("[RenderPathManager] Register path. Name-\'{}\' Address-\'{}\'\n", name, (void*)&path);
 		GetInstance().renderingPath.emplace(std::move(name), std::move(path));
 	}
 	else {
-		Log(std::format("[RenderPathManager] Registering aleady used name. Name-\'{}\'\n", name));
+		Console("[RenderPathManager] Registering aleady used name. Name-\'{}\'\n", name);
 	}
 }
 
 void RenderPathManager::UnregisterPath(const std::string& name) {
 	// DefaultPathを削除すると色々まずいのでさせない
 	if (name == "Default") {
-		Log("[RenderPathManager] Don't Unregister path \'Default\'.");
+		Console("[RenderPathManager] Don't Unregister path \'Default\'.");
 		return;
 	}
 	auto&& instance = GetInstance();
@@ -44,19 +42,19 @@ void RenderPathManager::UnregisterPath(const std::string& name) {
 	if (instance.renderingPath.contains(name)) {
 		// 正常に削除されるのでログを出す
 		deletePath = &instance.renderingPath.at(name);
-		Log(std::format("[RenderPathManager] Unregisterd path. Name-\'{}\' Address-\'{}\'\n", name, (void*)deletePath));
+		Console("[RenderPathManager] Unregisterd path. Name-\'{}\' Address-\'{}\'\n", name, (void*)deletePath);
 	}
 	// 削除
 	instance.renderingPath.erase(name);
 	// 削除したpathが今のPathと同じだった場合、delete済みポインタ参照が発生する場合があるので、強制的にDefaultにさせる
 	if (deletePath == instance.nowPath) {
 		SetPath("Default");
-		Log(std::format("[RenderPathManager] The path used has been unregistered. Current path is set to \'Default\'\n"));
+		Console("[RenderPathManager] The path used has been unregistered. Current path is set to \'Default\'\n");
 	}
 }
 
 void RenderPathManager::SetPath(const std::string& name) {
-	Log(std::format("[RenderPathManager] Set current render path. Name-\'{}\'\n", name));
+	Console("[RenderPathManager] Set current render path. Name-\'{}\'\n", name);
 	auto& instance = GetInstance();
 	instance.nowPath = &instance.renderingPath.at(name);
 	instance.nowPath->use();

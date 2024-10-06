@@ -40,9 +40,6 @@
     <Filter Include="Engine\HLSL\NormalColor">
       <UniqueIdentifier>{e2029ee5-c81a-42a8-984a-0b811b891152}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MainGame">
-      <UniqueIdentifier>{9c839059-164e-4b43-94f7-24ed6b8e0ded}</UniqueIdentifier>
-    </Filter>
     <Filter Include="TestProgram">
       <UniqueIdentifier>{7679c345-a15e-4a48-8c87-5ab6bea6a38e}</UniqueIdentifier>
     </Filter>
@@ -253,16 +250,31 @@
     <Filter Include="Engine\Module\WorldInstance">
       <UniqueIdentifier>{a00cae3f-2bb1-4881-a714-2b05bfb9d42d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MainGame\Scene">
+    <Filter Include="Game">
+      <UniqueIdentifier>{9c839059-164e-4b43-94f7-24ed6b8e0ded}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Debug\Output">
+      <UniqueIdentifier>{0aef4221-0958-4fdb-be97-cdb11642a887}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Utility\ConvertString">
+      <UniqueIdentifier>{54e423b1-e284-448e-998b-13f187255deb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Utility\SmartPointer">
+      <UniqueIdentifier>{378b6594-e092-4845-b0f7-185254b66c03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Utility\ComPtr">
+      <UniqueIdentifier>{20e07162-3bdd-43e4-b978-ca0158d2786a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Scene">
       <UniqueIdentifier>{bfd5fdf8-a6a3-4414-a54d-556be72ba3b0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MainGame\Scene\GameScene">
+    <Filter Include="Game\Scene\GameScene">
       <UniqueIdentifier>{d5a67fac-6b12-4461-9f92-0de10c685149}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MainGame\Scene\GameScene\Enemy">
+    <Filter Include="Game\Scene\GameScene\Enemy">
       <UniqueIdentifier>{b84a95a5-7b14-4966-a4c2-a1030024e6d3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MainGame\Scene\GameScene\Player">
+    <Filter Include="Game\Scene\GameScene\Player">
       <UniqueIdentifier>{1ebeb71e-a634-4e9f-b962-a407cd50604e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -317,9 +329,6 @@
     </ClCompile>
     <ClCompile Include="Engine\DirectX\DirectXResourceObject\ConstantBuffer\TransformMatrix\TransformMatrix.cpp">
       <Filter>Engine\DirectX\ResourceObject\ConstantBuffer\TransformMatrix</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Utility.cpp">
-      <Filter>Engine\Utility</Filter>
     </ClCompile>
     <ClCompile Include="Engine\DirectX\DirectXDescriptorHeap\RTVDescriptorHeap\RTVDescriptorHeap.cpp">
       <Filter>Engine\DirectX\DescriptorHeap\RTVDescriptorHeap</Filter>
@@ -480,20 +489,26 @@
     <ClCompile Include="Engine\Module\WorldInstance\WorldInstance.cpp">
       <Filter>Engine\Module\WorldInstance</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Utility\ConvertString.cpp">
+      <Filter>Engine\Utility\ConvertString</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Debug\Output.cpp">
+      <Filter>Engine\Debug\Output</Filter>
+    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameScene\Enemy\BaseEnemy.cpp">
-      <Filter>MainGame\Scene\GameScene\Enemy</Filter>
+      <Filter>Game\Scene\GameScene\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameScene\Player\Player.cpp">
-      <Filter>MainGame\Scene\GameScene\Player</Filter>
+      <Filter>Game\Scene\GameScene\Player</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameScene\Player\PlayerBullet.cpp">
-      <Filter>MainGame\Scene\GameScene\Player</Filter>
+      <Filter>Game\Scene\GameScene\Player</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameScene\GameScene.cpp">
-      <Filter>MainGame\Scene\GameScene</Filter>
+      <Filter>Game\Scene\GameScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -556,9 +571,6 @@
     </ClInclude>
     <ClInclude Include="Engine\DirectX\DirectXResourceObject\ConstantBuffer\TransformMatrix\TransformMatrix.h">
       <Filter>Engine\DirectX\ResourceObject\ConstantBuffer\TransformMatrix</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Utility.h">
-      <Filter>Engine\Utility</Filter>
     </ClInclude>
     <ClInclude Include="Engine\DirectX\DirectXDescriptorHeap\RTVDescriptorHeap\RTVDescriptorHeap.h">
       <Filter>Engine\DirectX\DescriptorHeap\RTVDescriptorHeap</Filter>
@@ -731,17 +743,26 @@
     <ClInclude Include="Engine\Module\WorldInstance\WorldInstance.h">
       <Filter>Engine\Module\WorldInstance</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Utility\SmartPointer.h">
+      <Filter>Engine\Utility\SmartPointer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Debug\Output.h">
+      <Filter>Engine\Debug\Output</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Utility\ConvertString.h">
+      <Filter>Engine\Utility\ConvertString</Filter>
+    </ClInclude>
     <ClInclude Include="Game\GameScene\Enemy\BaseEnemy.h">
-      <Filter>MainGame\Scene\GameScene\Enemy</Filter>
+      <Filter>Game\Scene\GameScene\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameScene\Player\Player.h">
-      <Filter>MainGame\Scene\GameScene\Player</Filter>
+      <Filter>Game\Scene\GameScene\Player</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameScene\Player\PlayerBullet.h">
-      <Filter>MainGame\Scene\GameScene\Player</Filter>
+      <Filter>Game\Scene\GameScene\Player</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameScene\GameScene.h">
-      <Filter>MainGame\Scene\GameScene</Filter>
+      <Filter>Game\Scene\GameScene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

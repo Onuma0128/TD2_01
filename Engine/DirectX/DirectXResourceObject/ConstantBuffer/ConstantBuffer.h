@@ -4,7 +4,7 @@
 #include <format>
 
 #include "Engine/DirectX/DirectXResourceObject/DirectXResourceObject.h"
-#include "Engine/Utility/Utility.h"
+#include "Engine/Utility/ConvertString.h"
 
 template<typename T>
 class ConstantBuffer : public DirectXResourceObject {
@@ -60,7 +60,8 @@ inline T* const ConstantBuffer<T>::get_data() noexcept {
 
 template<typename T>
 inline void ConstantBuffer<T>::unmap() {
-	if (resource) {
+	if (data) {
 		resource->Unmap(0, nullptr);
+		data = nullptr;
 	}
 }
