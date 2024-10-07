@@ -166,9 +166,6 @@
     <Filter Include="Engine\Application\Scene">
       <UniqueIdentifier>{a652764d-1091-4844-a8c3-ed92140a958e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Application\GameTimer">
-      <UniqueIdentifier>{aa787078-d9a9-4d2f-974b-8632c343151e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Debug">
       <UniqueIdentifier>{5ec78aaa-b6d4-4237-a97e-50ca04642a4e}</UniqueIdentifier>
     </Filter>
@@ -264,6 +261,12 @@
     </Filter>
     <Filter Include="Engine\Utility\ComPtr">
       <UniqueIdentifier>{20e07162-3bdd-43e4-b978-ca0158d2786a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Application\WorldClock">
+      <UniqueIdentifier>{aa787078-d9a9-4d2f-974b-8632c343151e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Module\Behavior">
+      <UniqueIdentifier>{edd14c29-1f65-49c3-a78a-a0345e98720a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\Scene">
       <UniqueIdentifier>{bfd5fdf8-a6a3-4414-a54d-556be72ba3b0}</UniqueIdentifier>
@@ -444,9 +447,6 @@
     <ClCompile Include="Engine\Module\Transform3D\Transform3D.cpp">
       <Filter>Engine\Module\Transform3D</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Application\GameTimer\GameTimer.cpp">
-      <Filter>Engine\Application\GameTimer</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Application\Scene\BaseScene.cpp">
       <Filter>Engine\Application\Scene</Filter>
     </ClCompile>
@@ -494,6 +494,12 @@
     </ClCompile>
     <ClCompile Include="Engine\Debug\Output.cpp">
       <Filter>Engine\Debug\Output</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Application\WorldClock\WorldClock.cpp">
+      <Filter>Engine\Application\WorldClock</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Module\Behavior\Behavior.cpp">
+      <Filter>Engine\Module\Behavior</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
@@ -692,9 +698,6 @@
     <ClInclude Include="Engine\Module\Transform3D\Transform3D.h">
       <Filter>Engine\Module\Transform3D</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Application\GameTimer\GameTimer.h">
-      <Filter>Engine\Application\GameTimer</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Application\Scene\SceneManager.h">
       <Filter>Engine\Application\Scene</Filter>
     </ClInclude>
@@ -751,6 +754,12 @@
     </ClInclude>
     <ClInclude Include="Engine\Utility\ConvertString.h">
       <Filter>Engine\Utility\ConvertString</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Application\WorldClock\WorldClock.h">
+      <Filter>Engine\Application\WorldClock</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Module\Behavior\Behavior.h">
+      <Filter>Engine\Module\Behavior</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameScene\Enemy\BaseEnemy.h">
       <Filter>Game\Scene\GameScene\Enemy</Filter>

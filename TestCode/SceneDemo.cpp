@@ -221,8 +221,8 @@ void SceneDemo::debug_update() {
 
 	AudioManager::DebugGui();
 
-	ImGui::Begin("GameTimer");
-	GameTimer::DebugGui();
+	ImGui::Begin("WorldClock");
+	WorldClock::DebugGui();
 	ImGui::End();
 
 	ImGui::Begin("CollisionManager");
