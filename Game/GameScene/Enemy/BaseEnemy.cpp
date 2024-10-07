@@ -1,6 +1,6 @@
 #include "BaseEnemy.h"
 
-#include <Engine/Application/GameTimer/GameTimer.h>
+#include <Engine/Application/WorldClock/WorldClock.h>
 
 #include "Game/GameScene/Player/Player.h"
 
@@ -78,7 +78,7 @@ void BaseEnemy::approach_update() {
 
 	// velocity算出
 	Vector3 velocity = distance.normalize_safe() * value.speed;
-	transform.plus_translate(velocity * GameTimer::DeltaTime());
+	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
 	// player方向を向く
 	//look_at(*targetPlayer);
 }

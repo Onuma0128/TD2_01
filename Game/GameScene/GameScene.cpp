@@ -114,7 +114,7 @@ void GameScene::debug_update()
 	ImGui::End();
 
 	ImGui::Begin("GameTimer");
-	GameTimer::DebugGui();
+	WorldClock::DebugGui();
 	ImGui::End();
 
 	player_->Debug_Update();

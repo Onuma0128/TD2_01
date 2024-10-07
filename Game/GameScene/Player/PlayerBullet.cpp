@@ -1,6 +1,6 @@
 #include "PlayerBullet.h"
 #include "Game/GameScene/Player/Player.h"
-#include "Engine/Application/GameTimer/GameTimer.h"
+#include "Engine/Application/WorldClock/WorldClock.h"
 #include "imgui.h"
 
 void PlayerBullet::Initialize(const Vector3& position)
@@ -43,8 +43,8 @@ void PlayerBullet::Update(const Vector3& position)
 		float speed = 10.0f;
 		Vector3 translate = bulletObject_->get_transform().get_translate();
 
-		translate.x += velocity_.x * speed * GameTimer::DeltaTime();
-		translate.z += velocity_.y * speed * GameTimer::DeltaTime();
+		translate.x += velocity_.x * speed * WorldClock::DeltaSeconds();
+		translate.z += velocity_.y * speed * WorldClock::DeltaSeconds();
 
 		bulletObject_->get_transform().set_translate(translate);
 	}

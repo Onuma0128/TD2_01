@@ -3,7 +3,7 @@
 #include "Engine/Application/Input/Input.h"
 #include "Engine/Application/Input/InputEnum.h"
 #include "Engine/Math/Definition.h"
-#include "Engine/Application/GameTimer/GameTimer.h"
+#include "Engine/Application/WorldClock/WorldClock.h"
 
 #include "imgui.h"
 
@@ -77,7 +77,7 @@ void Player::Move()
 	Vector2 input = Input::StickL();
 	velocity = { input.x, 0, input.y };
 
-	get_transform().plus_translate(velocity * speed * GameTimer::DeltaTime());
+	get_transform().plus_translate(velocity * speed * WorldClock::DeltaSeconds());
 }
 
 void Player::Attack()
