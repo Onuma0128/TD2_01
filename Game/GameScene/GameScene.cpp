@@ -26,8 +26,8 @@ void GameScene::initialize()
 	camera3D_->initialize();
 	camera3D_->set_transform({
 		CVector3::BASIS,
-		Quaternion::EulerDegree(45,0,0),
-		{0,10,-10}
+		Quaternion::EulerDegree(60,0,0),
+		{0,40,-25}
 		});
 
 	/*==================== シーン ====================*/
@@ -117,5 +117,5 @@ void GameScene::debug_update()
 	WorldClock::DebugGui();
 	ImGui::End();
 
-	player_->Debug_Update();
+	player_->debug_gui();
 }

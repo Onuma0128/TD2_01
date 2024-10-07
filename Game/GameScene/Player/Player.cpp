@@ -54,7 +54,7 @@ void Player::draw() const {
 	}
 }
 
-void Player::Debug_Update() {
+void Player::debug_gui() {
 	ImGui::Begin("Player");
 	GameObject::debug_gui();
 	ImGui::End();

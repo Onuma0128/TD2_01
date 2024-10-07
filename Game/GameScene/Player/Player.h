@@ -18,7 +18,7 @@ public:
 
 	void draw() const override;
 
-	void Debug_Update();
+	void debug_gui();
 
 	/*==================== メンバ関数 ====================*/
 
