@@ -4,6 +4,7 @@
 #include "Engine/Application/Input/InputEnum.h"
 #include "Engine/Math/Definition.h"
 #include "Engine/Application/WorldClock/WorldClock.h"
+#include "Game/GameScene/Enemy/BaseEnemy.h"
 
 #include "imgui.h"
 
@@ -28,13 +29,39 @@ void Player::initialize() {
 }
 
 void Player::update() {
-	Move();
+	switch (state_)
+	{
+	case Player::State::Move:
+		Move();
+		break;
+	case Player::State::Attack:
+		Attack();
+		break;
+	default:
+		break;
+	}
 
-	Attack();
 
 	// 弾の座標更新
-	for (auto& bullet : bullets_) {
+	for (auto it = bullets_.begin(); it != bullets_.end(); ) {
+		auto& bullet = *it;
+
+		if (bullet->get_state() == PlayerBullet::State::Follow) {
+			bullet->set_parent(this->get_hierarchy());
+		}
+		if (bullet->get_state() == PlayerBullet::State::Attach) {
+			// bullet->set_parent(enemy_->get_hierarchy());
+		}
+		bullet->set_play_translate(transform.get_translate());
 		bullet->update();
+
+		if (bullet->get_destructionCount() > 10.0f) {
+			// イテレータが無効にならないように削除後に次の要素を取得
+			it = bullets_.erase(it);
+		}
+		else {
+			++it;
+		}
 	}
 }
 
@@ -57,6 +84,8 @@ void Player::draw() const {
 void Player::debug_gui() {
 	ImGui::Begin("Player");
 	GameObject::debug_gui();
+	ImGui::Text("%f", attackFrame);
+
 	ImGui::End();
 }
 
@@ -73,15 +102,30 @@ void Player::Move() {
 		const Quaternion target = Quaternion::LookForward(velocity.normalize());
 		transform.set_rotate(Quaternion::Slerp(quaternion, target, 0.2f));
 	}
+	state_ = State::Attack;
 }
 
 void Player::Attack() {
-	if (Input::IsTriggerPad(PadID::A)) {
-		for (auto& bullet : bullets_) {
-			if (bullet->get_state() == PlayerBullet::State::Follow) {
+
+	for (auto& bullet : bullets_) {
+		// 通常攻撃(ハートを投げる)
+		if (bullet->get_state() == PlayerBullet::State::Follow && attackFrame < 1.0f) {
+			if (Input::IsReleasePad(PadID::A)) {
 				bullet->attack(world_position(), CVector3::BASIS_Z * transform.get_quaternion());
 				break;
 			}
+		}// ビート攻撃
+		else if (bullet->get_state() == PlayerBullet::State::Attach && attackFrame >= 1.0f) {
+			bullet->beatAttack();
 		}
+	}
+
+	// パッドボタンが押されているなら攻撃をする
+	if (Input::IsPressPad(PadID::A)) {
+		attackFrame += 0.02f;
+	}
+	else {
+		attackFrame = 0.0f;
+		state_ = State::Move;
 	}
 }

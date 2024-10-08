@@ -49,10 +49,11 @@ void GameScene::initialize()
 
 	/*==================== ゲームオブジェクト ====================*/
 
-	player_ = std::make_unique<Player>();
-
 	enemy = std::make_unique<BaseEnemy>();
 	enemy->initialize();
+
+	player_ = std::make_unique<Player>();
+	player_->SetEnemy(enemy.get());
 
 	BaseEnemy::targetPlayer = player_.get();
 }

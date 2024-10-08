@@ -6,8 +6,16 @@
 
 #include "Game/GameScene/Player/PlayerBullet.h"
 
+class BaseEnemy;
+
 class Player : public GameObject 
 {
+public:
+	enum class State {
+		Move,
+		Attack,
+	};
+
 public:
 	Player();
 
@@ -27,11 +35,18 @@ public:
 
 	void Attack();
 
+	void SetEnemy(BaseEnemy* enemy) { enemy_ = enemy; }
+	State get_state() const { return state_; }
+
 
 private:
 	Vector2 input = CVector2::ZERO;
 	Vector3 velocity = CVector3::ZERO;
 
-	std::vector<std::unique_ptr<PlayerBullet>> bullets_;
+	BaseEnemy* enemy_ = nullptr;
 
+	std::vector<std::unique_ptr<PlayerBullet>> bullets_;
+	float attackFrame = 0;
+
+	State state_;
 };

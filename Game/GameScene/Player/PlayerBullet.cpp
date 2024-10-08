@@ -1,6 +1,7 @@
 #include "PlayerBullet.h"
 
 #include "Engine/Math/Definition.h"
+#include "Engine/Application/Input/Input.h"
 #include "Engine/Application/WorldClock/WorldClock.h"
 
 #include "Game/WorldSystemValue.h"
@@ -13,27 +14,16 @@ void PlayerBullet::initialize(const WorldInstance& parent) {
 	heartbeatAmplitude_ = 0.05f;
 	// 基本のスケール値
 	baseScale_ = 0.2f;
+	// 地面に着いてからのタイマー
+	onGroundTimer = 0.0f;
 
 	this->set_parent(parent.get_hierarchy());
 }
 
 void PlayerBullet::update() {
-	constexpr float hartbeatCycle = 0.5f;
+	// 弾の動き
+	move();
 
-	// 脈拍のようなスケール変化
-	hartbeatTimer += WorldClock::DeltaSeconds();
-	hartbeatTimer = std::fmod(hartbeatTimer, hartbeatCycle);
-	float parametric = hartbeatTimer / hartbeatCycle;
-	// 時間に基づいてスケールが脈打つように変化する
-	float scaleValue = baseScale_ + heartbeatAmplitude_ * (parametric - std::floor(parametric));
-	Vector3 scale = { scaleValue, scaleValue, scaleValue };
-	get_transform().set_scale(scale);
-
-	// 攻撃処理が始まってなければプレイヤーの周りを回転
-	constexpr float angleLapCycle = 6.0f;
-	angleTimer += WorldClock::DeltaSeconds();
-	angleTimer = std::fmod(angleTimer, angleLapCycle);
-	parametric = angleTimer / angleLapCycle;
 	switch (state) {
 	case PlayerBullet::State::Follow:
 	{
@@ -43,24 +33,92 @@ void PlayerBullet::update() {
 		break;
 	}
 	case PlayerBullet::State::Attacking:
+
 		velocity += GRAVITY * WorldClock::DeltaSeconds();
 		transform.plus_translate(velocity * WorldClock::DeltaSeconds());
 		if (transform.get_translate().y <= 0) {
 			state = State::OnGround;
 			transform.set_translate_y(0);
 		}
+
+		// if (当たり判定が起きたら状態遷移){
+		//     state = State::Attach;
+		// }
+
 		break;
 	case PlayerBullet::State::OnGround:
-		// どうしようね～～～
+		
+		// 地面に着いてからのタイマーを増加
+		onGroundTimer += WorldClock::DeltaSeconds();
+		if (onGroundTimer >= 3.0f) {
+			// 3秒経ったらComeback状態に移行
+			state = State::Comeback;
+		}
+
 		break;
 	case PlayerBullet::State::Attach:
 
+		// 10秒カウントして10秒立ったら弾が消滅
+		destructionCount += WorldClock::DeltaSeconds();
+
+
+		break;
+	case PlayerBullet::State::BeatAttack:
+
+		// ビート攻撃をする
+		// 弾を揺らしたり動かしたりもろもろ
+
+		// ビート攻撃を止めたらAttachに戻る
+		if (Input::IsReleasePad(PadID::A)) {
+		    state = State::Attach;
+		}
+
+		// if (敵が死んだら弾を戻す){
+		//     state = State::Comeback;
+		// }
+
 		break;
 	case PlayerBullet::State::Comeback:
-		break;
-	default:
+		
+		// プレイヤーの位置に向かって移動する処理
+		Vector3 directionToPlayer = playerPos - transform.get_translate();
+		directionToPlayer.normalize();
+
+		// プレイヤーに戻る速度
+		constexpr float comebackSpeed = 5.0f;
+		transform.plus_translate(directionToPlayer * comebackSpeed * WorldClock::DeltaSeconds());
+
+		// プレイヤーに近づいたらFollow状態に戻る
+		if ((playerPos - transform.get_translate()).length() < 1.0f) {
+			state = State::Follow;
+			onGroundTimer = 0.0f;
+			destructionCount = 0.0f;
+		}
+		 
 		break;
 	}
+}
+
+void PlayerBullet::move()
+{
+	constexpr float hartbeatCycle = 0.5f;
+
+	// 脈拍のようなスケール変化
+	hartbeatTimer += WorldClock::DeltaSeconds();
+	hartbeatTimer = std::fmod(hartbeatTimer, hartbeatCycle);
+	parametric = hartbeatTimer / hartbeatCycle;
+	// 時間に基づいてスケールが脈打つように変化する
+	float scaleValue = baseScale_ + heartbeatAmplitude_ * (parametric - std::floor(parametric));
+	Vector3 scale = { scaleValue, scaleValue, scaleValue };
+	if (state == State::Follow) {
+		get_transform().set_scale(scale);
+	}
+
+	// 攻撃処理が始まってなければプレイヤーの周りを回転
+	constexpr float angleLapCycle = 6.0f;
+	angleTimer += WorldClock::DeltaSeconds();
+	angleTimer = std::fmod(angleTimer, angleLapCycle);
+	parametric = angleTimer / angleLapCycle;
 }
 
 void PlayerBullet::attack(const Vector3& worldPosition, const Vector3& velocityDirection) {
@@ -71,4 +129,9 @@ void PlayerBullet::attack(const Vector3& worldPosition, const Vector3& velocityD
 	velocity = velocityDirection * Speed;
 	velocity.y = 1.0f;
 	state = State::Attacking;
+}
+
+void PlayerBullet::beatAttack()
+{
+	state = State::BeatAttack;
 }
