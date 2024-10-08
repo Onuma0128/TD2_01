@@ -2,51 +2,54 @@
 
 #include <Engine/Application/WorldClock/WorldClock.h>
 
-#include "Game/GameScene/Player/Player.h"
-
 void BaseEnemy::initialize() {
 	hitpoint = 10;
-	behaviorRequest = EnemyBehavior::Spawn;
-	behaviorInitFunc = {
+	behavior.initalize(EnemyBehavior::Spawn);
+	behavior.add_list(
+		EnemyBehavior::Spawn,
 		std::bind(&BaseEnemy::spawn_initialize, this),
+		std::bind(&BaseEnemy::spawn_update, this)
+	);
+	behavior.add_list(
+		EnemyBehavior::Approach,
 		std::bind(&BaseEnemy::approach_initialize, this),
+		std::bind(&BaseEnemy::approach_update, this)
+	);
+	behavior.add_list(
+		EnemyBehavior::Attack,
 		std::bind(&BaseEnemy::attack_initialize, this),
+		std::bind(&BaseEnemy::attack_update, this)
+		);
+	behavior.add_list(
+		EnemyBehavior::Beating,
 		std::bind(&BaseEnemy::beating_initialize, this),
+		std::bind(&BaseEnemy::beating_update, this)
+	);
+	behavior.add_list(
+		EnemyBehavior::Damaged,
 		std::bind(&BaseEnemy::damaged_initialize, this),
+		std::bind(&BaseEnemy::damaged_update, this)
+	);
+	behavior.add_list(
+		EnemyBehavior::Despawn,
 		std::bind(&BaseEnemy::despawn_initialize, this),
-	};
-	behaviorUpdateFunc = {
-		std::bind(&BaseEnemy::spawn_update, this),
-		std::bind(&BaseEnemy::approach_update, this),
-		std::bind(&BaseEnemy::attack_update, this),
-		std::bind(&BaseEnemy::beating_update, this),
-		std::bind(&BaseEnemy::damaged_update, this),
-		std::bind(&BaseEnemy::despawn_update, this),
-	};
+		std::bind(&BaseEnemy::despawn_update, this)
+	);
 	reset_object("Sphere.obj");
 }
 
 void BaseEnemy::update() {
-	// リクエストが値があるなら遷移させる
-	if (behaviorRequest.has_value()) {
-		behavior = std::move(behaviorRequest.value());
-		// 初期化処理
-		behaviorInitFunc[static_cast<int32_t>(behavior)]();
-		behaviorRequest = std::nullopt;
-	}
-
-	// 更新処理
-	behaviorUpdateFunc[static_cast<int32_t>(behavior)]();
+	behavior.update();
 }
 
 void BaseEnemy::do_beat() {
-	behaviorRequest = EnemyBehavior::Beating;
+	behavior.behavior_request(EnemyBehavior::Beating);
 }
 
 // ---------- スポーン処理 ----------
 void BaseEnemy::spawn_initialize() {
 	behaviorValue = SpwanBehaviorWork{
-		{ [&] { behaviorRequest = EnemyBehavior::Approach; }, 3 }
+		{ [&] { behavior.behavior_request(EnemyBehavior::Approach); }, 3 }
 	};
 }
 
@@ -72,7 +75,7 @@ void BaseEnemy::approach_update() {
 
 	// distanceより近かったら攻撃に移行
 	if (distance.length() <= value.attackDistance) {
-		behaviorRequest = EnemyBehavior::Attack;
+		behavior.behavior_request(EnemyBehavior::Attack);
 		return;
 	}
 
@@ -89,7 +92,7 @@ void BaseEnemy::attack_initialize() {
 	collider->get_hierarchy().set_parent(hierarchy);
 	behaviorValue = AttackBehaviorWork{
 		collider,
-		{ [&] { behaviorRequest = EnemyBehavior::Approach; }, 3 }
+		{ [&] { behavior.behavior_request(EnemyBehavior::Approach); }, 3 }
 	};
 }
 
@@ -111,14 +114,14 @@ void BaseEnemy::beating_update() {
 	BeatingBehaviorWork& value = std::get<BeatingBehaviorWork>(behaviorValue);
 
 	if (hitpoint <= 0) {
-		behaviorRequest = EnemyBehavior::Despawn;
+		behavior.behavior_request(EnemyBehavior::Despawn);
 	}
 }
 
 // ---------- 被ダメージ時処理 ----------
 void BaseEnemy::damaged_initialize() {
 	behaviorValue = DamagedBehaviorWork{
-		{ [&] { behaviorRequest = EnemyBehavior::Approach; }, 3 }
+		{ [&] { behavior.behavior_request(EnemyBehavior::Approach); }, 3 }
 	};
 
 }
@@ -128,7 +131,7 @@ void BaseEnemy::damaged_update() {
 	value.damagedTimedCall.update();
 
 	if (hitpoint <= 0) {
-		behaviorRequest = EnemyBehavior::Despawn;
+		behavior.behavior_request(EnemyBehavior::Despawn);
 	}
 }
 

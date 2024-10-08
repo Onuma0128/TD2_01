@@ -2,13 +2,11 @@
 
 #include <Engine/Module/GameObject/GameObject.h>
 
-#include <optional>
-#include <functional>
-#include <vector>
 #include <variant>
 
 #include <Engine/Utility/TimedCall/TimedCall.h>
 #include <Engine/Module/Collision/Collider/SphereCollider.h>
+#include <Engine/Module/Behavior/Behavior.h>
 
 enum class EnemyBehavior {
 	Spawn,
@@ -71,9 +69,9 @@ private: // BehaviorFunctions
 private: // Member values
 	bool isDead;
 	int32_t hitpoint; // HP
-	std::shared_ptr<SphereCollider> collider;
+	std::shared_ptr<SphereCollider> hitCollider;
 
-	EnemyBehavior behavior;
+	Behavior<EnemyBehavior> behavior;
 	std::variant<
 		SpwanBehaviorWork,
 		ApproachBehaviorWork,
@@ -82,11 +80,7 @@ private: // Member values
 		DamagedBehaviorWork,
 		DespawnBehaviorWork
 	> behaviorValue;
-	std::optional<EnemyBehavior> behaviorRequest;
-
-	std::vector<std::function<void(void)>> behaviorUpdateFunc;
-	std::vector<std::function<void(void)>> behaviorInitFunc;
 
 public: // Static value
-	inline static const Player* targetPlayer = nullptr;
+	inline static const WorldInstance* targetPlayer = nullptr;
 };
