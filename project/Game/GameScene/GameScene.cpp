@@ -63,6 +63,7 @@ void GameScene::initialize() {
 	collisionManager->register_collider("Player", player_->get_hit_collider());
 
 	create_enemy();
+	create_enemy();
 
 	const auto& bullets = player_->get_bullets();
 	for (const std::unique_ptr<PlayerBullet>& bullet : bullets) {
@@ -157,5 +158,5 @@ void GameScene::create_enemy() {
 	newEnemy.initialize();
 	collisionManager->register_collider("EnemyHit", newEnemy.get_hit_collider());
 	collisionManager->register_collider("Beat", newEnemy.get_beat_collider());
-	collisionManager->register_collider("EnemyMelee", newEnemy.get_beat_collider());
+	collisionManager->register_collider("EnemyMelee", newEnemy.get_melee_collider());
 }

@@ -65,6 +65,11 @@ void BaseEnemy::initialize() {
 		std::bind(&BaseEnemy::down_update, this)
 	);
 	behavior.add_list(
+		EnemyBehavior::Revive,
+		std::bind(&BaseEnemy::revive_initialize, this),
+		std::bind(&BaseEnemy::revive_update, this)
+	);
+	behavior.add_list(
 		EnemyBehavior::Erase,
 		std::bind(&BaseEnemy::erase_initialize, this),
 		std::bind(&BaseEnemy::erase_update, this)
@@ -150,6 +155,9 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 		}
 	}
 	else if (group == "Beat") {
+		if (other == beatCollider.get()) {
+			return;
+		}
 		// 復活処理
 		if (behavior.state() == EnemyBehavior::Down) {
 			behavior.request(EnemyBehavior::Revive);
@@ -220,6 +228,7 @@ void BaseEnemy::spawn_update() {
 
 // ---------- 移動処理 ----------
 void BaseEnemy::approach_initialize() {
+	hitCollider->set_active(true);
 	behaviorValue = ApproachBehaviorWork{
 		globalValues.get_value<float>("Enemy", "StartAttackDistance"),
 		globalValues.get_value<float>("Enemy", "ApproachSpeed")
@@ -336,6 +345,7 @@ void BaseEnemy::down_update() {
 
 // ---------- 復活時処理 ----------
 void BaseEnemy::revive_initialize() {
+	hitCollider->set_active(false);
 	behaviorValue = ReviveBehaviorWork{
 		// 3秒後にApproachに戻す
 		{ [&] { behavior.request(EnemyBehavior::Approach); }, 3 }
@@ -349,6 +359,7 @@ void BaseEnemy::revive_update() {
 
 // ---------- 死亡時処理 ----------
 void BaseEnemy::erase_initialize() {
+	hitCollider->set_active(false);
 	behaviorValue = EraseBehaviorWork{
 		{ [&] { isActive = false; }, 3 }
 	};
