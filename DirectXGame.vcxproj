@@ -44,11 +44,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)externals\DirectXTex;$(SolutionDir)externals\imgui;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)externals\nlohmann;$(SolutionDir)externals\DirectXTex;$(SolutionDir)externals\imgui;$(IncludePath)</IncludePath>
     <MultiProcFXC>true</MultiProcFXC>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)externals\DirectXTex;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)externals\nlohmann;$(SolutionDir)externals\DirectXTex;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -188,6 +188,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameScene\GameScene.cpp" />
     <ClCompile Include="Game\GameScene\Player\Player.cpp" />
     <ClCompile Include="Game\GameScene\Player\PlayerBullet.cpp" />
+    <ClCompile Include="Game\GlobalValues\GlobalValues.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TestCode\SceneDemo.cpp" />
   </ItemGroup>
@@ -276,6 +277,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameScene\Player\Player.h" />
     <ClInclude Include="Game\GameScene\Player\PlayerBullet.h" />
     <ClInclude Include="Game\GameScene\Enemy\BaseEnemy.h" />
+    <ClInclude Include="Game\GlobalValues\GlobalValues.h" />
     <ClInclude Include="Game\WorldSystemValue.h" />
     <ClInclude Include="TestCode\SceneDemo.h" />
   </ItemGroup>

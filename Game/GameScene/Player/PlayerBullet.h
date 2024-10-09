@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Engine/Module/GameObject/GameObject.h"
+#include <Engine/Module/Collision/Collider/SphereCollider.h>
+
+#include "Game/GlobalValues/GlobalValues.h"
 
 class Player;
 
@@ -12,6 +15,7 @@ public:
 		OnGround,
 		Attach,
 		Comeback,
+		Lost,
 	};
 
 public:
@@ -21,14 +25,25 @@ public:
 
 	void attack(const Vector3& worldPosition, const Vector3& velocityDirection);
 
+	/// <summary>
+	/// HPが減る
+	/// </summary>
+	void lost();
+
+	std::weak_ptr<SphereCollider> get_collider() const;
+
+private:
+	void on_collision_enter(const BaseCollider* const other);
+
 public:
 	void set_angle_offset(float offset) { angleOffset = offset; };
 	State get_state() const { return state; };
+	const Vector3& get_velocity() const;
 
 private:
 	Vector3 velocity;
 
-	// 脈拍の速さ
+	// 脈拍用タイマー
 	float hartbeatTimer;
 	// スケールの振幅
 	float heartbeatAmplitude_;
@@ -43,5 +58,9 @@ private:
 
 	// 攻撃したか
 	State state;
+
+	std::shared_ptr<SphereCollider> collider;
+
+	GlobalValues& globalValues = GlobalValues::GetInstance();
 };
 

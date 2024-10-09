@@ -2,12 +2,14 @@
 
 #include "Engine/Math/Definition.h"
 #include "Engine/Application/WorldClock/WorldClock.h"
+#include <Engine/Utility/SmartPointer.h>
 
 #include "Game/WorldSystemValue.h"
+#include "Game/GameScene/Enemy/BaseEnemy.h"
 
 void PlayerBullet::initialize(const WorldInstance& parent) {
 	reset_object("Sphere.obj");
-	// 脈拍の速さ
+	// 脈拍のタイマー
 	hartbeatTimer = 0.0f;
 	// スケールの振幅
 	heartbeatAmplitude_ = 0.05f;
@@ -15,15 +17,22 @@ void PlayerBullet::initialize(const WorldInstance& parent) {
 	baseScale_ = 0.2f;
 
 	this->set_parent(parent.get_hierarchy());
+
+	collider = eps::CreateShared<SphereCollider>();
+	collider->initialize();
+	//collider->set_active(false);
+	collider->set_on_collision_enter(
+		std::bind(&PlayerBullet::on_collision_enter, this, std::placeholders::_1)
+	);
 }
 
 void PlayerBullet::update() {
-	constexpr float hartbeatCycle = 0.5f;
+	float HartbeatCycle = 0.5f;
 
 	// 脈拍のようなスケール変化
 	hartbeatTimer += WorldClock::DeltaSeconds();
-	hartbeatTimer = std::fmod(hartbeatTimer, hartbeatCycle);
-	float parametric = hartbeatTimer / hartbeatCycle;
+	hartbeatTimer = std::fmod(hartbeatTimer, HartbeatCycle);
+	float parametric = hartbeatTimer / HartbeatCycle;
 	// 時間に基づいてスケールが脈打つように変化する
 	float scaleValue = baseScale_ + heartbeatAmplitude_ * (parametric - std::floor(parametric));
 	Vector3 scale = { scaleValue, scaleValue, scaleValue };
@@ -58,6 +67,8 @@ void PlayerBullet::update() {
 		break;
 	case PlayerBullet::State::Comeback:
 		break;
+	case PlayerBullet::State::Lost:
+		break;
 	default:
 		break;
 	}
@@ -70,5 +81,33 @@ void PlayerBullet::attack(const Vector3& worldPosition, const Vector3& velocityD
 	transform.set_translate(worldPosition + velocityDirection * StartOffset + Vector3{ 0,0.5f,0 });
 	velocity = velocityDirection * Speed;
 	velocity.y = 1.0f;
+	//collider->set_active(true);
 	state = State::Attacking;
+}
+
+const Vector3& PlayerBullet::get_velocity() const {
+	return velocity;
+}
+
+void PlayerBullet::lost() {
+	state = State::Lost;
+}
+
+std::weak_ptr<SphereCollider> PlayerBullet::get_collider() const {
+	return collider;
+}
+
+void PlayerBullet::on_collision_enter(const BaseCollider* const other) {
+	const std::string& group = other->group();
+	if (group == "Enemy") {
+		// 
+		//const WorldInstance* enemy = other->get_parent_address(); 
+		const WorldInstance* enemy = nullptr; // 未実装のため一旦nullptr
+		if (enemy) {
+			Vector3 worldPosition = world_position();
+			Vector3 translate = Transform3D::Homogeneous(worldPosition, enemy->world_matrix());
+			set_parent(enemy->get_hierarchy());
+			transform.set_translate(translate);
+		}
+	}
 }

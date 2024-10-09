@@ -1,9 +1,10 @@
 #include "Player.h"
 
-#include "Engine/Application/Input/Input.h"
-#include "Engine/Application/Input/InputEnum.h"
-#include "Engine/Math/Definition.h"
-#include "Engine/Application/WorldClock/WorldClock.h"
+#include <Engine/Application/Input/Input.h>
+#include <Engine/Application/Input/InputEnum.h>
+#include <Engine/Math/Definition.h>
+#include <Engine/Application/WorldClock/WorldClock.h>
+#include <Engine/Utility/SmartPointer.h>
 
 #include "imgui.h"
 
@@ -12,19 +13,30 @@ Player::Player() {
 }
 
 void Player::initialize() {
+	globalValues.add_value<int>("Enemy", "BeatingDamage", 20);
+	
+	globalValues.add_value<int>("Player", "NumBullets", 10);
+
 	// 描画オブジェクトを設定
 	reset_object("Sphere.obj");
 
 	// 弾の初期化
 	// 弾の数を指定
-	uint32_t bulletIndex = 10;
-	for (uint32_t i = 0; i < bulletIndex; ++i) {
+	uint32_t numBullets = globalValues.get_value<int>("Player", "NumBullets");
+	for (uint32_t i = 0; i < numBullets; ++i) {
 		std::unique_ptr<PlayerBullet> bullet = std::make_unique<PlayerBullet>();
-		float parametric = static_cast<float>(i) / bulletIndex;
+		float parametric = static_cast<float>(i) / numBullets;
 		bullet->initialize(*this);
 		bullet->set_angle_offset(PI2 * parametric);
 		bullets_.emplace_back(std::move(bullet));
 	}
+
+	hitCollider = eps::CreateShared<SphereCollider>();
+	hitCollider->initialize();
+	hitCollider->set_parent(hierarchy);
+	hitCollider->set_on_collision_enter(
+		std::bind(&Player::OnCollisionCallBack, this, std::placeholders::_1)
+	);
 }
 
 void Player::update() {
@@ -80,6 +92,25 @@ void Player::Attack() {
 		for (auto& bullet : bullets_) {
 			if (bullet->get_state() == PlayerBullet::State::Follow) {
 				bullet->attack(world_position(), CVector3::BASIS_Z * transform.get_quaternion());
+				break;
+			}
+		}
+	}
+}
+
+std::weak_ptr<SphereCollider> Player::get_hit_collider() const {
+	return hitCollider;
+}
+
+const std::list<std::unique_ptr<PlayerBullet>>& Player::get_bullets() const {
+	return bullets_;
+}
+
+void Player::OnCollisionCallBack(const BaseCollider* const other) {
+	if (other->group() == "EnemyMelee") {
+		for (auto& bullet : bullets_) {
+			if (bullet->get_state() == PlayerBullet::State::Follow) {
+				bullet->lost();
 				break;
 			}
 		}
