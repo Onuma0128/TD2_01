@@ -1,10 +1,13 @@
 #pragma once
 
 #include "Engine/Module/GameObject/GameObject.h"
+#include <Engine/Module/Collision/Collider/SphereCollider.h>
 
 #include <memory>
 
 #include "Game/GameScene/Player/PlayerBullet.h"
+
+#include "Game/GlobalValues/GlobalValues.h"
 
 class BaseEnemy;
 
@@ -37,6 +40,12 @@ public:
 
 	void SetEnemy(BaseEnemy* enemy) { enemy_ = enemy; }
 	State get_state() const { return state_; }
+public:
+	std::weak_ptr<SphereCollider> get_hit_collider() const;
+	const std::vector<std::unique_ptr<PlayerBullet>>& get_bullets() const;
+
+private:
+	void OnCollisionCallBack(const BaseCollider* const other);
 
 
 private:
@@ -47,6 +56,8 @@ private:
 
 	std::vector<std::unique_ptr<PlayerBullet>> bullets_;
 	float attackFrame = 0;
+	std::shared_ptr<SphereCollider> hitCollider;
 
 	State state_;
+	GlobalValues& globalValues = GlobalValues::GetInstance();
 };

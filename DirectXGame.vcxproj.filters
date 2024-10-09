@@ -280,6 +280,9 @@
     <Filter Include="Game\Scene\GameScene\Player">
       <UniqueIdentifier>{1ebeb71e-a634-4e9f-b962-a407cd50604e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\GlobalValues">
+      <UniqueIdentifier>{fe9e44e1-1d89-4181-9dc8-a20cbaecf8de}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\WinApp.cpp">
@@ -515,6 +518,9 @@
     </ClCompile>
     <ClCompile Include="Game\GameScene\GameScene.cpp">
       <Filter>Game\Scene\GameScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GlobalValues\GlobalValues.cpp">
+      <Filter>Game\GlobalValues</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -775,6 +781,9 @@
     </ClInclude>
     <ClInclude Include="Game\WorldSystemValue.h">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GlobalValues\GlobalValues.h">
+      <Filter>Game\GlobalValues</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

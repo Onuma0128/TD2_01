@@ -10,6 +10,8 @@
 
 #include "Game/GameScene/Player/Player.h"
 
+#include "Engine/Module/Collision/CollisionManager.h"
+
 class GameScene : public BaseScene
 {
 public:
@@ -34,14 +36,13 @@ public:
 #endif 
 
 private:
+	std::unique_ptr<CollisionManager> collisionManager = nullptr;
 
 	std::unique_ptr<Camera3D> camera3D_ = nullptr;
-
 	std::unique_ptr<BaseEnemy> enemy = nullptr;
+	std::unique_ptr<Player> player_ = nullptr;
 
 	std::shared_ptr<Object3DNode> object3dNode_ = nullptr;
 	std::shared_ptr<SpriteNode> spriteNode_ = nullptr;
-
-	std::unique_ptr<Player> player_ = nullptr;
 };
 

@@ -8,13 +8,18 @@
 #include <Engine/Module/Collision/Collider/SphereCollider.h>
 #include <Engine/Module/Behavior/Behavior.h>
 
+#include "Game/GlobalValues/GlobalValues.h"
+
 enum class EnemyBehavior {
 	Spawn,
 	Approach,
 	Attack,
 	Beating,
-	Damaged,
-	Despawn,
+	DamagedHeart,
+	DamagedBeat,
+	Down,
+	Revive,
+	Erase
 };
 
 class Player;
@@ -29,16 +34,21 @@ private: // Structs
 		float speed;
 	};
 	struct AttackBehaviorWork {
-		std::shared_ptr<SphereCollider> attackCollider;
 		TimedCall<void(void)> attackTimedCall;
 	};
 	struct BeatingBehaviorWork {
-		std::shared_ptr<SphereCollider> beatCollider;
+		float timer;
 	};
 	struct DamagedBehaviorWork {
 		TimedCall<void(void)> damagedTimedCall;
 	};
-	struct DespawnBehaviorWork {
+	struct DownBehaviorWork {
+		float timer;
+	};
+	struct ReviveBehaviorWork {
+		TimedCall<void(void)> revicedCall;
+	};
+	struct EraseBehaviorWork {
 		TimedCall<void(void)> despawnTimedCall;
 	};
 
@@ -48,9 +58,16 @@ public: // Member function
 	void initialize();
 	void update() override;
 
+private:
+	void damaged_callback(const BaseCollider* const other);
+	void attack_callback(const BaseCollider* const other);
+
 public: // Getter/Setter
 	// ビート状態にする
 	void do_beat();
+	std::weak_ptr<SphereCollider> get_hit_collider();
+	std::weak_ptr<SphereCollider> get_beat_collider();
+	std::weak_ptr<SphereCollider> get_melee_collider();
 
 private: // BehaviorFunctions
 	void spawn_initialize();
@@ -61,15 +78,21 @@ private: // BehaviorFunctions
 	void attack_update();
 	void beating_initialize();
 	void beating_update();
-	void damaged_initialize();
-	void damaged_update();
-	void despawn_initialize();
-	void despawn_update();
+	void damaged_heart_initialize();
+	void damaged_heart_update();
+	void damaged_beat_initialize();
+	void damaged_beat_update();
+	void down_initialize();
+	void down_update();
+	void revive_initialize();
+	void revive_update();
+	void erase_initialize();
+	void erase_update();
 
 private: // Member values
 	bool isDead;
-	int32_t hitpoint; // HP
-	std::shared_ptr<SphereCollider> hitCollider;
+	int hitpoint; // HP
+	Vector3 velocity;
 
 	Behavior<EnemyBehavior> behavior;
 	std::variant<
@@ -78,8 +101,21 @@ private: // Member values
 		AttackBehaviorWork,
 		BeatingBehaviorWork,
 		DamagedBehaviorWork,
-		DespawnBehaviorWork
+		DownBehaviorWork,
+		ReviveBehaviorWork,
+		EraseBehaviorWork
 	> behaviorValue;
+
+	bool marked;
+	float markingTimer;
+	bool isAttakced;
+
+	std::shared_ptr<SphereCollider> hitCollider;
+
+	std::shared_ptr<SphereCollider> meleeCollider;
+	std::shared_ptr<SphereCollider> beatCollider;
+
+	GlobalValues& globalValues = GlobalValues::GetInstance();
 
 public: // Static value
 	inline static const WorldInstance* targetPlayer = nullptr;
