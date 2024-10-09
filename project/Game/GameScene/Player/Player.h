@@ -10,19 +10,23 @@
 #include "Game/GlobalValues/GlobalValues.h"
 
 class BaseEnemy;
+class BeatManager;
 
 class Player : public GameObject 
 {
 public:
 	enum class State {
 		Move,
-		Attack,
+		Beating,
+		Throwing,
 	};
 
 public:
 	Player();
 
 	void initialize();
+
+	void begin() override;
 
 	void update()override;
 
@@ -33,31 +37,37 @@ public:
 	void debug_gui();
 
 	/*==================== メンバ関数 ====================*/
+	void InputPad();
 
 	void Move();
 
-	void Attack();
+	void SetBeat();
 
-	void SetEnemy(BaseEnemy* enemy) { enemy_ = enemy; }
-	State get_state() const { return state_; }
+	void Beating();
+
+	void ThrowHeart();
+
 public:
+	State get_state() const { return state_; }
 	std::weak_ptr<SphereCollider> get_hit_collider() const;
 	const std::vector<std::unique_ptr<PlayerBullet>>& get_bullets() const;
 
 private:
 	void OnCollisionCallBack(const BaseCollider* const other);
 
-
 private:
+	bool releaseButton;
+	bool unreleaseOnce;
 	Vector2 input = CVector2::ZERO;
 	Vector3 velocity = CVector3::ZERO;
-
-	BaseEnemy* enemy_ = nullptr;
 
 	std::vector<std::unique_ptr<PlayerBullet>> bullets_;
 	float attackFrame = 0;
 	std::shared_ptr<SphereCollider> hitCollider;
 
 	State state_;
-	GlobalValues& globalValues = GlobalValues::GetInstance();
+
+public:
+	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
+	inline static BeatManager* beatManager = nullptr;
 };

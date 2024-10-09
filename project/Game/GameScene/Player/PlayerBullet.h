@@ -6,6 +6,8 @@
 #include "Game/GlobalValues/GlobalValues.h"
 
 class Player;
+class BaseEnemy;
+class BeatManager;
 
 class PlayerBullet : public GameObject {
 public:
@@ -24,11 +26,13 @@ public:
 
 	void update() override;
 
-	void move();
+	void BeatNormal();
 
-	void attack(const Vector3& worldPosition, const Vector3& velocityDirection);
+	void Throw(const Vector3& worldPosition, const Vector3& velocityDirection);
 
-	void beatAttack();
+	void BeatAttack();
+	void StopBeat();
+	void ComeBack();
 
 	/// <summary>
 	/// HPが減る
@@ -43,12 +47,9 @@ private:
 public:
 	void set_angle_offset(float offset) { angleOffset = offset; };
 	const State& get_state() const { return state; }
-	void set_play_translate(const Vector3& translate) { playerPos = translate; }
-	float get_destructionCount()const { return destructionCount; }
 	const Vector3& get_velocity() const;
 
 private:
-	Vector3 playerPos;
 	Vector3 velocity;
 
 	// 脈拍用タイマー
@@ -59,7 +60,6 @@ private:
 	float baseScale_;
 	// プレイヤーの周りを回転
 	float angleTimer= 0;
-	float angle= 0;
 	float parametric;
 
 	float angleOffset;
@@ -70,11 +70,14 @@ private:
 	// 弾が敵に当たっている時間
 	float destructionCount = 0;
 
-	// 攻撃したか
+	// ハートステート
 	State state;
 
 	std::shared_ptr<SphereCollider> collider;
 
-	GlobalValues& globalValues = GlobalValues::GetInstance();
+public:
+	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
+	inline static BeatManager* beatManager = nullptr;
+	inline static const WorldInstance* player = nullptr;
 };
 

@@ -16,13 +16,11 @@ GameScene::GameScene() = default;
 
 GameScene::~GameScene() = default;
 
-void GameScene::load()
-{
+void GameScene::load() {
 	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models", "Sphere.obj");
 }
 
-void GameScene::initialize()
-{
+void GameScene::initialize() {
 	GlobalValues::GetInstance().inport_json_all();
 	/*==================== カメラ ====================*/
 
@@ -36,6 +34,10 @@ void GameScene::initialize()
 
 	/*==================== シーン ====================*/
 	collisionManager = eps::CreateUnique<CollisionManager>();
+	beatManager = eps::CreateUnique<BeatManager>();
+	BaseEnemy::beatManager = beatManager.get();
+	PlayerBullet::beatManager = beatManager.get();
+	Player::beatManager = beatManager.get();
 
 	object3dNode_ = std::make_unique<Object3DNode>();
 	object3dNode_->initialize();
@@ -54,16 +56,13 @@ void GameScene::initialize()
 
 	/*==================== ゲームオブジェクト ====================*/
 
-	enemy = std::make_unique<BaseEnemy>();
-	enemy->initialize();
 
 	player_ = std::make_unique<Player>();
-	player_->SetEnemy(enemy.get());
+	PlayerBullet::player = player_.get();
 
 	collisionManager->register_collider("Player", player_->get_hit_collider());
-	collisionManager->register_collider("EnemyHit", enemy->get_hit_collider());
-	collisionManager->register_collider("Beat", enemy->get_beat_collider());
-	collisionManager->register_collider("EnemyMelee", enemy->get_beat_collider());
+
+	create_enemy();
 
 	const auto& bullets = player_->get_bullets();
 	for (const std::unique_ptr<PlayerBullet>& bullet : bullets) {
@@ -73,46 +72,50 @@ void GameScene::initialize()
 	BaseEnemy::targetPlayer = player_.get();
 }
 
-void GameScene::poped()
-{
+void GameScene::poped() {
 	RenderPathManager::SetPath("GameScene" + std::to_string(reinterpret_cast<std::uint64_t>(this)));
 }
 
-void GameScene::finalize()
-{
+void GameScene::finalize() {
 }
 
-void GameScene::begin()
-{
-	enemy->begin();
+void GameScene::begin() {
+	player_->begin();
+	for (BaseEnemy& enemy : enemies) {
+		enemy.begin();
+	}
 }
 
-void GameScene::update()
-{
+void GameScene::update() {
 	//camera3D_->update();
 	player_->update();
-	enemy->update();
+	for (BaseEnemy& enemy : enemies) {
+		enemy.update();
+	}
+
+	enemies.remove_if([](const BaseEnemy& enemy) {return !enemy.is_active(); });
 }
 
-void GameScene::begin_rendering()
-{
+void GameScene::begin_rendering() {
 	camera3D_->update_matrix();
 	player_->begin_rendering();
-	enemy->begin_rendering();
+	for (BaseEnemy& enemy : enemies) {
+		enemy.begin_rendering();
+	}
 
 	collisionManager->update();
 }
 
-void GameScene::late_update()
-{
+void GameScene::late_update() {
 	collisionManager->collision("Player", "EnemyMelee"); // プレイヤーとエネミー近接
 	collisionManager->collision("EnemyHit", "Beat"); // エネミーとビート
 	collisionManager->collision("EnemyHit", "Heart"); // ハートとエネミー
-	enemy->late_update();
+	for (BaseEnemy& enemy : enemies) {
+		enemy.late_update();
+	}
 }
 
-void GameScene::draw() const
-{
+void GameScene::draw() const {
 	RenderPathManager::BeginFrame();
 	camera3D_->set_command(1);
 	player_->draw();
@@ -123,14 +126,15 @@ void GameScene::draw() const
 
 
 	DirectXCore::ShowGrid();
-	enemy->draw();
+	for (const BaseEnemy& enemy : enemies) {
+		enemy.draw();
+	}
 
 	RenderPathManager::Next();
 	RenderPathManager::Next();
 }
 
-void GameScene::debug_update()
-{
+void GameScene::debug_update() {
 	ImGui::Begin("Camera3D");
 	camera3D_->debug_gui();
 	ImGui::End();
@@ -146,4 +150,12 @@ void GameScene::debug_update()
 	GlobalValues::GetInstance().debug_gui();
 
 	player_->debug_gui();
+}
+
+void GameScene::create_enemy() {
+	auto& newEnemy = enemies.emplace_back();
+	newEnemy.initialize();
+	collisionManager->register_collider("EnemyHit", newEnemy.get_hit_collider());
+	collisionManager->register_collider("Beat", newEnemy.get_beat_collider());
+	collisionManager->register_collider("EnemyMelee", newEnemy.get_beat_collider());
 }

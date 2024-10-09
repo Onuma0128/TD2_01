@@ -23,6 +23,7 @@ enum class EnemyBehavior {
 };
 
 class Player;
+class BeatManager;
 
 class BaseEnemy : public GameObject {
 private: // Structs
@@ -65,6 +66,9 @@ private:
 public: // Getter/Setter
 	// ビート状態にする
 	void do_beat();
+	void pause_beat();
+	void recovery();
+	EnemyBehavior get_now_behavior() const;
 	std::weak_ptr<SphereCollider> get_hit_collider();
 	std::weak_ptr<SphereCollider> get_beat_collider();
 	std::weak_ptr<SphereCollider> get_melee_collider();
@@ -106,7 +110,7 @@ private: // Member values
 		EraseBehaviorWork
 	> behaviorValue;
 
-	bool marked;
+	int markedCount;
 	float markingTimer;
 	bool isAttakced;
 
@@ -115,8 +119,8 @@ private: // Member values
 	std::shared_ptr<SphereCollider> meleeCollider;
 	std::shared_ptr<SphereCollider> beatCollider;
 
-	GlobalValues& globalValues = GlobalValues::GetInstance();
-
 public: // Static value
 	inline static const WorldInstance* targetPlayer = nullptr;
+	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
+	inline static BeatManager* beatManager = nullptr;
 };

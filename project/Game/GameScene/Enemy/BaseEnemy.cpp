@@ -4,6 +4,7 @@
 #include <Engine/Utility/SmartPointer.h>
 
 #include "Game/GameScene/Player/PlayerBullet.h"
+#include "Game/GameScene/BeatManager/BeatManager.h"
 
 void BaseEnemy::initialize() {
 	transform.set_translate({ 0,0,5 });
@@ -25,8 +26,8 @@ void BaseEnemy::initialize() {
 
 	globalValues.add_value<float>("Enemy", "ToDeadDuration", 5.0f);
 
-	marked = false;
-	hitpoint = globalValues.get_value<int>("BaseEnemy", "HP");
+	markedCount = 0;
+	hitpoint = globalValues.get_value<int>("Enemy", "HP");
 	behavior.initalize(EnemyBehavior::Spawn);
 	behavior.add_list(
 		EnemyBehavior::Spawn,
@@ -63,28 +64,34 @@ void BaseEnemy::initialize() {
 		std::bind(&BaseEnemy::down_initialize, this),
 		std::bind(&BaseEnemy::down_update, this)
 	);
+	behavior.add_list(
+		EnemyBehavior::Erase,
+		std::bind(&BaseEnemy::erase_initialize, this),
+		std::bind(&BaseEnemy::erase_update, this)
+	);
 	reset_object("Sphere.obj");
 
 	hitCollider = eps::CreateShared<SphereCollider>();
 	hitCollider->initialize();
-	hitCollider->get_hierarchy().set_parent(hierarchy);
+	hitCollider->set_parent(*this);
 	hitCollider->set_on_collision_enter(
 		std::bind(&BaseEnemy::damaged_callback, this, std::placeholders::_1)
 	);
-	//hitCollider->set_active(true);
+	hitCollider->set_active(true);
 
 	meleeCollider = eps::CreateShared<SphereCollider>();
 	meleeCollider->initialize();
-	meleeCollider->get_hierarchy().set_parent(hierarchy);
+	meleeCollider->set_parent(*this);
 	meleeCollider->set_on_collision_enter(
 		std::bind(&BaseEnemy::attack_callback, this, std::placeholders::_1)
 	);
-	//meleeCollider->set_active(false);
+	meleeCollider->set_active(false);
 
 	beatCollider = eps::CreateShared<SphereCollider>();
 	beatCollider->initialize();
-	beatCollider->get_hierarchy().set_parent(hierarchy);
-	//beatCollider->set_active(false);
+	beatCollider->set_parent(*this);
+	beatCollider->set_active(false);
+	beatCollider->set_radius(3.0f);
 }
 
 void BaseEnemy::update() {
@@ -92,17 +99,17 @@ void BaseEnemy::update() {
 	behavior.update();
 
 	// 付与状態かつビートでない場合
-	if (marked && behavior.behavior != EnemyBehavior::Beating) {
-		//if (marked && behavior.now() != EnemyBehavior::Beating) {
+	if (markedCount && behavior.state() != EnemyBehavior::Beating) {
 		markingTimer += WorldClock::DeltaSeconds();
 	}
 
 	// 付与状態でカウンタが達成した場合
 	if (markingTimer >= globalValues.get_value<float>("Enemy", "AbsorptionTime")) {
-		marked = false;
 		markingTimer = 0;
+		beatManager->recovery(this);
 		// 回復
-		hitpoint += globalValues.get_value<int>("Enemy", "AbsorptionAmount");
+		hitpoint += globalValues.get_value<int>("Enemy", "AbsorptionAmount") * markedCount;
+		markedCount = 0;
 	}
 }
 
@@ -113,12 +120,11 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 	if (group == "Heart") {
 		hitpoint -= globalValues.get_value<int>("Heart", "AttackDamage");
 		// マークされたのを記録
-		marked = true;
+		++markedCount;
 		// カウンタをリセット
 		markingTimer = 0;
 		// Parent情報から心臓を取得
-		//const PlayerBullet* playerBullet = dynamic_cast<const PlayerBullet*>(other->get_parent_address());
-		const PlayerBullet* playerBullet = nullptr; // 未実装のため一旦nullptr
+		const PlayerBullet* playerBullet = dynamic_cast<const PlayerBullet*>(other->get_hierarchy().get_parent_address());
 		// ノックバック方向の取得
 		if (playerBullet) {
 			Vector3 bulletVelocity = playerBullet->get_velocity();
@@ -129,36 +135,36 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 		else {
 			velocity = CVector3::ZERO;
 		}
+		beatManager->set_next_enemy(this);
 		// ビート状態の場合は遷移させない
-		if (behavior.behavior != EnemyBehavior::Beating) {
+		if (behavior.state() != EnemyBehavior::Beating) {
 			// まだ生きてる場合
 			if (hitpoint > 0) {
-				behavior.behavior_request(EnemyBehavior::DamagedHeart);
+				behavior.request(EnemyBehavior::DamagedHeart);
 			}
 			// HPが0以下になった場合
 			else {
-				//hitCollider->set_active(false);
-				behavior.behavior_request(EnemyBehavior::Down);
+				hitCollider->set_active(false);
+				behavior.request(EnemyBehavior::Down);
 			}
 		}
 	}
 	else if (group == "Beat") {
 		// 復活処理
-		//if(behavior.get_behavior()){
-		if (behavior.behavior == EnemyBehavior::Down) {
-			behavior.behavior_request(EnemyBehavior::Revive);
+		if (behavior.state() == EnemyBehavior::Down) {
+			behavior.request(EnemyBehavior::Revive);
 			return;
 		}
 		hitpoint -= globalValues.get_value<int>("Enemy", "BeatHitDamage");
-		if (behavior.behavior != EnemyBehavior::Beating) {
+		if (behavior.state() != EnemyBehavior::Beating) {
 			// まだ生きてる場合
 			if (hitpoint > 0) {
-				behavior.behavior_request(EnemyBehavior::DamagedHeart);
+				behavior.request(EnemyBehavior::DamagedHeart);
 			}
 			// HPが0以下になった場合
 			else {
-				//hitCollider->set_active(false);
-				behavior.behavior_request(EnemyBehavior::Down);
+				hitCollider->set_active(false);
+				behavior.request(EnemyBehavior::Down);
 			}
 		}
 	}
@@ -168,11 +174,24 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 void BaseEnemy::attack_callback(const BaseCollider* const other) {
 	isAttakced = true;
 	// コリジョンを無効化する
-	//meleeCollider->set_active(false);
+	meleeCollider->set_active(false);
 }
 
 void BaseEnemy::do_beat() {
-	behavior.behavior_request(EnemyBehavior::Beating);
+	behavior.request(EnemyBehavior::Beating);
+}
+
+void BaseEnemy::pause_beat() {
+	behavior.request(EnemyBehavior::Approach);
+	beatCollider->set_active(false);
+}
+
+void BaseEnemy::recovery() {
+	hitpoint += 30;
+}
+
+EnemyBehavior BaseEnemy::get_now_behavior() const {
+	return behavior.state();
 }
 
 std::weak_ptr<SphereCollider> BaseEnemy::get_hit_collider() {
@@ -190,7 +209,7 @@ std::weak_ptr<SphereCollider> BaseEnemy::get_melee_collider() {
 // ---------- スポーン処理 ----------
 void BaseEnemy::spawn_initialize() {
 	behaviorValue = SpwanBehaviorWork{
-		{ [&] { behavior.behavior_request(EnemyBehavior::Approach); }, 3 }
+		{ [&] { behavior.request(EnemyBehavior::Approach); }, 3 }
 	};
 }
 
@@ -217,7 +236,7 @@ void BaseEnemy::approach_update() {
 
 	// distanceより近かったら攻撃に移行
 	if (distance.length() <= value.attackDistance) {
-		behavior.behavior_request(EnemyBehavior::Attack);
+		behavior.request(EnemyBehavior::Attack);
 		return;
 	}
 
@@ -231,7 +250,7 @@ void BaseEnemy::approach_update() {
 // ---------- 攻撃処理 ----------
 void BaseEnemy::attack_initialize() {
 	behaviorValue = AttackBehaviorWork{
-		{ [&] { behavior.behavior_request(EnemyBehavior::Approach); }, 3 }
+		{ [&] { behavior.request(EnemyBehavior::Approach); }, 3 }
 	};
 	isAttakced = false;
 }
@@ -246,30 +265,30 @@ void BaseEnemy::beating_initialize() {
 	behaviorValue = BeatingBehaviorWork{
 		0
 	};
-	//beatCollider->set_active(true);
+	beatCollider->set_active(true);
 }
 
 void BaseEnemy::beating_update() {
 	BeatingBehaviorWork& value = std::get<BeatingBehaviorWork>(behaviorValue);
 	value.timer += WorldClock::DeltaSeconds();
-	hitpoint -= globalValues.get_value<int>("Enemy", "BeatingDamage");
 	value.timer = std::fmod(value.timer, globalValues.get_value<float>("Enemy", "BeatInterval"));
 	if (value.timer < WorldClock::DeltaSeconds()) {
-		//beatCollider->set_active(true);
+		hitpoint -= globalValues.get_value<int>("Enemy", "BeatingDamage");
+		beatCollider->set_active(true);
 	}
 	else {
-		//beatCollider->set_active(false);
+		beatCollider->set_active(false);
 	}
 	if (hitpoint <= 0) {
-		behavior.behavior_request(EnemyBehavior::Down);
-		//beatCollider->set_active(false);
+		behavior.request(EnemyBehavior::Down);
+		beatCollider->set_active(false);
 	}
 }
 
 // ---------- 被ハート時処理 ----------
 void BaseEnemy::damaged_heart_initialize() {
 	behaviorValue = DamagedBehaviorWork{
-		{ [&] { behavior.behavior_request(EnemyBehavior::Approach); }, 3 }
+		{ [&] { behavior.request(EnemyBehavior::Approach); }, 1 }
 	};
 }
 
@@ -277,13 +296,13 @@ void BaseEnemy::damaged_heart_update() {
 	DamagedBehaviorWork& value = std::get<DamagedBehaviorWork>(behaviorValue);
 	value.damagedTimedCall.update();
 	velocity *= globalValues.get_value<float>("Enemy", "NockbackFriction");
-	transform.plus_translate(velocity);
+	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
 }
 
 // ---------- 被ビート時処理 ----------
 void BaseEnemy::damaged_beat_initialize() {
 	behaviorValue = DamagedBehaviorWork{
-		{ [&] { behavior.behavior_request(EnemyBehavior::Approach); }, 3 }
+		{ [&] { behavior.request(EnemyBehavior::Approach); }, 3 }
 	};
 }
 
@@ -294,8 +313,12 @@ void BaseEnemy::damaged_beat_update() {
 
 // ---------- ダウン時処理 ----------
 void BaseEnemy::down_initialize() {
+	if (markedCount) {
+		// BeatManagerに通知
+		beatManager->enemy_down(this);
+	}
 	// ダウンしたらマークを戻す
-	marked = false;
+	markedCount = 0;
 	behaviorValue = DownBehaviorWork{ 0 };
 }
 
@@ -304,10 +327,10 @@ void BaseEnemy::down_update() {
 
 	value.timer += WorldClock::DeltaSeconds();
 	if (value.timer >= 0 && (value.timer - 1.0f) <= WorldClock::DeltaSeconds()) {
-		//hitCollider->set_active(true);
+		hitCollider->set_active(true);
 	}
 	if (value.timer >= 6.0f) {
-		behavior.behavior_request(EnemyBehavior::Erase);
+		behavior.request(EnemyBehavior::Erase);
 	}
 }
 
@@ -315,7 +338,7 @@ void BaseEnemy::down_update() {
 void BaseEnemy::revive_initialize() {
 	behaviorValue = ReviveBehaviorWork{
 		// 3秒後にApproachに戻す
-		{ [&] { behavior.behavior_request(EnemyBehavior::Approach); }, 3 }
+		{ [&] { behavior.request(EnemyBehavior::Approach); }, 3 }
 	};
 }
 
@@ -327,7 +350,7 @@ void BaseEnemy::revive_update() {
 // ---------- 死亡時処理 ----------
 void BaseEnemy::erase_initialize() {
 	behaviorValue = EraseBehaviorWork{
-		{ [&] { isDead = true; }, 3 }
+		{ [&] { isActive = false; }, 3 }
 	};
 }
 
