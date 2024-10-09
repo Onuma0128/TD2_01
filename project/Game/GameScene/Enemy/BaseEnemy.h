@@ -67,7 +67,6 @@ public: // Getter/Setter
 	// ビート状態にする
 	void do_beat();
 	void pause_beat();
-	void recovery();
 	EnemyBehavior get_now_behavior() const;
 	std::weak_ptr<SphereCollider> get_hit_collider();
 	std::weak_ptr<SphereCollider> get_beat_collider();
@@ -96,6 +95,7 @@ private: // BehaviorFunctions
 private: // Member values
 	bool isDead;
 	int hitpoint; // HP
+	int maxHitpoint; // HP
 	Vector3 velocity;
 
 	Behavior<EnemyBehavior> behavior;

@@ -27,7 +27,8 @@ void BaseEnemy::initialize() {
 	globalValues.add_value<float>("Enemy", "ToDeadDuration", 5.0f);
 
 	markedCount = 0;
-	hitpoint = globalValues.get_value<int>("Enemy", "HP");
+	maxHitpoint = globalValues.get_value<int>("Enemy", "HP");
+	hitpoint = maxHitpoint;
 	behavior.initalize(EnemyBehavior::Spawn);
 	behavior.add_list(
 		EnemyBehavior::Spawn,
@@ -114,6 +115,8 @@ void BaseEnemy::update() {
 		beatManager->recovery(this);
 		// 回復
 		hitpoint += globalValues.get_value<int>("Enemy", "AbsorptionAmount") * markedCount;
+		// 上限を超えないようにする
+		hitpoint = std::min(maxHitpoint, hitpoint);
 		markedCount = 0;
 	}
 }
@@ -192,10 +195,6 @@ void BaseEnemy::do_beat() {
 void BaseEnemy::pause_beat() {
 	behavior.request(EnemyBehavior::Approach);
 	beatCollider->set_active(false);
-}
-
-void BaseEnemy::recovery() {
-	hitpoint += 30;
 }
 
 EnemyBehavior BaseEnemy::get_now_behavior() const {
