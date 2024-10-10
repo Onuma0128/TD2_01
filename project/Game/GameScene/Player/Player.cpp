@@ -74,6 +74,7 @@ void Player::update() {
 		break;
 	}
 
+	hitCollider->set_radius(globalValues.get_value<float>("Player", "ColliderRadius"));
 
 	// 弾の座標更新
 	for (auto& bullet : bullets_) {

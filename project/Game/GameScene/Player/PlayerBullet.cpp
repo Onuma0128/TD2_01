@@ -11,16 +11,17 @@
 void PlayerBullet::initialize(const WorldInstance& parent) {
 	reset_object("Sphere.obj");
 
-	globalValues.add_value<float>("Heart", "AngleLapCycle", 6.0f);
 	globalValues.add_value<float>("Heart", "CamebackTime", 3.0f);
 	globalValues.add_value<float>("Heart", "CamebackSpeed", 5.0f);
 	globalValues.add_value<float>("Heart", "ToFollowDistance", 1.0f);
-	globalValues.add_value<float>("Heart", "HeartbeatCycle", 0.5f);
 	globalValues.add_value<float>("Heart", "StartOffset", 1.5f);
 	globalValues.add_value<float>("Heart", "AttackSpeed", 6.0f);
 	globalValues.add_value<float>("Heart", "HeightOffset", 1.0f);
-	globalValues.add_value<float>("Heart", "HeartBeatAmplitude", 0.05f);
-	globalValues.add_value<Vector3>("Heart", "DistanceOffset", { 0,0,1.5f });
+
+	globalValues.add_value<float>("Animation", "HeartbeatCycle", 0.5f);
+	globalValues.add_value<float>("Animation", "HeartBeatAmplitude", 0.05f);
+	globalValues.add_value<float>("Animation", "AngleLapCycle", 6.0f);
+	globalValues.add_value<Vector3>("Animation", "DistanceOffset", { 0,0,1.5f });
 
 	// 脈拍のタイマー
 	heartbeatTimer = 0.0f;
@@ -31,7 +32,7 @@ void PlayerBullet::initialize(const WorldInstance& parent) {
 	// 地面に着いてからのタイマー
 	onGroundTimer = 0.0f;
 
-	globalValues.add_value<float>("Heart", "HeartBaseScale", 0.2f);
+	globalValues.add_value<float>("Animation", "HeartBaseScale", 0.2f);
 
 	this->set_parent(parent);
 
@@ -59,13 +60,13 @@ void PlayerBullet::update() {
 	case PlayerBullet::State::Follow:
 	{
 		// 攻撃処理が始まってなければプレイヤーの周りを回転
-		float angleLapCycle = globalValues.get_value<float>("Heart", "AngleLapCycle");
+		float angleLapCycle = globalValues.get_value<float>("Animation", "AngleLapCycle");
 		angleTimer += WorldClock::DeltaSeconds();
 		angleTimer = std::fmod(angleTimer, angleLapCycle);
 		parametric = angleTimer / angleLapCycle;
 
 		float angle = parametric * PI2;
-		distanceOffset = globalValues.get_value<Vector3>("Heart", "DistanceOffset");
+		distanceOffset = globalValues.get_value<Vector3>("Animation", "DistanceOffset");
 		Vector3 translate = distanceOffset * Quaternion::AngleAxis(CVector3::BASIS_Y, angle + angleOffset);
 		get_transform().set_translate(translate);
 		break;
@@ -135,15 +136,15 @@ void PlayerBullet::update() {
 }
 
 void PlayerBullet::BeatNormal() {
-	float HartbeatCycle = globalValues.get_value<float>("Heart", "HeartbeatCycle");
+	float HartbeatCycle = globalValues.get_value<float>("Animation", "HeartbeatCycle");
 
 	// 脈拍のようなスケール変化
 	heartbeatTimer += WorldClock::DeltaSeconds();
 	heartbeatTimer = std::fmod(heartbeatTimer, HartbeatCycle);
 	parametric = heartbeatTimer / HartbeatCycle;
 	// 時間に基づいてスケールが脈打つように変化する
-	baseScale_ = globalValues.get_value<float>("Heart", "HeartBaseScale");
-	heartbeatAmplitude_ = globalValues.get_value<float>("Heart", "HeartBeatAmplitude");
+	baseScale_ = globalValues.get_value<float>("Animation", "HeartBaseScale");
+	heartbeatAmplitude_ = globalValues.get_value<float>("Animation", "HeartBeatAmplitude");
 	float scaleValue = baseScale_ + heartbeatAmplitude_ * (parametric - std::floor(parametric));
 	Vector3 scale = { scaleValue, scaleValue, scaleValue };
 	get_transform().set_scale(scale);
