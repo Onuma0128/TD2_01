@@ -19,8 +19,11 @@ Player::Player() {
 
 void Player::initialize() {
 	globalValues.add_value<int>("Enemy", "BeatingDamage", 20);
-
 	globalValues.add_value<int>("Player", "NumBullets", 10);
+	globalValues.add_value<float>("Player", "Speed", 3.0f);
+	globalValues.add_value<float>("Player", "ThrowTime", 0.3f);
+	globalValues.add_value<float>("Player", "TurnAroundSpeed", 0.2f);
+	globalValues.add_value<float>("Player", "ColliderRadius", 1.0f);
 
 	// 描画オブジェクトを設定
 	reset_object("Sphere.obj");
@@ -121,11 +124,10 @@ void Player::InputPad() {
 }
 
 void Player::Move() {
-	float speed = 3.0f;
 	// 入力から向き決定
 	Vector3 moveDirection = Vector3{ input.x, 0, input.y };
 	// Velocityに変換
-	velocity = moveDirection * speed;
+	velocity = moveDirection * globalValues.get_value<float>("Player", "Speed");
 	// 足す
 	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
 
@@ -133,12 +135,12 @@ void Player::Move() {
 	if (velocity != CVector3::ZERO) {
 		const Quaternion& quaternion = transform.get_quaternion();
 		const Quaternion target = Quaternion::LookForward(velocity.normalize());
-		transform.set_quaternion(Quaternion::Slerp(quaternion, target, 0.2f));
+		float turnAround = globalValues.get_value<float>("Player", "TurnAroundSpeed");
+		transform.set_quaternion(Quaternion::Slerp(quaternion, target, turnAround));
 	}
 
-	float throwTime = 0.3f;
 	// 長押し時間がThrowTimeより長いならビート状態に遷移
-	if (attackFrame >= throwTime && !beatManager->empty_pair()) {
+	if (attackFrame >= globalValues.get_value<float>("Player", "ThrowTime") && !beatManager->empty_pair()) {
 		SetBeat();
 	}
 	// その前にボタンが離れたら投げる

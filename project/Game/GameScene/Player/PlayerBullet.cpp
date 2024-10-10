@@ -10,14 +10,27 @@
 
 void PlayerBullet::initialize(const WorldInstance& parent) {
 	reset_object("Sphere.obj");
+
+	globalValues.add_value<float>("Heart", "AngleLapCycle", 6.0f);
+	globalValues.add_value<float>("Heart", "CamebackTime", 3.0f);
+	globalValues.add_value<float>("Heart", "CamebackSpeed", 5.0f);
+	globalValues.add_value<float>("Heart", "ToFollowDistance", 1.0f);
+	globalValues.add_value<float>("Heart", "HeartbeatCycle", 0.5f);
+	globalValues.add_value<float>("Heart", "StartOffset", 1.5f);
+	globalValues.add_value<float>("Heart", "AttackSpeed", 6.0f);
+	globalValues.add_value<float>("Heart", "HeartBeatAmplitude", 0.05f);
+	globalValues.add_value<Vector3>("Heart", "DistanceOffset", { 0,0,1.5f });
+
 	// 脈拍のタイマー
-	hartbeatTimer = 0.0f;
+	heartbeatTimer = 0.0f;
 	// スケールの振幅
 	heartbeatAmplitude_ = 0.05f;
 	// 基本のスケール値
 	baseScale_ = 0.2f;
 	// 地面に着いてからのタイマー
 	onGroundTimer = 0.0f;
+
+	globalValues.add_value<float>("Heart", "HeartBaseScale", 0.2f);
 
 	this->set_parent(parent);
 
@@ -40,18 +53,18 @@ void PlayerBullet::update() {
 
 	// 弾の動き
 	BeatNormal();
-	float HartbeatCycle = 0.5f;
 
 	switch (state) {
 	case PlayerBullet::State::Follow:
 	{
 		// 攻撃処理が始まってなければプレイヤーの周りを回転
-		constexpr float angleLapCycle = 6.0f;
+		float angleLapCycle = globalValues.get_value<float>("Heart", "AngleLapCycle");
 		angleTimer += WorldClock::DeltaSeconds();
 		angleTimer = std::fmod(angleTimer, angleLapCycle);
 		parametric = angleTimer / angleLapCycle;
 
 		float angle = parametric * PI2;
+		distanceOffset = globalValues.get_value<Vector3>("Heart", "DistanceOffset");
 		Vector3 translate = distanceOffset * Quaternion::AngleAxis(CVector3::BASIS_Y, angle + angleOffset);
 		get_transform().set_translate(translate);
 		break;
@@ -71,7 +84,7 @@ void PlayerBullet::update() {
 
 		// 地面に着いてからのタイマーを増加
 		onGroundTimer += WorldClock::DeltaSeconds();
-		if (onGroundTimer >= 3.0f) {
+		if (onGroundTimer >= globalValues.get_value<float>("Heart", "CamebackTime")) {
 			// 3秒経ったらComeback状態に移行
 			state = State::Comeback;
 		}
@@ -100,12 +113,10 @@ void PlayerBullet::update() {
 		Vector3 directionToPlayer = distanceToPlayer.normalize_safe();
 
 		// プレイヤーに戻る速度
-		constexpr float comebackSpeed = 5.0f;
-		transform.plus_translate(directionToPlayer * comebackSpeed * WorldClock::DeltaSeconds());
+		transform.plus_translate(directionToPlayer * globalValues.get_value<float>("Heart", "CamebackSpeed") * WorldClock::DeltaSeconds());
 
 		// プレイヤーに近づいたらFollow状態に戻る
-		constexpr float ToFollowDistance = 1.0f;
-		if (distanceToPlayer.length() < ToFollowDistance) {
+		if (distanceToPlayer.length() < globalValues.get_value<float>("Heart", "ToFollowDistance")) {
 			state = State::Follow;
 			onGroundTimer = 0.0f;
 			destructionCount = 0.0f;
@@ -123,13 +134,15 @@ void PlayerBullet::update() {
 }
 
 void PlayerBullet::BeatNormal() {
-	constexpr float hartbeatCycle = 0.5f;
+	float heartbeatCycle = globalValues.get_value<float>("Heart", "HeartbeatCycle");
 
 	// 脈拍のようなスケール変化
-	hartbeatTimer += WorldClock::DeltaSeconds();
-	hartbeatTimer = std::fmod(hartbeatTimer, hartbeatCycle);
-	parametric = hartbeatTimer / hartbeatCycle;
+	heartbeatTimer += WorldClock::DeltaSeconds();
+	heartbeatTimer = std::fmod(heartbeatTimer, heartbeatCycle);
+	parametric = heartbeatTimer / heartbeatCycle;
 	// 時間に基づいてスケールが脈打つように変化する
+	baseScale_ = globalValues.get_value<float>("Heart", "HeartBaseScale");
+	heartbeatAmplitude_ = globalValues.get_value<float>("Heart", "HeartBeatAmplitude");
 	float scaleValue = baseScale_ + heartbeatAmplitude_ * (parametric - std::floor(parametric));
 	Vector3 scale = { scaleValue, scaleValue, scaleValue };
 	get_transform().set_scale(scale);
@@ -137,8 +150,8 @@ void PlayerBullet::BeatNormal() {
 
 void PlayerBullet::Throw(const Vector3& worldPosition, const Vector3& velocityDirection) {
 	hierarchy.reset_parent();
-	float StartOffset = 1.5f;
-	float Speed = 6.0f;
+	float StartOffset = globalValues.get_value<float>("Heart", "StartOffset");
+	float Speed = globalValues.get_value<float>("Heart", "AttackSpeed");
 	transform.set_translate(worldPosition + velocityDirection * StartOffset + Vector3{ 0,0.5f,0 });
 	velocity = velocityDirection * Speed;
 	velocity.y = 1.0f;
