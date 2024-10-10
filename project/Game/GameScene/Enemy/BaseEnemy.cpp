@@ -267,7 +267,7 @@ void BaseEnemy::approach_update() {
 	velocity = distance.normalize_safe() * value.speed;
 	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
 	// player方向を向く
-	//look_at(*targetPlayer);
+	look_at(*targetPlayer);
 }
 
 // ---------- 攻撃処理 ----------

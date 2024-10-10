@@ -133,7 +133,7 @@ void Player::Move() {
 	if (velocity != CVector3::ZERO) {
 		const Quaternion& quaternion = transform.get_quaternion();
 		const Quaternion target = Quaternion::LookForward(velocity.normalize());
-		transform.set_rotate(Quaternion::Slerp(quaternion, target, 0.2f));
+		transform.set_quaternion(Quaternion::Slerp(quaternion, target, 0.2f));
 	}
 
 	float throwTime = 0.3f;
