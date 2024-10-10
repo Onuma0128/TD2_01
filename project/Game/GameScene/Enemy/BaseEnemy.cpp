@@ -4,6 +4,7 @@
 #include <Engine/Utility/SmartPointer.h>
 
 #include "Game/GameScene/Player/PlayerBullet.h"
+#include "Game/GameScene/Player/PlayerHPManager.h"
 #include "Game/GameScene/BeatManager/BeatManager.h"
 
 void BaseEnemy::initialize() {

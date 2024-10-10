@@ -39,9 +39,14 @@ void GameScene::initialize() {
 	/*==================== シーン ====================*/
 	collisionManager = eps::CreateUnique<CollisionManager>();
 	beatManager = eps::CreateUnique<BeatManager>();
+	playerHpManager_ = std::make_unique<PlayerHPManager>();
+	playerHpManager_->initialize();
 	BaseEnemy::beatManager = beatManager.get();
+	BaseEnemy::playerHpManager_ = playerHpManager_.get();
 	PlayerBullet::beatManager = beatManager.get();
+	PlayerBullet::playerHpManager = playerHpManager_.get();
 	Player::beatManager = beatManager.get();
+	Player::playerHpManager_ = playerHpManager_.get();
 
 	object3dNode_ = std::make_unique<Object3DNode>();
 	object3dNode_->initialize();
@@ -59,7 +64,6 @@ void GameScene::initialize() {
 	RenderPathManager::SetPath("GameScene" + std::to_string(reinterpret_cast<std::uint64_t>(this)));
 
 	/*==================== ゲームオブジェクト ====================*/
-
 
 	player_ = std::make_unique<Player>();
 	PlayerBullet::player = player_.get();
@@ -94,6 +98,7 @@ void GameScene::update() {
 	for (BaseEnemy& enemy : enemies) {
 		enemy.update();
 	}
+	playerHpManager_->update();
 
 	enemies.remove_if([](const BaseEnemy& enemy) {return !enemy.is_active(); });
 }

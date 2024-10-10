@@ -525,6 +525,9 @@
     <ClCompile Include="Game\GameScene\BeatManager\BeatManager.cpp">
       <Filter>Game\Scene\GameScene\BeatManager</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameScene\Player\PlayerHPManager.cpp">
+      <Filter>Game\Scene\GameScene\Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\WinApp.h">
@@ -790,6 +793,9 @@
     </ClInclude>
     <ClInclude Include="Game\GameScene\BeatManager\BeatManager.h">
       <Filter>Game\Scene\GameScene\BeatManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameScene\Player\PlayerHPManager.h">
+      <Filter>Game\Scene\GameScene\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

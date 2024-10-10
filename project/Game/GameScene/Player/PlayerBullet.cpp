@@ -5,6 +5,8 @@
 #include <Engine/Utility/SmartPointer.h>
 #include "Game/WorldSystemValue.h"
 
+#include "Game/GameScene/Player/PlayerHPManager.h"
+
 #include "Game/GameScene/Enemy/BaseEnemy.h"
 #include "Game/GameScene/BeatManager/BeatManager.h"
 
@@ -124,6 +126,8 @@ void PlayerBullet::update() {
 			destructionCount = 0.0f;
 			transform.set_translate(Transform3D::Homogeneous(transform.get_translate(), player->world_matrix().inverse()));
 			set_parent(*player);
+			playerHpManager->set_state(PlayerHPManager::HP_State::Recovery);
+			playerHpManager->update();
 		}
 	}
 	break;
@@ -136,7 +140,7 @@ void PlayerBullet::update() {
 }
 
 void PlayerBullet::BeatNormal() {
-	float HartbeatCycle = globalValues.get_value<float>("Animation", "HeartbeatCycle");
+	float HartbeatCycle = globalValues.get_value<float>("Animation", "HeartbeatCycle") * float(playerHpManager->get_hp()) / 5.0f;
 
 	// 脈拍のようなスケール変化
 	heartbeatTimer += WorldClock::DeltaSeconds();

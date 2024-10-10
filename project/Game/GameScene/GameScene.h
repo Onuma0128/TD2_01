@@ -9,6 +9,7 @@
 #include "Game/GameScene/Enemy/BaseEnemy.h"
 
 #include "Game/GameScene/Player/Player.h"
+#include "Game/GameScene/Player/PlayerHPManager.h"
 #include "Game/GameScene/BeatManager/BeatManager.h"
 
 #include "Engine/Module/Collision/CollisionManager.h"
@@ -46,6 +47,7 @@ private:
 	std::unique_ptr<Camera3D> camera3D_ = nullptr;
 	std::list<BaseEnemy> enemies;
 	std::unique_ptr<Player> player_ = nullptr;
+	std::unique_ptr<PlayerHPManager> playerHpManager_ = nullptr;
 
 	std::shared_ptr<Object3DNode> object3dNode_ = nullptr;
 	std::shared_ptr<SpriteNode> spriteNode_ = nullptr;

@@ -8,6 +8,7 @@
 class Player;
 class BaseEnemy;
 class BeatManager;
+class PlayerHPManager;
 
 class PlayerBullet : public GameObject {
 public:
@@ -79,5 +80,6 @@ public:
 	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
 	inline static BeatManager* beatManager = nullptr;
 	inline static const WorldInstance* player = nullptr;
+	inline static PlayerHPManager* playerHpManager = nullptr;
 };
 
