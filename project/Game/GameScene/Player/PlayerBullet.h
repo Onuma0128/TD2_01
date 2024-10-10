@@ -53,7 +53,7 @@ private:
 	Vector3 velocity;
 
 	// 脈拍用タイマー
-	float hartbeatTimer;
+	float heartbeatTimer;
 	// スケールの振幅
 	float heartbeatAmplitude_;
 	// 基本のスケール値
