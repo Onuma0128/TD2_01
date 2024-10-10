@@ -32,8 +32,8 @@ void GameScene::initialize() {
 	camera3D_->initialize();
 	camera3D_->set_transform({
 		CVector3::BASIS,
-		Quaternion::EulerDegree(60,0,0),
-		{0,40,-25}
+		Quaternion::EulerDegree(49,0,0),
+		{0,23,-21}
 		});
 
 	/*==================== シーン ====================*/
