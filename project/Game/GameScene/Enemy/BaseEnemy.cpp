@@ -140,6 +140,10 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 	const std::string& group = other->group();
 	// 心臓の場合
 	if (group == "Heart") {
+		// ダウン時は何もしない
+		if (behavior.state() == EnemyBehavior::Down) {
+			return;
+		}
 		hitpoint -= globalValues.get_value<int>("Heart", "AttackDamage");
 		// マークされたのを記録
 		++markedCount;
