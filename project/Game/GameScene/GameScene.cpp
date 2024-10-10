@@ -10,14 +10,18 @@
 
 #include "Game/GlobalValues/GlobalValues.h"
 
+#ifdef _DEBUG
 #include "imgui.h"
+#endif // _DEBUG
 
 GameScene::GameScene() = default;
 
 GameScene::~GameScene() = default;
 
 void GameScene::load() {
+	std::string ResourceDirectory = "./Resources/GameScene/";
 	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models", "Sphere.obj");
+	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models", "Ghost.obj");
 }
 
 void GameScene::initialize() {
@@ -82,9 +86,6 @@ void GameScene::finalize() {
 
 void GameScene::begin() {
 	player_->begin();
-	for (BaseEnemy& enemy : enemies) {
-		enemy.begin();
-	}
 }
 
 void GameScene::update() {
@@ -111,9 +112,6 @@ void GameScene::late_update() {
 	collisionManager->collision("Player", "EnemyMelee"); // プレイヤーとエネミー近接
 	collisionManager->collision("EnemyHit", "Beat"); // エネミーとビート
 	collisionManager->collision("EnemyHit", "Heart"); // ハートとエネミー
-	for (BaseEnemy& enemy : enemies) {
-		enemy.late_update();
-	}
 }
 
 void GameScene::draw() const {
@@ -135,6 +133,8 @@ void GameScene::draw() const {
 	RenderPathManager::Next();
 }
 
+#ifdef _DEBUG
+
 void GameScene::debug_update() {
 	ImGui::Begin("Camera3D");
 	camera3D_->debug_gui();
@@ -152,6 +152,7 @@ void GameScene::debug_update() {
 
 	player_->debug_gui();
 }
+#endif // _DEBUG
 
 void GameScene::create_enemy() {
 	auto& newEnemy = enemies.emplace_back();

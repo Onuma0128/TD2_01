@@ -8,7 +8,10 @@
 
 #include "Game/GameScene/BeatManager/BeatManager.h"
 
+
+#ifdef _DEBUG
 #include "imgui.h"
+#endif // _DEBUG
 
 Player::Player() {
 	initialize();
@@ -86,6 +89,8 @@ void Player::draw() const {
 	}
 }
 
+#ifdef _DEBUG
+
 void Player::debug_gui() {
 	ImGui::Begin("Player");
 	GameObject::debug_gui();
@@ -93,6 +98,7 @@ void Player::debug_gui() {
 
 	ImGui::End();
 }
+#endif // _DEBUG
 
 void Player::InputPad() {
 	// パッドボタンが押されているなら攻撃をする

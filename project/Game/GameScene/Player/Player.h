@@ -58,6 +58,7 @@ private:
 private:
 	bool releaseButton;
 	bool unreleaseOnce;
+	int invincibleTimer;
 	Vector2 input = CVector2::ZERO;
 	Vector3 velocity = CVector3::ZERO;
 

@@ -75,11 +75,15 @@ void BaseEnemy::initialize() {
 		std::bind(&BaseEnemy::erase_initialize, this),
 		std::bind(&BaseEnemy::erase_update, this)
 	);
-	reset_object("Sphere.obj");
+
+	ghostMesh = eps::CreateUnique<GameObject>("Ghost.obj");
+	ghostMesh->initialize();
+	ghostMesh->set_parent(*this);
+	ghostMesh->get_transform().set_translate({ 0,1,0 });
 
 	hitCollider = eps::CreateShared<SphereCollider>();
 	hitCollider->initialize();
-	hitCollider->set_parent(*this);
+	hitCollider->set_parent(*ghostMesh);
 	hitCollider->set_on_collision_enter(
 		std::bind(&BaseEnemy::damaged_callback, this, std::placeholders::_1)
 	);
@@ -87,15 +91,16 @@ void BaseEnemy::initialize() {
 
 	meleeCollider = eps::CreateShared<SphereCollider>();
 	meleeCollider->initialize();
-	meleeCollider->set_parent(*this);
+	meleeCollider->set_parent(*ghostMesh);
+	meleeCollider->set_active(false);
+	meleeCollider->set_radius(1.0f);
 	meleeCollider->set_on_collision_enter(
 		std::bind(&BaseEnemy::attack_callback, this, std::placeholders::_1)
 	);
-	meleeCollider->set_active(false);
 
 	beatCollider = eps::CreateShared<SphereCollider>();
 	beatCollider->initialize();
-	beatCollider->set_parent(*this);
+	beatCollider->set_parent(*ghostMesh);
 	beatCollider->set_active(false);
 	beatCollider->set_radius(3.0f);
 }
@@ -119,6 +124,15 @@ void BaseEnemy::update() {
 		hitpoint = std::min(maxHitpoint, hitpoint);
 		markedCount = 0;
 	}
+}
+
+void BaseEnemy::begin_rendering() {
+	WorldInstance::update_matrix();
+	ghostMesh->begin_rendering();
+}
+
+void BaseEnemy::draw() const {
+	ghostMesh->draw();
 }
 
 // 被ダメ時コールバック
@@ -167,10 +181,11 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 			return;
 		}
 		hitpoint -= globalValues.get_value<int>("Enemy", "BeatHitDamage");
+		// ビート状態だった場合はリアクションさせない
 		if (behavior.state() != EnemyBehavior::Beating) {
 			// まだ生きてる場合
 			if (hitpoint > 0) {
-				behavior.request(EnemyBehavior::DamagedHeart);
+				behavior.request(EnemyBehavior::DamagedBeat);
 			}
 			// HPが0以下になった場合
 			else {
@@ -252,20 +267,29 @@ void BaseEnemy::approach_update() {
 	velocity = distance.normalize_safe() * value.speed;
 	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
 	// player方向を向く
-	look_at(*targetPlayer);
+	//look_at(*targetPlayer);
 }
 
 // ---------- 攻撃処理 ----------
 void BaseEnemy::attack_initialize() {
 	behaviorValue = AttackBehaviorWork{
-		{ [&] { behavior.request(EnemyBehavior::Approach); }, 3 }
 	};
 	isAttakced = false;
+	meleeCollider->set_active(true);
 }
 
 void BaseEnemy::attack_update() {
 	AttackBehaviorWork& value = std::get<AttackBehaviorWork>(behaviorValue);
-	value.attackTimedCall.update();
+	value.timer += WorldClock::DeltaSeconds();
+	if (value.timer < 1.0f) {
+		meleeCollider->set_active(false);
+	}
+	else if (value.timer < 1.5f) {
+		meleeCollider->set_active(false);
+	}
+	else if (value.timer > 3.0f) {
+		behavior.request(EnemyBehavior::Approach);
+	}
 }
 
 // ---------- 鼓動同期時処理 ----------

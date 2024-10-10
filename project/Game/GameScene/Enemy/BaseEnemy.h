@@ -25,7 +25,7 @@ enum class EnemyBehavior {
 class Player;
 class BeatManager;
 
-class BaseEnemy : public GameObject {
+class BaseEnemy : public WorldInstance {
 private: // Structs
 	struct SpwanBehaviorWork {
 		TimedCall<void(void)> timedCall;
@@ -35,7 +35,7 @@ private: // Structs
 		float speed;
 	};
 	struct AttackBehaviorWork {
-		TimedCall<void(void)> attackTimedCall;
+		float timer;
 	};
 	struct BeatingBehaviorWork {
 		float timer;
@@ -57,7 +57,9 @@ public: // Contsructor/Destructor
 
 public: // Member function
 	void initialize();
-	void update() override;
+	void update();
+	void begin_rendering();
+	void draw() const;
 
 private:
 	void damaged_callback(const BaseCollider* const other);
@@ -97,6 +99,8 @@ private: // Member values
 	int hitpoint; // HP
 	int maxHitpoint; // HP
 	Vector3 velocity;
+
+	std::unique_ptr<GameObject> ghostMesh;
 
 	Behavior<EnemyBehavior> behavior;
 	std::variant<
