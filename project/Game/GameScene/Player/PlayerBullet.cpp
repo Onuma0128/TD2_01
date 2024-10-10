@@ -57,17 +57,19 @@ void PlayerBullet::update() {
 
 	// 弾の動き
 	BeatNormal();
+	// 周りの回転のみ記録
+	float angleLapCycle = globalValues.get_value<float>("Animation", "AngleLapCycle");
+	angleTimer += WorldClock::DeltaSeconds();
+	angleTimer = std::fmod(angleTimer, angleLapCycle);
 
 	switch (state) {
 	case PlayerBullet::State::Follow:
 	{
 		// 攻撃処理が始まってなければプレイヤーの周りを回転
-		float angleLapCycle = globalValues.get_value<float>("Animation", "AngleLapCycle");
-		angleTimer += WorldClock::DeltaSeconds();
-		angleTimer = std::fmod(angleTimer, angleLapCycle);
 		parametric = angleTimer / angleLapCycle;
 
 		float angle = parametric * PI2;
+		// 常に同期させるために処理
 		distanceOffset = globalValues.get_value<Vector3>("Animation", "DistanceOffset");
 		Vector3 translate = distanceOffset * Quaternion::AngleAxis(CVector3::BASIS_Y, angle + angleOffset);
 		get_transform().set_translate(translate);
@@ -159,7 +161,7 @@ void PlayerBullet::Throw(const Vector3& worldPosition, const Vector3& velocityDi
 	float StartOffset = globalValues.get_value<float>("Heart", "StartOffset");
 	float Speed = globalValues.get_value<float>("Heart", "AttackSpeed");
 	float HeightOffset = globalValues.get_value<float>("Heart", "HeightOffset");
-	transform.set_translate(worldPosition + velocityDirection * StartOffset + Vector3{0,HeightOffset, 0});
+	transform.set_translate(worldPosition + velocityDirection * StartOffset + Vector3{ 0,HeightOffset, 0 });
 	velocity = velocityDirection * Speed;
 	velocity.y = 1.0f;
 	collider->set_active(true);
