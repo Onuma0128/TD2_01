@@ -112,13 +112,13 @@ void Player::debug_gui() {
 
 void Player::InputPad() {
 	// パッドボタンが押されているなら攻撃をする
-	if (Input::IsTriggerPad(PadID::A)) {
+	if (Input::IsTriggerPad(PadID::A) || Input::IsTriggerKey(KeyID::Space)) {
 		attackFrame = 0;
 	}
-	else if (Input::IsPressPad(PadID::A)) {
+	else if (Input::IsPressPad(PadID::A) || Input::IsPressKey(KeyID::Space)) {
 		attackFrame += WorldClock::DeltaSeconds();
 	}
-	else if (Input::IsReleasePad(PadID::A)) {
+	else if (Input::IsReleasePad(PadID::A) || Input::IsReleaseKey(KeyID::Space)) {
 		attackFrame = 0;
 		if (!unreleaseOnce) {
 			releaseButton = true;
@@ -128,6 +128,20 @@ void Player::InputPad() {
 		}
 	}
 	input = Input::StickL();
+
+	if (Input::IsPressKey(KeyID::W)) {
+		input.y = 1.0f;
+	}
+	if (Input::IsPressKey(KeyID::S)) {
+		input.y = -1.0f;
+	}
+	if (Input::IsPressKey(KeyID::A)) {
+		input.x = -1.0f;
+	}
+	if (Input::IsPressKey(KeyID::D)) {
+		input.x = 1.0f;
+	}
+
 }
 
 void Player::Move() {
