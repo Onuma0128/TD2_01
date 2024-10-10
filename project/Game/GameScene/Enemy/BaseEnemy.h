@@ -23,6 +23,7 @@ enum class EnemyBehavior {
 };
 
 class Player;
+class PlayerHPManager;
 class BeatManager;
 
 class BaseEnemy : public WorldInstance {
@@ -127,4 +128,5 @@ public: // Static value
 	inline static const WorldInstance* targetPlayer = nullptr;
 	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
 	inline static BeatManager* beatManager = nullptr;
+	inline static PlayerHPManager* playerHpManager_ = nullptr;
 };

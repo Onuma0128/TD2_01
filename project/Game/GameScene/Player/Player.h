@@ -11,6 +11,7 @@
 
 class BaseEnemy;
 class BeatManager;
+class PlayerHPManager;
 
 class Player : public WorldInstance 
 {
@@ -76,4 +77,5 @@ private:
 public:
 	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
 	inline static BeatManager* beatManager = nullptr;
+	inline static PlayerHPManager* playerHpManager_ = nullptr;
 };
