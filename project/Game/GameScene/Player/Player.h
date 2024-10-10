@@ -12,7 +12,7 @@
 class BaseEnemy;
 class BeatManager;
 
-class Player : public GameObject 
+class Player : public WorldInstance 
 {
 public:
 	enum class State {
@@ -26,15 +26,17 @@ public:
 
 	void initialize();
 
-	void begin() override;
+	void begin();
 
-	void update()override;
+	void update();
 
-	void begin_rendering() noexcept override;
+	void begin_rendering() noexcept;
 
-	void draw() const override;
+	void draw() const;
 
+#ifdef _DEBUG
 	void debug_gui();
+#endif // _DEBUG
 
 	/*==================== メンバ関数 ====================*/
 	void InputPad();
@@ -59,6 +61,9 @@ private:
 	bool releaseButton;
 	bool unreleaseOnce;
 	int invincibleTimer;
+
+	std::unique_ptr<GameObject> playerMesh;
+
 	Vector2 input = CVector2::ZERO;
 	Vector3 velocity = CVector3::ZERO;
 

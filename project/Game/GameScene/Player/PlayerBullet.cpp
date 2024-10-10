@@ -15,7 +15,7 @@ void PlayerBullet::initialize(const WorldInstance& parent) {
 	// スケールの振幅
 	heartbeatAmplitude_ = 0.05f;
 	// 基本のスケール値
-	baseScale_ = 0.2f;
+	baseScale_ = 0.12f;
 	// 地面に着いてからのタイマー
 	onGroundTimer = 0.0f;
 
@@ -24,7 +24,7 @@ void PlayerBullet::initialize(const WorldInstance& parent) {
 	collider = eps::CreateShared<SphereCollider>();
 	collider->initialize();
 	collider->set_parent(*this);
-	collider->set_radius(0.25f);
+	collider->set_radius(0.12f);
 	// コリジョンは非活性状態
 	collider->set_active(false);
 	collider->set_on_collision_enter(
@@ -40,7 +40,6 @@ void PlayerBullet::update() {
 
 	// 弾の動き
 	BeatNormal();
-	float HartbeatCycle = 0.5f;
 
 	switch (state) {
 	case PlayerBullet::State::Follow:
@@ -80,7 +79,7 @@ void PlayerBullet::update() {
 	case PlayerBullet::State::Attach:
 		// 10秒カウントして10秒立ったら弾が消滅
 		break;
-	
+
 	case PlayerBullet::State::BeatAttack:
 	{
 		// ビート攻撃をする
@@ -123,12 +122,12 @@ void PlayerBullet::update() {
 }
 
 void PlayerBullet::BeatNormal() {
-	constexpr float hartbeatCycle = 0.5f;
+	float HartbeatCycle = 0.5f;
 
 	// 脈拍のようなスケール変化
 	hartbeatTimer += WorldClock::DeltaSeconds();
-	hartbeatTimer = std::fmod(hartbeatTimer, hartbeatCycle);
-	parametric = hartbeatTimer / hartbeatCycle;
+	hartbeatTimer = std::fmod(hartbeatTimer, HartbeatCycle);
+	parametric = hartbeatTimer / HartbeatCycle;
 	// 時間に基づいてスケールが脈打つように変化する
 	float scaleValue = baseScale_ + heartbeatAmplitude_ * (parametric - std::floor(parametric));
 	Vector3 scale = { scaleValue, scaleValue, scaleValue };
@@ -137,9 +136,10 @@ void PlayerBullet::BeatNormal() {
 
 void PlayerBullet::Throw(const Vector3& worldPosition, const Vector3& velocityDirection) {
 	hierarchy.reset_parent();
-	float StartOffset = 1.5f;
+	float StartOffset = 1.0f;
 	float Speed = 6.0f;
-	transform.set_translate(worldPosition + velocityDirection * StartOffset + Vector3{ 0,0.5f,0 });
+	Vector3 upwardOffset = { 0,1,0 };
+	transform.set_translate(worldPosition + velocityDirection * StartOffset + upwardOffset);
 	velocity = velocityDirection * Speed;
 	velocity.y = 1.0f;
 	collider->set_active(true);
@@ -175,7 +175,11 @@ std::weak_ptr<SphereCollider> PlayerBullet::get_collider() const {
 void PlayerBullet::on_collision_enter(const BaseCollider* const other) {
 	const std::string& group = other->group();
 	if (group == "EnemyHit") {
-		const BaseEnemy* beatEnemy = dynamic_cast<const BaseEnemy*>(other->get_hierarchy().get_parent_address());
+		const WorldInstance* enemy_model = other->get_hierarchy().get_parent_address();
+		const BaseEnemy* beatEnemy = nullptr;
+		if (enemy_model) {
+			beatEnemy = dynamic_cast<const BaseEnemy*>(enemy_model->get_hierarchy().get_parent_address());
+		}
 		if (beatEnemy && beatEnemy->get_now_behavior() != EnemyBehavior::Down) {
 			Vector3 worldPosition = world_position();
 			Vector3 translate = Transform3D::Homogeneous(worldPosition, beatEnemy->world_matrix().inverse());

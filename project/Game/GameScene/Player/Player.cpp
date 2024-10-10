@@ -23,7 +23,10 @@ void Player::initialize() {
 	globalValues.add_value<int>("Player", "NumBullets", 10);
 
 	// 描画オブジェクトを設定
-	reset_object("Sphere.obj");
+	playerMesh = std::make_unique<GameObject>("Sphere.obj");
+	playerMesh->initialize();
+	playerMesh->set_parent(*this);
+	playerMesh->get_transform().set_translate_y(1.0f);
 
 	// 弾の初期化
 	// 弾の数を指定
@@ -31,6 +34,7 @@ void Player::initialize() {
 	for (uint32_t i = 0; i < numBullets; ++i) {
 		std::unique_ptr<PlayerBullet> bullet = std::make_unique<PlayerBullet>();
 		float parametric = static_cast<float>(i) / numBullets;
+		// Playerとペアレント
 		bullet->initialize(*this);
 		bullet->set_angle_offset(PI2 * parametric);
 		bullets_.emplace_back(std::move(bullet));
@@ -38,7 +42,7 @@ void Player::initialize() {
 
 	hitCollider = eps::CreateShared<SphereCollider>();
 	hitCollider->initialize();
-	hitCollider->set_parent(*this);
+	hitCollider->set_parent(*playerMesh);
 	hitCollider->set_on_collision_enter(
 		std::bind(&Player::OnCollisionCallBack, this, std::placeholders::_1)
 	);
@@ -52,6 +56,7 @@ void Player::begin() {
 }
 
 void Player::update() {
+	playerMesh->update();
 	switch (state_) {
 	case Player::State::Move:
 		Move();
@@ -74,7 +79,8 @@ void Player::update() {
 }
 
 void Player::begin_rendering() noexcept {
-	GameObject::begin_rendering();
+	update_matrix();
+	playerMesh->begin_rendering();
 
 	for (auto& bullet : bullets_) {
 		bullet->begin_rendering();
@@ -82,7 +88,7 @@ void Player::begin_rendering() noexcept {
 }
 
 void Player::draw() const {
-	GameObject::draw();
+	playerMesh->draw();
 
 	for (auto& bullet : bullets_) {
 		bullet->draw();
@@ -93,7 +99,7 @@ void Player::draw() const {
 
 void Player::debug_gui() {
 	ImGui::Begin("Player");
-	GameObject::debug_gui();
+	playerMesh->debug_gui();
 	ImGui::Text("%f", attackFrame);
 
 	ImGui::End();
@@ -153,11 +159,13 @@ void Player::SetBeat() {
 }
 
 void Player::Beating() {
-	// ボタンが離れたらMoveに戻す
 	bool killAll = beatManager->empty_pair();
+	// ボタンが離れたらor敵が全員倒れたらMoveに戻す
 	if (releaseButton || killAll) {
 		state_ = State::Move;
 		beatManager->pause_beat();
+		// すべての敵が倒れた場合はボタンが押しっぱなしなので
+		// 1回反応させないようにする
 		if (killAll) {
 			unreleaseOnce = true;
 		}

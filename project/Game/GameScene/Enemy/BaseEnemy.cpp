@@ -100,7 +100,7 @@ void BaseEnemy::initialize() {
 
 	beatCollider = eps::CreateShared<SphereCollider>();
 	beatCollider->initialize();
-	beatCollider->set_parent(*ghostMesh);
+	beatCollider->set_parent(*this);
 	beatCollider->set_active(false);
 	beatCollider->set_radius(3.0f);
 }
