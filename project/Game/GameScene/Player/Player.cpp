@@ -31,7 +31,6 @@ void Player::initialize() {
 	playerMesh = std::make_unique<GameObject>("player_model.obj");
 	playerMesh->initialize();
 	playerMesh->set_parent(*this);
-	playerMesh->get_transform().set_translate_y(1.0f);
 
 	// 弾の初期化
 	// 弾の数を指定

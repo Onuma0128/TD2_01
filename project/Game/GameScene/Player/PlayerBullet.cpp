@@ -23,7 +23,7 @@ void PlayerBullet::initialize(const WorldInstance& parent) {
 	globalValues.add_value<float>("Animation", "HeartbeatCycle", 0.5f);
 	globalValues.add_value<float>("Animation", "HeartBeatAmplitude", 0.05f);
 	globalValues.add_value<float>("Animation", "AngleLapCycle", 6.0f);
-	globalValues.add_value<Vector3>("Animation", "DistanceOffset", { 0,0,1.5f });
+	globalValues.add_value<Vector3>("Animation", "DistanceOffset", { 0.0f,1.0f,1.5f });
 
 	// 脈拍のタイマー
 	heartbeatTimer = 0.0f;
@@ -34,7 +34,7 @@ void PlayerBullet::initialize(const WorldInstance& parent) {
 	// 地面に着いてからのタイマー
 	onGroundTimer = 0.0f;
 
-	globalValues.add_value<float>("Animation", "HeartBaseScale", 0.2f);
+	globalValues.add_value<float>("Animation", "HeartBaseScale", 2.0f);
 
 	this->set_parent(parent);
 
