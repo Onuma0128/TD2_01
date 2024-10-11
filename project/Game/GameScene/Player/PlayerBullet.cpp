@@ -151,7 +151,7 @@ void PlayerBullet::BeatNormal() {
 	// 時間に基づいてスケールが脈打つように変化する
 	baseScale_ = globalValues.get_value<float>("Animation", "HeartBaseScale");
 	heartbeatAmplitude_ = globalValues.get_value<float>("Animation", "HeartBeatAmplitude");
-	float scaleValue = baseScale_ + heartbeatAmplitude_ * (parametric - std::floor(parametric));
+	float scaleValue = baseScale_ + heartbeatAmplitude_ * -(parametric - std::floor(parametric));
 	Vector3 scale = { scaleValue, scaleValue, scaleValue };
 	get_transform().set_scale(scale);
 }
