@@ -21,7 +21,6 @@ GameScene::~GameScene() = default;
 void GameScene::load() {
 	std::string ResourceDirectory = "./Resources/GameScene/";
 	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models", "Sphere.obj");
-	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models", "Ghost.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models", "ghost_model.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models", "hart.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models", "player_model.obj");

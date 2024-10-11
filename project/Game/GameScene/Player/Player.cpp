@@ -47,6 +47,7 @@ void Player::initialize() {
 	hitCollider = eps::CreateShared<SphereCollider>();
 	hitCollider->initialize();
 	hitCollider->set_parent(*playerMesh);
+	hitCollider->get_transform().set_translate_y(1.0f);
 	hitCollider->set_on_collision_enter(
 		std::bind(&Player::OnCollisionCallBack, this, std::placeholders::_1)
 	);

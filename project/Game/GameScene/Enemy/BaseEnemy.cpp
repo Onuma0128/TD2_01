@@ -85,6 +85,7 @@ void BaseEnemy::initialize() {
 	hitCollider = eps::CreateShared<SphereCollider>();
 	hitCollider->initialize();
 	hitCollider->set_parent(*ghostMesh);
+	hitCollider->set_radius(0.5);
 	hitCollider->set_on_collision_enter(
 		std::bind(&BaseEnemy::damaged_callback, this, std::placeholders::_1)
 	);
@@ -94,7 +95,7 @@ void BaseEnemy::initialize() {
 	meleeCollider->initialize();
 	meleeCollider->set_parent(*ghostMesh);
 	meleeCollider->set_active(false);
-	meleeCollider->set_radius(1.0f);
+	meleeCollider->set_radius(0.5);
 	meleeCollider->set_on_collision_enter(
 		std::bind(&BaseEnemy::attack_callback, this, std::placeholders::_1)
 	);
