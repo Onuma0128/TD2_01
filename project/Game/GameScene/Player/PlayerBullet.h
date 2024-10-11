@@ -64,7 +64,7 @@ private:
 	float parametric;
 
 	float angleOffset;
-	Vector3 distanceOffset{ 0,0,1.5f };
+	Vector3 distanceOffset{ 0.0f,1.0f,1.5f };
 
 	float onGroundTimer = 0;
 
