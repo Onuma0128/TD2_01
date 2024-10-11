@@ -11,7 +11,7 @@
 #include "Game/GameScene/BeatManager/BeatManager.h"
 
 void PlayerBullet::initialize(const WorldInstance& parent) {
-	reset_object("Sphere.obj");
+	reset_object("hart.obj");
 
 	globalValues.add_value<float>("Heart", "CamebackTime", 3.0f);
 	globalValues.add_value<float>("Heart", "CamebackSpeed", 5.0f);
