@@ -28,7 +28,7 @@ void Player::initialize() {
 	globalValues.add_value<float>("Player", "ColliderRadius", 1.0f);
 
 	// 描画オブジェクトを設定
-	playerMesh = std::make_unique<GameObject>("Sphere.obj");
+	playerMesh = std::make_unique<GameObject>("player_model.obj");
 	playerMesh->initialize();
 	playerMesh->set_parent(*this);
 	playerMesh->get_transform().set_translate_y(1.0f);

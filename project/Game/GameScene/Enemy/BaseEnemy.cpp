@@ -77,7 +77,7 @@ void BaseEnemy::initialize() {
 		std::bind(&BaseEnemy::erase_update, this)
 	);
 
-	ghostMesh = eps::CreateUnique<GameObject>("Ghost.obj");
+	ghostMesh = eps::CreateUnique<GameObject>("ghost_model.obj");
 	ghostMesh->initialize();
 	ghostMesh->set_parent(*this);
 	ghostMesh->get_transform().set_translate({ 0,1,0 });
