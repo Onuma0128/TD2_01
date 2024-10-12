@@ -1,34 +1,26 @@
 #include "PlayerHPManager.h"
 
-void PlayerHPManager::initialize()
-{
-	hp_ = 10;
+#include "Game/GlobalValues/GlobalValues.h"
 
-	state_ = HP_State::None;
+void PlayerHPManager::initialize() {
+	GlobalValues::GetInstance().add_value<int>("Player", "NumBullets", 10);
+	hp_ = GlobalValues::GetInstance().get_value<int>("Player", "NumBullets");
 }
 
-void PlayerHPManager::update()
-{
-	switch (state_)
-	{
-	case PlayerHPManager::HP_State::None:
+void PlayerHPManager::set_state(HP_State state) {
+	switch (state) {
+	case HP_State::None:
 		break;
-	case PlayerHPManager::HP_State::Recovery:
-
-		hp_++;
-
-		state_ = HP_State::None;
-
+	
+	case HP_State::Recovery:
+		++hp_;
 		break;
-	case PlayerHPManager::HP_State::Damage:
 
-		hp_--;
-
-		state_ = HP_State::None;
-
+	case HP_State::Damage:
+		--hp_;
 		break;
+	
 	default:
 		break;
 	}
-
 }

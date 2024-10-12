@@ -41,13 +41,13 @@ void GameScene::initialize() {
 	/*==================== シーン ====================*/
 	collisionManager = eps::CreateUnique<CollisionManager>();
 	beatManager = eps::CreateUnique<BeatManager>();
+	BaseEnemy::beatManager = beatManager.get();
+	PlayerBullet::beatManager = beatManager.get();
+	Player::beatManager = beatManager.get();
 	playerHpManager_ = std::make_unique<PlayerHPManager>();
 	playerHpManager_->initialize();
-	BaseEnemy::beatManager = beatManager.get();
 	BaseEnemy::playerHpManager_ = playerHpManager_.get();
-	PlayerBullet::beatManager = beatManager.get();
 	PlayerBullet::playerHpManager = playerHpManager_.get();
-	Player::beatManager = beatManager.get();
 	Player::playerHpManager_ = playerHpManager_.get();
 
 	object3dNode_ = std::make_unique<Object3DNode>();
@@ -100,7 +100,6 @@ void GameScene::update() {
 	for (BaseEnemy& enemy : enemies) {
 		enemy.update();
 	}
-	playerHpManager_->update();
 
 	enemies.remove_if([](const BaseEnemy& enemy) {return !enemy.is_active(); });
 }
@@ -158,6 +157,10 @@ void GameScene::debug_update() {
 	GlobalValues::GetInstance().debug_gui();
 
 	player_->debug_gui();
+
+	ImGui::Begin("HP");
+	ImGui::Text("HP : %d", playerHpManager_->get_hp());
+	ImGui::End();
 }
 #endif // _DEBUG
 

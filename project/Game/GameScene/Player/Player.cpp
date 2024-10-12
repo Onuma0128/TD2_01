@@ -106,8 +106,6 @@ void Player::draw() const {
 void Player::debug_gui() {
 	ImGui::Begin("Player");
 	playerMesh->debug_gui();
-	ImGui::Text("%d", playerHpManager_->get_hp());
-
 	ImGui::End();
 }
 #endif // _DEBUG
@@ -197,8 +195,7 @@ void Player::ThrowHeart() {
 		// 追跡状態だったらbulletを投げる
 		if (bullet->get_state() == PlayerBullet::State::Follow && playerHpManager_->get_hp() >= 2) {
 			bullet->Throw(world_position(), CVector3::BASIS_Z * transform.get_quaternion());
-			playerHpManager_->set_state(PlayerHPManager::HP_State::Damage);
-			playerHpManager_->update();
+			playerHpManager_->set_state(HP_State::Damage);
 			// 1回投げたら終わる
 			return;
 		}
@@ -218,8 +215,7 @@ void Player::OnCollisionCallBack(const BaseCollider* const other) {
 		for (auto& bullet : bullets_) {
 			if (bullet->get_state() == PlayerBullet::State::Follow) {
 				bullet->lost();
-				playerHpManager_->set_state(PlayerHPManager::HP_State::Damage);
-				playerHpManager_->update();
+				playerHpManager_->set_state(HP_State::Damage);
 				break;
 			}
 		}
