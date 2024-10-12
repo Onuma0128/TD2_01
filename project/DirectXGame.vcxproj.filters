@@ -286,6 +286,15 @@
     <Filter Include="Game\Scene\GameScene\BeatManager">
       <UniqueIdentifier>{2f9ef8fb-39db-4691-8703-8961dce6cff2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Scene\GameScene\Timeline">
+      <UniqueIdentifier>{dd87d0b9-2e32-4352-a554-5a2972b9a2d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Scene\GameScene\Timeline\TimelineEditor">
+      <UniqueIdentifier>{53218b96-f533-47b6-868b-30e99c872d0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Scene\GameScene\Enemy\EnemyManager">
+      <UniqueIdentifier>{79f0aae8-8cdd-462a-b87f-b553026ff2ca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\WinApp.cpp">
@@ -527,6 +536,15 @@
     </ClCompile>
     <ClCompile Include="Game\GameScene\Player\PlayerHPManager.cpp">
       <Filter>Game\Scene\GameScene\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameScene\Timeline\Timeline.cpp">
+      <Filter>Game\Scene\GameScene\Timeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameScene\Timeline\TimelineEditor\TimelineEditor.cpp">
+      <Filter>Game\Scene\GameScene\Timeline\TimelineEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameScene\EnemyManager\EnemyManager.cpp">
+      <Filter>Game\Scene\GameScene\Enemy\EnemyManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -796,6 +814,15 @@
     </ClInclude>
     <ClInclude Include="Game\GameScene\Player\PlayerHPManager.h">
       <Filter>Game\Scene\GameScene\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameScene\Timeline\Timeline.h">
+      <Filter>Game\Scene\GameScene\Timeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameScene\Timeline\TimelineEditor\TimelineEditor.h">
+      <Filter>Game\Scene\GameScene\Timeline\TimelineEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameScene\EnemyManager\EnemyManager.h">
+      <Filter>Game\Scene\GameScene\Enemy\EnemyManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

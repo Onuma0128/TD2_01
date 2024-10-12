@@ -189,10 +189,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Utility\ConvertString.cpp" />
     <ClCompile Include="Engine\WinApp.cpp" />
     <ClCompile Include="Game\GameScene\BeatManager\BeatManager.cpp" />
+    <ClCompile Include="Game\GameScene\EnemyManager\EnemyManager.cpp" />
     <ClCompile Include="Game\GameScene\Enemy\BaseEnemy.cpp" />
     <ClCompile Include="Game\GameScene\GameScene.cpp" />
     <ClCompile Include="Game\GameScene\Player\Player.cpp" />
     <ClCompile Include="Game\GameScene\Player\PlayerBullet.cpp" />
+    <ClCompile Include="Game\GameScene\Timeline\Timeline.cpp" />
+    <ClCompile Include="Game\GameScene\Timeline\TimelineEditor\TimelineEditor.cpp" />
     <ClCompile Include="Game\GlobalValues\GlobalValues.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Game\GameScene\Player\PlayerHPManager.cpp" />
@@ -280,10 +283,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Utility\TimedCall\TimedCall.h" />
     <ClInclude Include="Engine\WinApp.h" />
     <ClInclude Include="Game\GameScene\BeatManager\BeatManager.h" />
+    <ClInclude Include="Game\GameScene\EnemyManager\EnemyManager.h" />
     <ClInclude Include="Game\GameScene\GameScene.h" />
     <ClInclude Include="Game\GameScene\Player\Player.h" />
     <ClInclude Include="Game\GameScene\Player\PlayerBullet.h" />
     <ClInclude Include="Game\GameScene\Enemy\BaseEnemy.h" />
+    <ClInclude Include="Game\GameScene\Timeline\Timeline.h" />
+    <ClInclude Include="Game\GameScene\Timeline\TimelineEditor\TimelineEditor.h" />
     <ClInclude Include="Game\GlobalValues\GlobalValues.h" />
     <ClInclude Include="Game\WorldSystemValue.h" />
     <ClInclude Include="Game\GameScene\Player\PlayerHPManager.h" />

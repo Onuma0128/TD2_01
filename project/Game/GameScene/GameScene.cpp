@@ -40,9 +40,19 @@ void GameScene::initialize() {
 
 	/*==================== シーン ====================*/
 	collisionManager = eps::CreateUnique<CollisionManager>();
+
+	enemyManager = eps::CreateUnique<EnemyManager>();
+	enemyManager->set_collision_manager(collisionManager.get());
+	
 	beatManager = eps::CreateUnique<BeatManager>();
+	
+	timeline = std::make_unique<Timeline>();
+	timeline->Initialize();
+	timeline->SetEnemyManager(enemyManager.get());
+
 	playerHpManager_ = std::make_unique<PlayerHPManager>();
 	playerHpManager_->initialize();
+	
 	BaseEnemy::beatManager = beatManager.get();
 	BaseEnemy::playerHpManager_ = playerHpManager_.get();
 	PlayerBullet::beatManager = beatManager.get();
@@ -96,21 +106,18 @@ void GameScene::begin() {
 
 void GameScene::update() {
 	//camera3D_->update();
-	player_->update();
-	for (BaseEnemy& enemy : enemies) {
-		enemy.update();
-	}
-	playerHpManager_->update();
 
-	enemies.remove_if([](const BaseEnemy& enemy) {return !enemy.is_active(); });
+	timeline->Update();
+
+	player_->update();
+	enemyManager->update();
+	playerHpManager_->update();
 }
 
 void GameScene::begin_rendering() {
 	camera3D_->update_matrix();
 	player_->begin_rendering();
-	for (BaseEnemy& enemy : enemies) {
-		enemy.begin_rendering();
-	}
+	enemyManager->begin_rendering();
 
 	collisionManager->update();
 }
@@ -125,6 +132,7 @@ void GameScene::draw() const {
 	RenderPathManager::BeginFrame();
 	camera3D_->set_command(1);
 	player_->draw();
+	enemyManager->draw();
 #ifdef _DEBUG
 	camera3D_->debug_draw();
 	collisionManager->debug_draw3d();
@@ -132,9 +140,6 @@ void GameScene::draw() const {
 
 
 	DirectXCore::ShowGrid();
-	for (const BaseEnemy& enemy : enemies) {
-		enemy.draw();
-	}
 
 	RenderPathManager::Next();
 	RenderPathManager::Next();
@@ -158,13 +163,15 @@ void GameScene::debug_update() {
 	GlobalValues::GetInstance().debug_gui();
 
 	player_->debug_gui();
+
+	timeline->debug_gui();
 }
 #endif // _DEBUG
 
 void GameScene::create_enemy() {
-	auto& newEnemy = enemies.emplace_back();
-	newEnemy.initialize();
-	collisionManager->register_collider("EnemyHit", newEnemy.get_hit_collider());
-	collisionManager->register_collider("Beat", newEnemy.get_beat_collider());
-	collisionManager->register_collider("EnemyMelee", newEnemy.get_melee_collider());
+	//auto& newEnemy = enemies.emplace_back();
+	//newEnemy.initialize();
+	//collisionManager->register_collider("EnemyHit", newEnemy.get_hit_collider());
+	//collisionManager->register_collider("Beat", newEnemy.get_beat_collider());
+	//collisionManager->register_collider("EnemyMelee", newEnemy.get_melee_collider());
 }

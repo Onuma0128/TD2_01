@@ -7,8 +7,7 @@
 #include "Game/GameScene/Player/PlayerHPManager.h"
 #include "Game/GameScene/BeatManager/BeatManager.h"
 
-void BaseEnemy::initialize() {
-	transform.set_translate({ 0,0,5 });
+void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
 	globalValues.add_value<int>("Heart", "AttackDamage", 30);
 
 	globalValues.add_value<int>("Enemy", "HP", 100);
@@ -30,6 +29,9 @@ void BaseEnemy::initialize() {
 	markedCount = 0;
 	maxHitpoint = globalValues.get_value<int>("Enemy", "HP");
 	hitpoint = maxHitpoint;
+	transform.set_translate(translate);
+	transform.set_quaternion(Quaternion::LookForward(forward));
+	// behavior初期化
 	behavior.initalize(EnemyBehavior::Spawn);
 	behavior.add_list(
 		EnemyBehavior::Spawn,
