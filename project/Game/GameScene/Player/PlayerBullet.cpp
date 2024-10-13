@@ -19,6 +19,7 @@ void PlayerBullet::initialize(const WorldInstance& parent) {
 	globalValues.add_value<float>("Heart", "AttackSpeed", 6.0f);
 	globalValues.add_value<float>("Heart", "HeightOffset", 1.0f);
 	globalValues.add_value<float>("Heart", "ColliderRadius", 1.0f);
+	globalValues.add_value<float>("Heart", "ToFollowDistance", 1.0f);
 
 	globalValues.add_value<float>("Animation", "HeartbeatCycle", 0.5f);
 	globalValues.add_value<float>("Animation", "HeartBeatAmplitude", 0.5f);
@@ -128,8 +129,7 @@ void PlayerBullet::update() {
 			destructionCount = 0.0f;
 			transform.set_translate(Transform3D::Homogeneous(transform.get_translate(), player->world_matrix().inverse()));
 			set_parent(*player);
-			playerHpManager->set_state(PlayerHPManager::HP_State::Recovery);
-			playerHpManager->update();
+			playerHpManager->set_state(HP_State::Recovery);
 		}
 	}
 	break;

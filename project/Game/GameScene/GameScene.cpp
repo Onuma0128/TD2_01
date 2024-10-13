@@ -45,19 +45,20 @@ void GameScene::initialize() {
 	enemyManager->set_collision_manager(collisionManager.get());
 	
 	beatManager = eps::CreateUnique<BeatManager>();
+
+	BaseEnemy::beatManager = beatManager.get();
+	PlayerBullet::beatManager = beatManager.get();
+	Player::beatManager = beatManager.get();
 	
 	timeline = std::make_unique<Timeline>();
 	timeline->Initialize();
 	timeline->SetEnemyManager(enemyManager.get());
-
+	
 	playerHpManager_ = std::make_unique<PlayerHPManager>();
 	playerHpManager_->initialize();
 	
-	BaseEnemy::beatManager = beatManager.get();
 	BaseEnemy::playerHpManager_ = playerHpManager_.get();
-	PlayerBullet::beatManager = beatManager.get();
 	PlayerBullet::playerHpManager = playerHpManager_.get();
-	Player::beatManager = beatManager.get();
 	Player::playerHpManager_ = playerHpManager_.get();
 
 	object3dNode_ = std::make_unique<Object3DNode>();
@@ -165,6 +166,10 @@ void GameScene::debug_update() {
 	player_->debug_gui();
 
 	timeline->debug_gui();
+	
+	ImGui::Begin("HP");
+	ImGui::Text("HP : %d", playerHpManager_->get_hp());
+	ImGui::End();
 }
 #endif // _DEBUG
 
