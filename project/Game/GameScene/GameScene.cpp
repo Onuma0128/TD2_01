@@ -112,7 +112,6 @@ void GameScene::update() {
 
 	player_->update();
 	enemyManager->update();
-	playerHpManager_->update();
 }
 
 void GameScene::begin_rendering() {
