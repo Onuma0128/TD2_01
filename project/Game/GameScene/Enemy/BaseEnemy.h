@@ -57,7 +57,7 @@ private: // Structs
 public: // Contsructor/Destructor
 
 public: // Member function
-	void initialize();
+	void initialize(const Vector3& transform, const Vector3& forward);
 	void update();
 	void begin_rendering();
 	void draw() const;

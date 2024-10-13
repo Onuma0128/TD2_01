@@ -4,15 +4,13 @@
 #include "Engine/Render/RenderNode/Object3DNode/Object3DNode.h"
 #include "Engine/Render/RenderNode/Sprite/SpriteNode.h"
 #include "Engine/Application/Scene/BaseScene.h"
-
 #include "Engine/Module/Camera/Camera3D.h"
-#include "Game/GameScene/Enemy/BaseEnemy.h"
-
+#include "Engine/Module/Collision/CollisionManager.h"
 #include "Game/GameScene/Player/Player.h"
 #include "Game/GameScene/Player/PlayerHPManager.h"
 #include "Game/GameScene/BeatManager/BeatManager.h"
-
-#include "Engine/Module/Collision/CollisionManager.h"
+#include "Game/GameScene/Timeline/Timeline.h"
+#include "Game/GameScene/EnemyManager/EnemyManager.h"
 
 class GameScene : public BaseScene
 {
@@ -43,9 +41,10 @@ private:
 private:
 	std::unique_ptr<CollisionManager> collisionManager = nullptr;
 	std::unique_ptr<BeatManager> beatManager = nullptr;
+	std::unique_ptr<Timeline> timeline = nullptr;
+	std::unique_ptr<EnemyManager> enemyManager = nullptr;
 
 	std::unique_ptr<Camera3D> camera3D_ = nullptr;
-	std::list<BaseEnemy> enemies;
 	std::unique_ptr<Player> player_ = nullptr;
 	std::unique_ptr<PlayerHPManager> playerHpManager_ = nullptr;
 
