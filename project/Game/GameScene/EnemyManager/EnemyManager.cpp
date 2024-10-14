@@ -37,3 +37,7 @@ void EnemyManager::create_enemy(const Vector3& position, const Vector3& forward)
 	collisionManager->register_collider("Beat", newEnemy.get_beat_collider());
 	collisionManager->register_collider("EnemyMelee", newEnemy.get_melee_collider());
 }
+
+void EnemyManager::clear() {
+	enemies.clear();
+}
