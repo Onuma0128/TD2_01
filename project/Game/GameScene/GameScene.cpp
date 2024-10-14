@@ -7,8 +7,12 @@
 #include <Engine/DirectX/DirectXCore.h>
 #include <Engine/Module/PolygonMesh/PolygonMeshManager.h>
 #include <Engine/Utility/SmartPointer.h>
+#include <Engine/Application/Input/Input.h>
 
 #include "Game/GlobalValues/GlobalValues.h"
+#include "Game/TitleScene/TitleScene.h"
+#include "Game/GameOverScene/GameOverScene.h"
+#include "Game/TutorialScene/TutorialScene.h"
 
 #ifdef _DEBUG
 #include "imgui.h"
@@ -112,6 +116,12 @@ void GameScene::update() {
 
 	player_->update();
 	enemyManager->update();
+
+#ifdef _DEBUG
+	if (playerHpManager_->get_hp() <= 0) {
+		SceneManager::SetSceneChange(std::make_unique<GameOverScene>(), 1, false);
+	}
+#endif // DEBUG
 }
 
 void GameScene::begin_rendering() {

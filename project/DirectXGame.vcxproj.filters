@@ -295,6 +295,15 @@
     <Filter Include="Game\Scene\GameScene\Enemy\EnemyManager">
       <UniqueIdentifier>{79f0aae8-8cdd-462a-b87f-b553026ff2ca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Scene\GameOverScene">
+      <UniqueIdentifier>{3d6d3c49-3e25-420f-b733-fb92d4ac3402}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Scene\TutorialScene">
+      <UniqueIdentifier>{cc91361b-128b-4dd1-aae6-8db26081be33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Scene\TitleScene">
+      <UniqueIdentifier>{4cc1e95d-2c45-4f3f-b898-c4d14c67e34f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\WinApp.cpp">
@@ -545,6 +554,15 @@
     </ClCompile>
     <ClCompile Include="Game\GameScene\EnemyManager\EnemyManager.cpp">
       <Filter>Game\Scene\GameScene\Enemy\EnemyManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameOverScene\GameOverScene.cpp">
+      <Filter>Game\Scene\GameOverScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\TitleScene\TitleScene.cpp">
+      <Filter>Game\Scene\TitleScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\TutorialScene\TutorialScene.cpp">
+      <Filter>Game\Scene\TutorialScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -823,6 +841,15 @@
     </ClInclude>
     <ClInclude Include="Game\GameScene\EnemyManager\EnemyManager.h">
       <Filter>Game\Scene\GameScene\Enemy\EnemyManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameOverScene\GameOverScene.h">
+      <Filter>Game\Scene\GameOverScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\TitleScene\TitleScene.h">
+      <Filter>Game\Scene\TitleScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\TutorialScene\TutorialScene.h">
+      <Filter>Game\Scene\TutorialScene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
