@@ -9,6 +9,10 @@ class BaseEnemy;
 class EnemyManager;
 
 class Timeline {
+#ifdef _DEBUG
+	friend class TimelineEditor;
+#endif // _DEBUG
+
 	struct PopData {
 		float delay;
 		Vector3 translate;
@@ -16,7 +20,6 @@ class Timeline {
 	};
 
 	struct WaveData {
-		int32_t numPop;
 		std::vector<PopData> popData;
 	};
 public:
@@ -53,12 +56,12 @@ private:
 
 #ifdef _DEBUG
 	bool isActiveEditor;
-	bool isUpdate;
+	bool isDemoPlay;
 #endif // _DEBUG
 
 private:
-	static inline std::filesystem::path TimelinePath
+	static const inline std::filesystem::path TimelinePath
 	{ "./Resources/GameScene/Timeline/" };
-	static inline std::filesystem::path LoadPath
+	static const inline std::filesystem::path LoadPath
 	{ TimelinePath.string() + "WaveData/" };
 };

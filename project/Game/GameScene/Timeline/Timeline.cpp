@@ -24,6 +24,12 @@ void Timeline::Initialize() {
 }
 
 void Timeline::Update() {
+#ifdef _DEBUG
+	if (isActiveEditor && !isDemoPlay) {
+		return;
+	}
+#endif // _DEBUG
+
 	// 終わっていたら更新しない
 	if (IsEndWaveAll()) {
 		return;
@@ -77,9 +83,7 @@ void Timeline::Load(const std::filesystem::path& directoryPath) {
 	// ウェーブ追加
 	WaveData& newWaveData = waveData.emplace_back();
 
-	newWaveData.numPop = data.at("NumEnemy");
-
-	for (int i = 0; i < newWaveData.numPop; ++i) {
+	for (int i = 0; i < newWaveData.popData.size(); ++i) {
 		// 発生データ
 		PopData& popData = newWaveData.popData.emplace_back();
 		std::string test = std::format("{:02}", i);
@@ -109,9 +113,6 @@ void Timeline::LoadAll() {
 	json root{ json::parse(ifstream) };
 	ifstream.close();
 
-	int numWaveData = root.at("NumWaveData");
-	waveData.reserve(numWaveData);
-
 	const auto& waveArray = root.at("WaveFiles");
 
 	for (const auto& waveFileName : waveArray) {
@@ -123,20 +124,27 @@ void Timeline::LoadAll() {
 #include <imgui.h>
 void Timeline::debug_gui() {
 	ImGui::Begin("Timeline");
-	ImGui::Text("Wave : %d/%d", std::distance(waveData.begin(), nowWave), waveData.size());
-	if (nowWave != waveData.end()) {
-		ImGui::Text("Poped : %d/%d", std::distance(nowWave->popData.begin(), nextPopData), nowWave->popData.size());
+	if (ImGui::Checkbox("Editor", &isActiveEditor)) {
+		enemyManager->clear();
+	}
+	if (isActiveEditor && !isDemoPlay) {
+		ImGui::Text("Editting");
 	}
 	else {
-		if (!waveData.empty()) {
-			auto size = waveData.rbegin()->numPop;
-			ImGui::Text("Poped : %d/%d", size, size);
+		ImGui::Text("Wave : %d/%d", std::distance(waveData.begin(), nowWave), waveData.size());
+		if (nowWave != waveData.end()) {
+			ImGui::Text("Poped : %d/%d", std::distance(nowWave->popData.begin(), nextPopData), nowWave->popData.size());
 		}
 		else {
-			ImGui::Text("Poped : 0/0");
+			if (!waveData.empty()) {
+				auto size = waveData.rbegin()->popData.size();
+				ImGui::Text("Poped : %d/%d", size, size);
+			}
+			else {
+				ImGui::Text("Poped : 0/0");
+			}
 		}
 	}
-	ImGui::Checkbox("Editor", &isActiveEditor);
 	ImGui::End();
 }
 #endif // _DEBUG

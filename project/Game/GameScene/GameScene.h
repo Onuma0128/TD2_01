@@ -12,6 +12,10 @@
 #include "Game/GameScene/Timeline/Timeline.h"
 #include "Game/GameScene/EnemyManager/EnemyManager.h"
 
+#ifdef _DEBUG
+#include "Game/GameScene/Timeline/TimelineEditor/TimelineEditor.h"
+#endif // _DEBUG
+
 class GameScene : public BaseScene
 {
 public:
@@ -50,5 +54,9 @@ private:
 
 	std::shared_ptr<Object3DNode> object3dNode_ = nullptr;
 	std::shared_ptr<SpriteNode> spriteNode_ = nullptr;
+
+#ifdef _DEBUG
+	std::unique_ptr<TimelineEditor> editor = nullptr;
+#endif // _DEBUG
 };
 

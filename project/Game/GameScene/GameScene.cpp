@@ -92,6 +92,12 @@ void GameScene::initialize() {
 	}
 
 	BaseEnemy::targetPlayer = player_.get();
+
+#ifdef _DEBUG
+	editor = eps::CreateUnique<TimelineEditor>();
+	editor->initialize(timeline.get(), camera3D_.get());
+#endif // _DEBUG
+
 }
 
 void GameScene::poped() {
@@ -136,6 +142,7 @@ void GameScene::draw() const {
 #ifdef _DEBUG
 	camera3D_->debug_draw();
 	collisionManager->debug_draw3d();
+	editor->draw_preview();
 #endif // _DEBUG
 
 
@@ -169,6 +176,8 @@ void GameScene::debug_update() {
 	ImGui::Begin("HP");
 	ImGui::Text("HP : %d", playerHpManager_->get_hp());
 	ImGui::End();
+
+	editor->editor_gui();
 }
 #endif // _DEBUG
 

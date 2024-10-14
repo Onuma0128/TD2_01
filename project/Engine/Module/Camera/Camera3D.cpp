@@ -139,7 +139,7 @@ void Camera3D::debug_camera() {
 		offset.z = std::min(offset.z + wheel, 0.0f);
 
 		// 左クリック(回転)
-		if (Input::IsPressMouse(MouseID::Left)) {
+		if (Input::IsPressMouse(MouseID::Right)) {
 			// 倍率をかけて調整
 			Vector2 rotateAngle = mouseDelta / 200;
 			Quaternion rotation = debugCamera->get_transform().get_quaternion();

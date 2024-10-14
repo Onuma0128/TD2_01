@@ -24,6 +24,11 @@ public:
 	void set_collision_manager(CollisionManager* collisionManager_);
 	void create_enemy(const Vector3& position, const Vector3& forward);
 
+#ifdef _DEBUG
+public:
+	void clear();
+#endif // _DEBUG
+
 private:
 	std::list<BaseEnemy> enemies;
 	CollisionManager* collisionManager;
