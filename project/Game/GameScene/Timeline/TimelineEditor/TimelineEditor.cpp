@@ -181,7 +181,7 @@ void TimelineEditor::demoplay() {
 					run_demoplay();
 				}
 			}
-			ImGui::Checkbox("DemoplayEditStep", &isDemoplayEditStep);
+			ImGui::Checkbox("DemoplayEditWave", &isDemoplayEditWave);
 		}
 	}
 }
@@ -238,7 +238,7 @@ void TimelineEditor::get_nearest_enemy() {
 	if (rayToGround.has_value() && !timeline->waveData.empty() && editWave.has_value()) {
 		for (int i = 0; i < timeline->waveData[editWave.value()].popData.size(); ++i) {
 			Timeline::PopData& popData = timeline->waveData[editWave.value()].popData[i];
-			if ((popData.translate - rayToGround.value()).length() < 1.0f) {
+			if (((popData.translate + CVector3::BASIS_Y) - rayToGround.value()).length() < 1.0f) {
 				nearestIndex = i;
 				return;
 			}
@@ -257,7 +257,7 @@ void TimelineEditor::detail_window() {
 	Timeline::PopData& popData = timeline->waveData[editWave.value()].popData[selectPopData.value()];
 
 	ImGui::DragFloat("Delay", &popData.delay, 0.01f, 0.0f, std::numeric_limits<float>::infinity());
-	ImGui::DragFloat3("Transform", &popData.translate.x, 0.01f);
+	ImGui::DragFloat3("Translate", &popData.translate.x, 0.01f);
 	if (ImGui::DragFloat("Forward", &forawardAngle, 0.1f)) {
 		popData.forward = CVector3::BASIS_Z * Quaternion::EulerDegree(0, forawardAngle, 0);
 	}
@@ -360,7 +360,7 @@ void TimelineEditor::run_demoplay() {
 	}
 	timeline->isDemoPlay = true;
 	sort_all_wave_deta();
-	if (isDemoplayEditStep) {
+	if (isDemoplayEditWave) {
 		timeline->ResetWave(editWave.value());
 	}
 	else {

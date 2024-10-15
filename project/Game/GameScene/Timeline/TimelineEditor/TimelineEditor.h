@@ -72,7 +72,7 @@ private:
 
 	std::vector<GameObject> previews;
 
-	bool isDemoplayEditStep;
+	bool isDemoplayEditWave;
 };
 
 #endif // _DEBUG
