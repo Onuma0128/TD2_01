@@ -11,6 +11,7 @@
 #include "Game/GameScene/BeatManager/BeatManager.h"
 #include "Game/GameScene/Timeline/Timeline.h"
 #include "Game/GameScene/EnemyManager/EnemyManager.h"
+#include "Game/GameScene/RenderNode/CircleGauge/CircleGaugeNode.h"
 
 #ifdef _DEBUG
 #include "Game/GameScene/Timeline/TimelineEditor/TimelineEditor.h"
@@ -53,6 +54,7 @@ private:
 	std::unique_ptr<PlayerHPManager> playerHpManager_ = nullptr;
 
 	std::shared_ptr<Object3DNode> object3dNode_ = nullptr;
+	std::shared_ptr<CircleGaugeNode> circleGaugeNode = nullptr;
 	std::shared_ptr<SpriteNode> spriteNode_ = nullptr;
 
 #ifdef _DEBUG

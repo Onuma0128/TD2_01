@@ -22,6 +22,12 @@ void EnemyManager::draw() const {
 	}
 }
 
+void EnemyManager::draw_marker() const {
+	for (const BaseEnemy& enemy : enemies) {
+		enemy.draw_marker();
+	}
+}
+
 const std::list<BaseEnemy>& EnemyManager::get_enemies() {
 	return enemies;
 }

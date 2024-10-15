@@ -2,6 +2,7 @@
 
 #include <Engine/Application/WorldClock/WorldClock.h>
 #include <Engine/Utility/SmartPointer.h>
+#include "Engine/DirectX/DirectXCommand/DirectXCommand.h"
 
 #include "Game/GameScene/Player/PlayerBullet.h"
 #include "Game/GameScene/Player/PlayerHPManager.h"
@@ -84,6 +85,10 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
 	ghostMesh->set_parent(*this);
 	ghostMesh->get_transform().set_translate({ 0,1,0 });
 
+	hitMarkerMesh = eps::CreateUnique<GameObject>("HitMarker.obj");
+	hitMarkerMesh->initialize();
+	hitMarkerMesh->set_parent(*this);
+
 	hitCollider = eps::CreateShared<SphereCollider>();
 	hitCollider->initialize();
 	hitCollider->set_parent(*ghostMesh);
@@ -113,13 +118,15 @@ void BaseEnemy::update() {
 	// 行動の更新
 	behavior.update();
 
+	float markingTime = globalValues.get_value<float>("Enemy", "AbsorptionTime");
 	// 付与状態かつビートでない場合
 	if (markedCount && behavior.state() != EnemyBehavior::Beating) {
 		markingTimer += WorldClock::DeltaSeconds();
+		*percentage.get_data() = 1 - markingTimer / markingTime;
 	}
 
 	// 付与状態でカウンタが達成した場合
-	if (markingTimer >= globalValues.get_value<float>("Enemy", "AbsorptionTime")) {
+	if (markingTimer >= markingTime) {
 		markingTimer = 0;
 		beatManager->recovery(this);
 		// 回復
@@ -133,10 +140,20 @@ void BaseEnemy::update() {
 void BaseEnemy::begin_rendering() {
 	WorldInstance::update_matrix();
 	ghostMesh->begin_rendering();
+	hitMarkerMesh->begin_rendering();
 }
 
 void BaseEnemy::draw() const {
 	ghostMesh->draw();
+}
+
+void BaseEnemy::draw_marker() const {
+	if (markedCount) {
+		DirectXCommand::GetCommandList()->SetGraphicsRootConstantBufferView(
+			3, percentage.get_resource()->GetGPUVirtualAddress()
+		);
+		hitMarkerMesh->draw();
+	}
 }
 
 // 被ダメ時コールバック
