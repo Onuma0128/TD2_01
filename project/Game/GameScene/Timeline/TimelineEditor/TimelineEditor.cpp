@@ -15,7 +15,6 @@
 #include <Engine/Application/WorldClock/WorldClock.h>
 #include <Engine/Module/GameObject/GameObject.h>
 #include <Engine/Math/Definition.h>
-#include <Engine/Debug/Output.h>
 
 #include "Game/GameScene/EnemyManager/EnemyManager.h"
 
@@ -138,6 +137,8 @@ void TimelineEditor::input() {
 }
 
 void TimelineEditor::export_json_all() {
+	sort_all_wave_deta();
+
 	json root;
 	root["WaveFiles"] = json::array();
 	auto& array = root["WaveFiles"];
@@ -358,16 +359,13 @@ void TimelineEditor::run_demoplay() {
 		return;
 	}
 	timeline->isDemoPlay = true;
-	timeline->enemyManager->clear();
 	sort_all_wave_deta();
 	if (isDemoplayEditStep) {
-		timeline->nowWave = timeline->waveData.begin() + editWave.value();
+		timeline->ResetWave(editWave.value());
 	}
 	else {
-		timeline->nowWave = timeline->waveData.begin();
+		timeline->ResetWave(0);
 	}
-	timeline->timer = 0;
-	timeline->nextPopData = timeline->nowWave->popData.begin();
 }
 
 void TimelineEditor::stop_demoplay() {
