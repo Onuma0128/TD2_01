@@ -26,6 +26,7 @@ void GameScene::load() {
 	std::string ResourceDirectory = "./Resources/GameScene/";
 	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models", "Sphere.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models", "ghost_model.obj");
+	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/HitMarker", "HitMarker.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models", "hart.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models", "player_model.obj");
 }
@@ -67,7 +68,13 @@ void GameScene::initialize() {
 
 	object3dNode_ = std::make_unique<Object3DNode>();
 	object3dNode_->initialize();
+	object3dNode_->set_config(eps::to_bitflag(RenderNodeConfig::ContinueDrawBefore) | RenderNodeConfig::ContinueUseDpehtBefore);
 	object3dNode_->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+
+	circleGaugeNode = std::make_unique<CircleGaugeNode>();
+	circleGaugeNode->initialize();
+	circleGaugeNode->set_config(eps::to_bitflag(RenderNodeConfig::ContinueDrawBefore) | RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueUseDpehtAfter);
+	circleGaugeNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 
 	spriteNode_ = std::make_unique<SpriteNode>();
 	spriteNode_->initialize();
@@ -75,7 +82,7 @@ void GameScene::initialize() {
 	spriteNode_->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 
 	RenderPath path{};
-	path.initialize({ object3dNode_,spriteNode_ });
+	path.initialize({ object3dNode_,circleGaugeNode,spriteNode_ });
 
 	RenderPathManager::RegisterPath("GameScene" + std::to_string(reinterpret_cast<std::uint64_t>(this)), std::move(path));
 	RenderPathManager::SetPath("GameScene" + std::to_string(reinterpret_cast<std::uint64_t>(this)));
@@ -146,6 +153,7 @@ void GameScene::late_update() {
 
 void GameScene::draw() const {
 	RenderPathManager::BeginFrame();
+	// 3Dオブジェ
 	camera3D_->set_command(1);
 	player_->draw();
 	enemyManager->draw();
@@ -155,9 +163,11 @@ void GameScene::draw() const {
 	editor->draw_preview();
 #endif // _DEBUG
 
-
 	DirectXCore::ShowGrid();
 
+	RenderPathManager::Next();
+	// マーカー
+	enemyManager->draw_marker();
 	RenderPathManager::Next();
 	RenderPathManager::Next();
 }

@@ -18,6 +18,7 @@ public:
 	void update();
 	void begin_rendering();
 	void draw() const;
+	void draw_marker() const;
 
 public:
 	const std::list<BaseEnemy>& get_enemies();

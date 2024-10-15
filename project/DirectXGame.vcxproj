@@ -195,6 +195,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameScene\GameScene.cpp" />
     <ClCompile Include="Game\GameScene\Player\Player.cpp" />
     <ClCompile Include="Game\GameScene\Player\PlayerBullet.cpp" />
+    <ClCompile Include="Game\GameScene\RenderNode\CircleGauge\CircleGaugeNode.cpp" />
     <ClCompile Include="Game\GameScene\Timeline\Timeline.cpp" />
     <ClCompile Include="Game\GameScene\Timeline\TimelineEditor\TimelineEditor.cpp" />
     <ClCompile Include="Game\GlobalValues\GlobalValues.cpp" />
@@ -292,6 +293,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameScene\Player\Player.h" />
     <ClInclude Include="Game\GameScene\Player\PlayerBullet.h" />
     <ClInclude Include="Game\GameScene\Enemy\BaseEnemy.h" />
+    <ClInclude Include="Game\GameScene\RenderNode\CircleGauge\CircleGaugeNode.h" />
     <ClInclude Include="Game\GameScene\Timeline\Timeline.h" />
     <ClInclude Include="Game\GameScene\Timeline\TimelineEditor\TimelineEditor.h" />
     <ClInclude Include="Game\GlobalValues\GlobalValues.h" />

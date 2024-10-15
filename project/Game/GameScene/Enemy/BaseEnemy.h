@@ -7,6 +7,7 @@
 #include <Engine/Utility/TimedCall/TimedCall.h>
 #include <Engine/Module/Collision/Collider/SphereCollider.h>
 #include <Engine/Module/Behavior/Behavior.h>
+#include <Engine/DirectX/DirectXResourceObject/ConstantBuffer/ConstantBuffer.h>
 
 #include "Game/GlobalValues/GlobalValues.h"
 
@@ -61,6 +62,7 @@ public: // Member function
 	void update();
 	void begin_rendering();
 	void draw() const;
+	void draw_marker() const;
 
 private:
 	void damaged_callback(const BaseCollider* const other);
@@ -102,6 +104,7 @@ private: // Member values
 	Vector3 velocity;
 
 	std::unique_ptr<GameObject> ghostMesh;
+	std::unique_ptr<GameObject> hitMarkerMesh;
 
 	Behavior<EnemyBehavior> behavior;
 	std::variant<
@@ -123,6 +126,8 @@ private: // Member values
 
 	std::shared_ptr<SphereCollider> meleeCollider;
 	std::shared_ptr<SphereCollider> beatCollider;
+
+	ConstantBuffer<float> percentage;
 
 public: // Static value
 	inline static const WorldInstance* targetPlayer = nullptr;
