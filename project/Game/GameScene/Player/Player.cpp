@@ -27,6 +27,10 @@ void Player::initialize() {
 	globalValues.add_value<float>("Player", "TurnAroundSpeed", 0.2f);
 	globalValues.add_value<float>("Player", "ColliderRadius", 1.0f);
 
+	globalValues.add_value<float>("Player", "NockbackTime", 0.5f);
+	globalValues.add_value<float>("Player", "MaxNockbackStrength", 10.0f);
+	globalValues.add_value<float>("Player", "InvincibleTime", 2.0f);
+
 	// 描画オブジェクトを設定
 	playerMesh = std::make_unique<GameObject>("player_model.obj");
 	playerMesh->initialize();
@@ -65,12 +69,17 @@ void Player::update() {
 	switch (state_) {
 	case Player::State::Move:
 		Move();
+		InvincibleUpdate();
 		break;
 	case Player::State::Beating:
 		Beating();
 		break;
 	case Player::State::Throwing:
 		state_ = State::Move;
+		break;
+	case Player::State::NockBack:
+		KnockBack();
+		InvincibleUpdate();
 		break;
 	default:
 		break;
@@ -94,7 +103,15 @@ void Player::begin_rendering() noexcept {
 }
 
 void Player::draw() const {
-	playerMesh->draw();
+	if (isInvincible_) {
+		if (static_cast<int>(invincibleFrame_ * 10) % 2 == 0) {
+			playerMesh->draw();
+		}
+	}
+	else {
+		// 通常時は常に描画
+		playerMesh->draw();
+	}
 
 	for (auto& bullet : bullets_) {
 		bullet->draw();
@@ -150,12 +167,7 @@ void Player::Move() {
 	// Velocityに変換
 	velocity = moveDirection * globalValues.get_value<float>("Player", "Speed");
 	// 足す
-	if (isDamage_) {
-		KnockBack();
-	}
-	if (!isDamage_) {
-		transform.plus_translate(velocity * WorldClock::DeltaSeconds());
-	}
+	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
 	// 移動があれば向きを更新
 	if (velocity != CVector3::ZERO) {
 		const Quaternion& quaternion = transform.get_quaternion();
@@ -208,23 +220,47 @@ void Player::ThrowHeart() {
 
 void Player::KnockBack()
 {
+	// ノックバックフレームを更新
+	nockBackFrame_ += WorldClock::DeltaSeconds();
+
+	// ノックバックが続く時間
+	float knockbackDuration = globalValues.get_value<float>("Player", "NockbackTime");
+	float t = nockBackFrame_ / knockbackDuration;
+
+	// イージング関数を使ってノックバック強さを決定
+	float easedStrength = EaseOutCubic(t);
+
 	// ノックバック方向を計算
 	Vector3 knockbackDirection = transform.get_translate() - damageSourcePosition_;
 	knockbackDirection = knockbackDirection.normalize();
+	knockbackDirection.y = 0.0f;
 
-	// ノックバック強さ（距離）を定義
-	float knockbackStrength = 5.0f;
+	// ノックバック強さ（最大値を設定）
+	float maxKnockbackStrength = globalValues.get_value<float>("Player", "MaxNockbackStrength");
 
-	// ノックバック移動
-	transform.plus_translate(knockbackDirection * knockbackStrength * WorldClock::DeltaSeconds());
+	// ノックバック移動（イージングで減少する）
+	transform.plus_translate(knockbackDirection * maxKnockbackStrength * easedStrength * WorldClock::DeltaSeconds());
 
-	// ダメージフレーム管理
-	DamegeFrame_ += WorldClock::DeltaSeconds();
-
-	if (DamegeFrame_ > 1.0f) {
-		DamegeFrame_ = 0;
-		isDamage_ = false;
+	// ノックバック終了判定
+	if (nockBackFrame_ >= knockbackDuration) {
+		nockBackFrame_ = 0;
+		state_ = State::Move;
 	}
+}
+
+void Player::InvincibleUpdate()
+{
+	// 無敵時間の更新
+	invincibleFrame_ += WorldClock::DeltaSeconds();
+	if (invincibleFrame_ >= globalValues.get_value<float>("Player", "InvincibleTime")) {
+		isInvincible_ = false;
+		invincibleFrame_ = globalValues.get_value<float>("Player", "InvincibleTime");
+	}
+}
+
+float Player::EaseOutCubic(float t)
+{
+	return 1.0f - powf(1.0f - t, 10.0f);
 }
 
 std::weak_ptr<SphereCollider> Player::get_hit_collider() const {
@@ -236,13 +272,15 @@ const std::vector<std::unique_ptr<PlayerBullet>>& Player::get_bullets() const {
 }
 
 void Player::OnCollisionCallBack(const BaseCollider* const other) {
-	if (other->group() == "EnemyMelee") {
+	if (other->group() == "EnemyMelee" && !isInvincible_) {
 		for (auto& bullet : bullets_) {
 			if (bullet->get_state() == PlayerBullet::State::Follow) {
 				bullet->lost();
 				playerHpManager_->set_state(HP_State::Damage);
-				damageSourcePosition_ = other->get_transform().get_translate();
-				isDamage_ = true;
+				damageSourcePosition_ = other->world_position();
+				state_ = State::NockBack;
+				isInvincible_ = true;
+				invincibleFrame_ = 0.0f;
 				break;
 			}
 		}

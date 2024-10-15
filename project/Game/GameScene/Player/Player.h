@@ -20,6 +20,7 @@ public:
 		Move,
 		Beating,
 		Throwing,
+		NockBack,
 	};
 
 public:
@@ -52,6 +53,10 @@ public:
 
 	void KnockBack();
 
+	void InvincibleUpdate();
+
+	float EaseOutCubic(float t);
+
 public:
 	State get_state() const { return state_; }
 	std::weak_ptr<SphereCollider> get_hit_collider() const;
@@ -74,9 +79,13 @@ private:
 	float attackFrame = 0;
 	std::shared_ptr<SphereCollider> hitCollider;
 
-	bool isDamage_ = false;
-	float DamegeFrame_ = 0;
-	Vector3 damageSourcePosition_{};
+	// ノックバック
+	float nockBackFrame_ = 0;
+	Vector3 damageSourcePosition_{ 0,0,1 };
+
+	// 無敵時間
+	bool isInvincible_ = false;
+	float invincibleFrame_ = 0;
 
 	State state_;
 
