@@ -83,7 +83,7 @@ void Timeline::Load(const std::filesystem::path& directoryPath) {
 	// ウェーブ追加
 	WaveData& newWaveData = waveData.emplace_back();
 
-	for (int i = 0; i < newWaveData.popData.size(); ++i) {
+	for (int i = 0; i < data.size(); ++i) {
 		// 発生データ
 		PopData& popData = newWaveData.popData.emplace_back();
 		std::string test = std::format("{:02}", i);
