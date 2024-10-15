@@ -121,11 +121,20 @@ void Timeline::LoadAll() {
 }
 
 #ifdef _DEBUG
+void Timeline::ResetWave(int wave) {
+	enemyManager->clear();
+	nowWave = waveData.begin() + wave;
+	timer = 0;
+	nextPopData = nowWave->popData.begin();
+}
+#endif // _DEBUG
+
+#ifdef _DEBUG
 #include <imgui.h>
 void Timeline::debug_gui() {
 	ImGui::Begin("Timeline");
 	if (ImGui::Checkbox("Editor", &isActiveEditor)) {
-		enemyManager->clear();
+		ResetWave(0);
 	}
 	if (isActiveEditor && !isDemoPlay) {
 		ImGui::Text("Editting");

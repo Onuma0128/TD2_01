@@ -37,6 +37,10 @@ private:
 	void Load(const std::filesystem::path& directoryPath);
 	void LoadAll();
 
+#ifdef _DEBUG
+	void ResetWave(int wave = 0);
+#endif // _DEBUG
+
 public:
 	bool IsEndWaveAll() { return nowWave == waveData.end(); };
 	void SetEnemyManager(EnemyManager* enemyManager_) { enemyManager = enemyManager_; };
