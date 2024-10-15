@@ -150,8 +150,12 @@ void Player::Move() {
 	// Velocityに変換
 	velocity = moveDirection * globalValues.get_value<float>("Player", "Speed");
 	// 足す
-	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
-
+	if (isDamage_) {
+		KnockBack();
+	}
+	if (!isDamage_) {
+		transform.plus_translate(velocity * WorldClock::DeltaSeconds());
+	}
 	// 移動があれば向きを更新
 	if (velocity != CVector3::ZERO) {
 		const Quaternion& quaternion = transform.get_quaternion();
@@ -202,6 +206,27 @@ void Player::ThrowHeart() {
 	}
 }
 
+void Player::KnockBack()
+{
+	// ノックバック方向を計算
+	Vector3 knockbackDirection = transform.get_translate() - damageSourcePosition_;
+	knockbackDirection = knockbackDirection.normalize();
+
+	// ノックバック強さ（距離）を定義
+	float knockbackStrength = 5.0f;
+
+	// ノックバック移動
+	transform.plus_translate(knockbackDirection * knockbackStrength * WorldClock::DeltaSeconds());
+
+	// ダメージフレーム管理
+	DamegeFrame_ += WorldClock::DeltaSeconds();
+
+	if (DamegeFrame_ > 1.0f) {
+		DamegeFrame_ = 0;
+		isDamage_ = false;
+	}
+}
+
 std::weak_ptr<SphereCollider> Player::get_hit_collider() const {
 	return hitCollider;
 }
@@ -216,6 +241,8 @@ void Player::OnCollisionCallBack(const BaseCollider* const other) {
 			if (bullet->get_state() == PlayerBullet::State::Follow) {
 				bullet->lost();
 				playerHpManager_->set_state(HP_State::Damage);
+				damageSourcePosition_ = other->get_transform().get_translate();
+				isDamage_ = true;
 				break;
 			}
 		}

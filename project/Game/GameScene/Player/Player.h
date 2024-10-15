@@ -50,6 +50,8 @@ public:
 
 	void ThrowHeart();
 
+	void KnockBack();
+
 public:
 	State get_state() const { return state_; }
 	std::weak_ptr<SphereCollider> get_hit_collider() const;
@@ -71,6 +73,10 @@ private:
 	std::vector<std::unique_ptr<PlayerBullet>> bullets_;
 	float attackFrame = 0;
 	std::shared_ptr<SphereCollider> hitCollider;
+
+	bool isDamage_ = false;
+	float DamegeFrame_ = 0;
+	Vector3 damageSourcePosition_{};
 
 	State state_;
 
