@@ -55,6 +55,9 @@ void PlayerBullet::update() {
 	if (!isActive) {
 		return;
 	}
+	if (playerHpManager->get_hp() <= 0) {
+		isActive = false;
+	}
 
 	// 弾の動き
 	BeatNormal();

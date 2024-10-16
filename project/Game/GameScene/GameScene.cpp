@@ -131,12 +131,6 @@ void GameScene::update() {
 
 	player_->update();
 	enemyManager->update();
-
-#ifdef _DEBUG
-	if (playerHpManager_->get_hp() <= 0) {
-		SceneManager::SetSceneChange(std::make_unique<GameOverScene>(), 1, false);
-	}
-#endif // DEBUG
 }
 
 void GameScene::begin_rendering() {

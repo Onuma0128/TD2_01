@@ -5,6 +5,8 @@
 #include <Engine/Math/Definition.h>
 #include <Engine/Application/WorldClock/WorldClock.h>
 #include <Engine/Utility/SmartPointer.h>
+#include <Engine/Application/Scene/SceneManager.h>
+#include <Game/GameOverScene/GameOverScene.h>
 
 #include "Game/GameScene/Player/PlayerHPManager.h"
 
@@ -37,6 +39,11 @@ void Player::initialize() {
 	globalValues.add_value<int>("Sweat", "Radius", 240);
 	globalValues.add_value<float>("Sweat", "AccelerationY", 0.4f);
 	globalValues.add_value<float>("Sweat", "SmallerScale", 0.25f);
+
+	// 死ぬ時のアニメーション
+	globalValues.add_value<float>("DeadAnimation", "BeatScale", 0.5f);
+	globalValues.add_value<float>("DeadAnimation", "DownCount", 1.0f);
+
 
 	// 描画オブジェクトを設定
 	playerMesh = std::make_unique<GameObject>("player_model.obj");
@@ -88,6 +95,9 @@ void Player::update() {
 		KnockBack();
 		InvincibleUpdate();
 		break;
+	case Player::State::Dead:
+		Dead();
+		break;
 	default:
 		break;
 	}
@@ -101,6 +111,12 @@ void Player::update() {
 
 	for (auto& sweat : sweats_) {
 		sweat->update();
+	}
+	// プレイヤーのHPが0なら死亡処理
+	if (playerHpManager_->get_hp() <= 0 && state_ != State::Dead) {
+		state_ = State::Dead;
+		lastBeat_ = true;
+		axisOfQuaternion_ = transform.get_quaternion();
 	}
 }
 
@@ -286,6 +302,49 @@ void Player::InvincibleUpdate()
 	if (invincibleFrame_ >= globalValues.get_value<float>("Player", "InvincibleTime")) {
 		isInvincible_ = false;
 		invincibleFrame_ = globalValues.get_value<float>("Player", "InvincibleTime");
+	}
+}
+
+void Player::Dead()
+{
+	invincibleFrame_ = 0.0f;
+
+	if (lastBeat_) {
+		downFrame_ += WorldClock::DeltaSeconds();
+
+		// 一回だけスケールを膨らませる
+		float t = downFrame_; // 0.0f から 1.0f の範囲で進行
+
+		// プレイヤーの一回限りの膨張動作
+		float beatScale = 1.0f + globalValues.get_value<float>("DeadAnimation", "BeatScale") * (1.0f - std::clamp(t / 0.1f, 0.0f, 1.0f));
+
+		// プレイヤーのスケールを更新
+		transform.set_scale(Vector3(beatScale, beatScale, beatScale));
+
+		if (downFrame_ >= globalValues.get_value<float>("DeadAnimation","DownCount")) {
+			lastBeat_ = false;
+			downFrame_ = 0.0f;
+			// スケールを完全に元に戻す
+			transform.set_scale(Vector3(1.0f, 1.0f, 1.0f));
+		}
+	}
+	else {
+		float angle = 80.0f * ToRadian;
+
+		// ローカルZ軸に沿った回転クォータニオンを生成
+		Quaternion zRotation = Quaternion::AngleAxis(Vector3(0.0f, 0.0f, 1.0f), angle);
+
+		// ローカルZ軸回転を現在のクォータニオンに掛け合わせて適用
+		Quaternion combinedRotation = zRotation * axisOfQuaternion_;
+
+		// Slerpで回転を補間
+		downFrame_ += WorldClock::DeltaSeconds();
+		downFrame_ = std::clamp(downFrame_, 0.0f, 1.0f);
+
+		transform.set_quaternion(Quaternion::Slerp(axisOfQuaternion_, combinedRotation, downFrame_));
+
+		// 死んだらシーン切り替え
+		SceneManager::SetSceneChange(std::make_unique<GameOverScene>(), 2, false);
 	}
 }
 

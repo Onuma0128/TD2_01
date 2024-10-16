@@ -22,6 +22,7 @@ public:
 		Beating,
 		Throwing,
 		NockBack,
+		Dead,
 	};
 
 public:
@@ -58,6 +59,8 @@ public:
 
 	void InvincibleUpdate();
 
+	void Dead();
+
 	float EaseOutCubic(float t);
 
 public:
@@ -91,6 +94,11 @@ private:
 	// 無敵時間
 	bool isInvincible_ = false;
 	float invincibleFrame_ = 0;
+
+	// 今の回転軸保存(死ぬ時使う)
+	Quaternion axisOfQuaternion_{};
+	float downFrame_ = 0;
+	bool lastBeat_ = false;
 
 	State state_;
 
