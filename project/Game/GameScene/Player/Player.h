@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "Game/GameScene/Player/PlayerBullet.h"
+#include "Game/GameScene/Player/PlayerSweat.h"
 
 #include "Game/GlobalValues/GlobalValues.h"
 
@@ -20,6 +21,8 @@ public:
 		Move,
 		Beating,
 		Throwing,
+		NockBack,
+		Dead,
 	};
 
 public:
@@ -50,6 +53,16 @@ public:
 
 	void ThrowHeart();
 
+	void KnockBack();
+
+	void AddSweat();
+
+	void InvincibleUpdate();
+
+	void Dead();
+
+	float EaseOutCubic(float t);
+
 public:
 	State get_state() const { return state_; }
 	std::weak_ptr<SphereCollider> get_hit_collider() const;
@@ -61,7 +74,8 @@ private:
 private:
 	bool releaseButton;
 	bool unreleaseOnce;
-	int invincibleTimer;
+
+	float beatingTimer;
 
 	std::unique_ptr<GameObject> playerMesh;
 
@@ -71,6 +85,21 @@ private:
 	std::vector<std::unique_ptr<PlayerBullet>> bullets_;
 	float attackFrame = 0;
 	std::shared_ptr<SphereCollider> hitCollider;
+
+	std::vector<std::unique_ptr<PlayerSweat>> sweats_;
+
+	// ノックバック
+	float nockBackFrame_ = 0;
+	Vector3 damageSourcePosition_{ 0,0,1 };
+
+	// 無敵時間
+	bool isInvincible_ = false;
+	float invincibleFrame_ = 0;
+
+	// 今の回転軸保存(死ぬ時使う)
+	Quaternion axisOfQuaternion_{};
+	float downFrame_ = 0;
+	bool lastBeat_ = false;
 
 	State state_;
 

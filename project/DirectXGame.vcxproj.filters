@@ -567,6 +567,9 @@
     <ClCompile Include="Game\GameScene\RenderNode\CircleGauge\CircleGaugeNode.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameScene\Player\PlayerSweat.cpp">
+      <Filter>Game\Scene\GameScene\Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\WinApp.h">
@@ -856,6 +859,9 @@
     </ClInclude>
     <ClInclude Include="Game\GameScene\RenderNode\CircleGauge\CircleGaugeNode.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameScene\Player\PlayerSweat.h">
+      <Filter>Game\Scene\GameScene\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

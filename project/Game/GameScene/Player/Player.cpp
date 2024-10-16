@@ -5,6 +5,8 @@
 #include <Engine/Math/Definition.h>
 #include <Engine/Application/WorldClock/WorldClock.h>
 #include <Engine/Utility/SmartPointer.h>
+#include <Engine/Application/Scene/SceneManager.h>
+#include <Game/GameOverScene/GameOverScene.h>
 
 #include "Game/GameScene/Player/PlayerHPManager.h"
 
@@ -20,12 +22,31 @@ Player::Player() {
 }
 
 void Player::initialize() {
+	globalValues.add_value<float>("Player", "BeatIntervalBase", 1.0f);
+	globalValues.add_value<float>("Player", "BeatIntervalMin", 0.1f);
+
 	globalValues.add_value<int>("Enemy", "BeatingDamage", 20);
 	globalValues.add_value<int>("Player", "NumBullets", 10);
 	globalValues.add_value<float>("Player", "Speed", 3.0f);
 	globalValues.add_value<float>("Player", "ThrowTime", 0.3f);
 	globalValues.add_value<float>("Player", "TurnAroundSpeed", 0.2f);
 	globalValues.add_value<float>("Player", "ColliderRadius", 1.0f);
+
+	globalValues.add_value<float>("Player", "NockbackTime", 0.5f);
+	globalValues.add_value<float>("Player", "MaxNockbackStrength", 10.0f);
+	globalValues.add_value<float>("Player", "InvincibleTime", 2.0f);
+
+	// 汗
+	globalValues.add_value<int>("Sweat", "NumSweat", 5);
+	globalValues.add_value<float>("Sweat", "velocityY", 0.1f);
+	globalValues.add_value<int>("Sweat", "Radius", 240);
+	globalValues.add_value<float>("Sweat", "AccelerationY", 0.4f);
+	globalValues.add_value<float>("Sweat", "SmallerScale", 0.25f);
+
+	// 死ぬ時のアニメーション
+	globalValues.add_value<float>("DeadAnimation", "BeatScale", 0.5f);
+	globalValues.add_value<float>("DeadAnimation", "DownCount", 1.0f);
+
 
 	// 描画オブジェクトを設定
 	playerMesh = std::make_unique<GameObject>("player_model.obj");
@@ -65,12 +86,20 @@ void Player::update() {
 	switch (state_) {
 	case Player::State::Move:
 		Move();
+		InvincibleUpdate();
 		break;
 	case Player::State::Beating:
 		Beating();
 		break;
 	case Player::State::Throwing:
 		state_ = State::Move;
+		break;
+	case Player::State::NockBack:
+		KnockBack();
+		InvincibleUpdate();
+		break;
+	case Player::State::Dead:
+		Dead();
 		break;
 	default:
 		break;
@@ -82,6 +111,16 @@ void Player::update() {
 	for (auto& bullet : bullets_) {
 		bullet->update();
 	}
+
+	for (auto& sweat : sweats_) {
+		sweat->update();
+	}
+	// プレイヤーのHPが0なら死亡処理
+	if (playerHpManager_->get_hp() <= 0 && state_ != State::Dead) {
+		state_ = State::Dead;
+		lastBeat_ = true;
+		axisOfQuaternion_ = transform.get_quaternion();
+	}
 }
 
 void Player::begin_rendering() noexcept {
@@ -91,13 +130,28 @@ void Player::begin_rendering() noexcept {
 	for (auto& bullet : bullets_) {
 		bullet->begin_rendering();
 	}
+	for (auto& sweat : sweats_) {
+		sweat->begin_rendering();
+	}
 }
 
 void Player::draw() const {
-	playerMesh->draw();
+	if (isInvincible_) {
+		if (static_cast<int>(invincibleFrame_ * 10) % 2 == 0) {
+			playerMesh->draw();
+		}
+	}
+	else {
+		// 通常時は常に描画
+		playerMesh->draw();
+	}
 
 	for (auto& bullet : bullets_) {
 		bullet->draw();
+	}
+
+	for (auto& sweat : sweats_) {
+		sweat->draw();
 	}
 }
 
@@ -151,7 +205,6 @@ void Player::Move() {
 	velocity = moveDirection * globalValues.get_value<float>("Player", "Speed");
 	// 足す
 	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
-
 	// 移動があれば向きを更新
 	if (velocity != CVector3::ZERO) {
 		const Quaternion& quaternion = transform.get_quaternion();
@@ -172,10 +225,23 @@ void Player::Move() {
 
 void Player::SetBeat() {
 	state_ = State::Beating;
-	beatManager->do_beat();
+	beatingTimer = 0;
+	beatManager->start_beat();
 }
 
 void Player::Beating() {
+	beatingTimer += WorldClock::DeltaSeconds();
+	// 途中でダメージを食らうとインターバルが変わるので、毎回取得する
+	float baseInterval = globalValues.get_value<float>("Player", "BeatIntervalBase");
+	float minInterval = globalValues.get_value<float>("Player", "BeatIntervalMin");
+	int maxHp = globalValues.get_value<int>("Player", "NumBullets");
+	// インターバル間隔を線形補間で算出
+	float beatAttackInterval = std::lerp(minInterval, baseInterval, (float)playerHpManager_->get_hp() / maxHp);
+	// インターバルより長いならビートを発生させる
+	if (beatingTimer >= beatAttackInterval) {
+		beatingTimer = std::fmod(beatingTimer, beatAttackInterval);
+		beatManager->beating();
+	}
 	bool killAll = beatManager->empty_pair();
 	// ボタンが離れたらor敵が全員倒れたらMoveに戻す
 	if (releaseButton || killAll) {
@@ -196,10 +262,111 @@ void Player::ThrowHeart() {
 		if (bullet->get_state() == PlayerBullet::State::Follow && playerHpManager_->get_hp() >= 2) {
 			bullet->Throw(world_position(), CVector3::BASIS_Z * transform.get_quaternion());
 			playerHpManager_->set_state(HP_State::Damage);
+			AddSweat();
 			// 1回投げたら終わる
 			return;
 		}
 	}
+}
+
+void Player::KnockBack()
+{
+	// ノックバックフレームを更新
+	nockBackFrame_ += WorldClock::DeltaSeconds();
+
+	// ノックバックが続く時間
+	float knockbackDuration = globalValues.get_value<float>("Player", "NockbackTime");
+	float t = nockBackFrame_ / knockbackDuration;
+
+	// イージング関数を使ってノックバック強さを決定
+	float easedStrength = EaseOutCubic(t);
+
+	// ノックバック方向を計算
+	Vector3 knockbackDirection = transform.get_translate() - damageSourcePosition_;
+	knockbackDirection = knockbackDirection.normalize();
+	knockbackDirection.y = 0.0f;
+
+	// ノックバック強さ（最大値を設定）
+	float maxKnockbackStrength = globalValues.get_value<float>("Player", "MaxNockbackStrength");
+
+	// ノックバック移動（イージングで減少する）
+	transform.plus_translate(knockbackDirection * maxKnockbackStrength * easedStrength * WorldClock::DeltaSeconds());
+
+	// ノックバック終了判定
+	if (nockBackFrame_ >= knockbackDuration) {
+		nockBackFrame_ = 0;
+		state_ = State::Move;
+	}
+}
+
+void Player::AddSweat()
+{
+	if (playerHpManager_->get_hp() < 5) {
+		uint32_t numSweat = globalValues.get_value<int>("Sweat","NumSweat");
+		for (uint32_t i = 0; i < numSweat; ++i) {
+			std::unique_ptr<PlayerSweat> sweat = std::make_unique<PlayerSweat>();
+			sweat->initialize(CVector3::BASIS_Z * transform.get_quaternion());
+			sweats_.emplace_back(std::move(sweat));
+		}
+	}
+}
+
+void Player::InvincibleUpdate()
+{
+	// 無敵時間の更新
+	invincibleFrame_ += WorldClock::DeltaSeconds();
+	if (invincibleFrame_ >= globalValues.get_value<float>("Player", "InvincibleTime")) {
+		isInvincible_ = false;
+		invincibleFrame_ = globalValues.get_value<float>("Player", "InvincibleTime");
+	}
+}
+
+void Player::Dead()
+{
+	invincibleFrame_ = 0.0f;
+
+	if (lastBeat_) {
+		downFrame_ += WorldClock::DeltaSeconds();
+
+		// 一回だけスケールを膨らませる
+		float t = downFrame_; // 0.0f から 1.0f の範囲で進行
+
+		// プレイヤーの一回限りの膨張動作
+		float beatScale = 1.0f + globalValues.get_value<float>("DeadAnimation", "BeatScale") * (1.0f - std::clamp(t / 0.1f, 0.0f, 1.0f));
+
+		// プレイヤーのスケールを更新
+		transform.set_scale(Vector3(beatScale, beatScale, beatScale));
+
+		if (downFrame_ >= globalValues.get_value<float>("DeadAnimation","DownCount")) {
+			lastBeat_ = false;
+			downFrame_ = 0.0f;
+			// スケールを完全に元に戻す
+			transform.set_scale(Vector3(1.0f, 1.0f, 1.0f));
+		}
+	}
+	else {
+		float angle = 80.0f * ToRadian;
+
+		// ローカルZ軸に沿った回転クォータニオンを生成
+		Quaternion zRotation = Quaternion::AngleAxis(Vector3(0.0f, 0.0f, 1.0f), angle);
+
+		// ローカルZ軸回転を現在のクォータニオンに掛け合わせて適用
+		Quaternion combinedRotation = zRotation * axisOfQuaternion_;
+
+		// Slerpで回転を補間
+		downFrame_ += WorldClock::DeltaSeconds();
+		downFrame_ = std::clamp(downFrame_, 0.0f, 1.0f);
+
+		transform.set_quaternion(Quaternion::Slerp(axisOfQuaternion_, combinedRotation, downFrame_));
+
+		// 死んだらシーン切り替え
+		SceneManager::SetSceneChange(std::make_unique<GameOverScene>(), 2, false);
+	}
+}
+
+float Player::EaseOutCubic(float t)
+{
+	return 1.0f - powf(1.0f - t, 10.0f);
 }
 
 std::weak_ptr<SphereCollider> Player::get_hit_collider() const {
@@ -211,11 +378,15 @@ const std::vector<std::unique_ptr<PlayerBullet>>& Player::get_bullets() const {
 }
 
 void Player::OnCollisionCallBack(const BaseCollider* const other) {
-	if (other->group() == "EnemyMelee") {
+	if (other->group() == "EnemyMelee" && !isInvincible_) {
 		for (auto& bullet : bullets_) {
 			if (bullet->get_state() == PlayerBullet::State::Follow) {
 				bullet->lost();
 				playerHpManager_->set_state(HP_State::Damage);
+				damageSourcePosition_ = other->world_position();
+				state_ = State::NockBack;
+				isInvincible_ = true;
+				invincibleFrame_ = 0.0f;
 				break;
 			}
 		}

@@ -28,7 +28,8 @@ public:
 	void set_next_heart(PlayerBullet* heart);
 	bool empty_pair();
 
-	void do_beat();
+	void start_beat();
+	void beating();
 	void pause_beat();
 	void enemy_down(BaseEnemy* enemy);
 	void recovery(BaseEnemy* enemy);

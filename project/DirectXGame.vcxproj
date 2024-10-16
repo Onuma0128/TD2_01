@@ -201,6 +201,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GlobalValues\GlobalValues.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Game\GameScene\Player\PlayerHPManager.cpp" />
+    <ClCompile Include="Game\GameScene\Player\PlayerSweat.cpp" />
     <ClCompile Include="TestCode\SceneDemo.cpp" />
     <ClCompile Include="Game\TitleScene\TitleScene.cpp" />
     <ClCompile Include="Game\TutorialScene\TutorialScene.cpp" />
@@ -299,6 +300,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GlobalValues\GlobalValues.h" />
     <ClInclude Include="Game\WorldSystemValue.h" />
     <ClInclude Include="Game\GameScene\Player\PlayerHPManager.h" />
+    <ClInclude Include="Game\GameScene\Player\PlayerSweat.h" />
     <ClInclude Include="TestCode\SceneDemo.h" />
     <ClInclude Include="Game\TitleScene\TitleScene.h" />
     <ClInclude Include="Game\TutorialScene\TutorialScene.h" />
