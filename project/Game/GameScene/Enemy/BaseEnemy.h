@@ -28,37 +28,11 @@ class PlayerHPManager;
 class BeatManager;
 
 class BaseEnemy : public WorldInstance {
-private: // Structs
-	struct SpwanBehaviorWork {
-		TimedCall<void(void)> timedCall;
-	};
-	struct ApproachBehaviorWork {
-		float attackDistance;
-		float speed;
-	};
-	struct AttackBehaviorWork {
-		float timer;
-	};
-	struct BeatingBehaviorWork {
-		float timer;
-	};
-	struct DamagedBehaviorWork {
-		TimedCall<void(void)> damagedTimedCall;
-	};
-	struct DownBehaviorWork {
-		float timer;
-	};
-	struct ReviveBehaviorWork {
-		TimedCall<void(void)> revicedCall;
-	};
-	struct EraseBehaviorWork {
-		TimedCall<void(void)> despawnTimedCall;
-	};
-
 public: // Contsructor/Destructor
 
 public: // Member function
 	void initialize(const Vector3& transform, const Vector3& forward);
+	void begin();
 	void update();
 	void begin_rendering();
 	void draw() const;
@@ -71,8 +45,11 @@ private:
 	void attack_callback(const BaseCollider* const other);
 
 public: // Getter/Setter
+	int get_hp() const { return hitpoint; };
+	int get_state() const { return static_cast<int>(behavior.state()); };
 	// ビート状態にする
-	void do_beat();
+	void start_beat();
+	void beating();
 	void pause_beat();
 	EnemyBehavior get_now_behavior() const;
 	std::weak_ptr<SphereCollider> get_hit_collider();
@@ -109,22 +86,14 @@ private: // Member values
 	std::unique_ptr<GameObject> hitMarkerMesh;
 
 	Behavior<EnemyBehavior> behavior;
-	std::variant<
-		SpwanBehaviorWork,
-		ApproachBehaviorWork,
-		AttackBehaviorWork,
-		BeatingBehaviorWork,
-		DamagedBehaviorWork,
-		DownBehaviorWork,
-		ReviveBehaviorWork,
-		EraseBehaviorWork
-	> behaviorValue;
 
 	int markedCount;
 	float markingTimer;
 	bool isAttakced;
 	float waveFrameCount;
 	float initialY;
+
+	float behaviorTimer;
 
 	std::shared_ptr<SphereCollider> hitCollider;
 

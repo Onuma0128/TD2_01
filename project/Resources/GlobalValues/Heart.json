@@ -1,0 +1,12 @@
+{
+    "Heart": {
+        "AttackDamage": 50,
+        "AttackSpeed": 6.0,
+        "CamebackSpeed": 5.0,
+        "CamebackTime": 3.0,
+        "ColliderRadius": 1.0,
+        "HeightOffset": 1.0,
+        "StartOffset": 1.5,
+        "ToFollowDistance": 1.0
+    }
+}

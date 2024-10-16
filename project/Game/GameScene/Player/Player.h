@@ -74,7 +74,8 @@ private:
 private:
 	bool releaseButton;
 	bool unreleaseOnce;
-	int invincibleTimer;
+
+	float beatingTimer;
 
 	std::unique_ptr<GameObject> playerMesh;
 

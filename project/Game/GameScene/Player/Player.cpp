@@ -22,6 +22,9 @@ Player::Player() {
 }
 
 void Player::initialize() {
+	globalValues.add_value<float>("Player", "BeatIntervalBase", 1.0f);
+	globalValues.add_value<float>("Player", "BeatIntervalMin", 0.1f);
+
 	globalValues.add_value<int>("Enemy", "BeatingDamage", 20);
 	globalValues.add_value<int>("Player", "NumBullets", 10);
 	globalValues.add_value<float>("Player", "Speed", 3.0f);
@@ -222,10 +225,23 @@ void Player::Move() {
 
 void Player::SetBeat() {
 	state_ = State::Beating;
-	beatManager->do_beat();
+	beatingTimer = 0;
+	beatManager->start_beat();
 }
 
 void Player::Beating() {
+	beatingTimer += WorldClock::DeltaSeconds();
+	// 途中でダメージを食らうとインターバルが変わるので、毎回取得する
+	float baseInterval = globalValues.get_value<float>("Player", "BeatIntervalBase");
+	float minInterval = globalValues.get_value<float>("Player", "BeatIntervalMin");
+	int maxHp = globalValues.get_value<int>("Player", "NumBullets");
+	// インターバル間隔を線形補間で算出
+	float beatAttackInterval = std::lerp(minInterval, baseInterval, (float)playerHpManager_->get_hp() / maxHp);
+	// インターバルより長いならビートを発生させる
+	if (beatingTimer >= beatAttackInterval) {
+		beatingTimer = std::fmod(beatingTimer, beatAttackInterval);
+		beatManager->beating();
+	}
 	bool killAll = beatManager->empty_pair();
 	// ボタンが離れたらor敵が全員倒れたらMoveに戻す
 	if (releaseButton || killAll) {
