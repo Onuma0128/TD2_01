@@ -8,6 +8,7 @@
 #include "Engine/Module/Collision/CollisionManager.h"
 #include "Game/GameScene/Player/Player.h"
 #include "Game/GameScene/Player/PlayerHPManager.h"
+#include "Game/GameScene/Player/PlayerSweat.h"
 #include "Game/GameScene/BeatManager/BeatManager.h"
 #include "Game/GameScene/Timeline/Timeline.h"
 #include "Game/GameScene/EnemyManager/EnemyManager.h"

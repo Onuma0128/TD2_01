@@ -31,6 +31,13 @@ void Player::initialize() {
 	globalValues.add_value<float>("Player", "MaxNockbackStrength", 10.0f);
 	globalValues.add_value<float>("Player", "InvincibleTime", 2.0f);
 
+	// 汗
+	globalValues.add_value<int>("Sweat", "NumSweat", 5);
+	globalValues.add_value<float>("Sweat", "velocityY", 0.1f);
+	globalValues.add_value<int>("Sweat", "Radius", 240);
+	globalValues.add_value<float>("Sweat", "AccelerationY", 0.4f);
+	globalValues.add_value<float>("Sweat", "SmallerScale", 0.25f);
+
 	// 描画オブジェクトを設定
 	playerMesh = std::make_unique<GameObject>("player_model.obj");
 	playerMesh->initialize();
@@ -91,6 +98,10 @@ void Player::update() {
 	for (auto& bullet : bullets_) {
 		bullet->update();
 	}
+
+	for (auto& sweat : sweats_) {
+		sweat->update();
+	}
 }
 
 void Player::begin_rendering() noexcept {
@@ -99,6 +110,9 @@ void Player::begin_rendering() noexcept {
 
 	for (auto& bullet : bullets_) {
 		bullet->begin_rendering();
+	}
+	for (auto& sweat : sweats_) {
+		sweat->begin_rendering();
 	}
 }
 
@@ -115,6 +129,10 @@ void Player::draw() const {
 
 	for (auto& bullet : bullets_) {
 		bullet->draw();
+	}
+
+	for (auto& sweat : sweats_) {
+		sweat->draw();
 	}
 }
 
@@ -212,6 +230,7 @@ void Player::ThrowHeart() {
 		if (bullet->get_state() == PlayerBullet::State::Follow && playerHpManager_->get_hp() >= 2) {
 			bullet->Throw(world_position(), CVector3::BASIS_Z * transform.get_quaternion());
 			playerHpManager_->set_state(HP_State::Damage);
+			AddSweat();
 			// 1回投げたら終わる
 			return;
 		}
@@ -245,6 +264,18 @@ void Player::KnockBack()
 	if (nockBackFrame_ >= knockbackDuration) {
 		nockBackFrame_ = 0;
 		state_ = State::Move;
+	}
+}
+
+void Player::AddSweat()
+{
+	if (playerHpManager_->get_hp() < 5) {
+		uint32_t numSweat = globalValues.get_value<int>("Sweat","NumSweat");
+		for (uint32_t i = 0; i < numSweat; ++i) {
+			std::unique_ptr<PlayerSweat> sweat = std::make_unique<PlayerSweat>();
+			sweat->initialize(CVector3::BASIS_Z * transform.get_quaternion());
+			sweats_.emplace_back(std::move(sweat));
+		}
 	}
 }
 

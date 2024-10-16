@@ -29,6 +29,7 @@ void GameScene::load() {
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/HitMarker", "HitMarker.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models", "hart.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models", "player_model.obj");
+	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/playerSweat", "playerSweat.obj");
 }
 
 void GameScene::initialize() {
@@ -91,6 +92,7 @@ void GameScene::initialize() {
 
 	player_ = std::make_unique<Player>();
 	PlayerBullet::player = player_.get();
+	PlayerSweat::player = player_.get();
 
 	collisionManager->register_collider("Player", player_->get_hit_collider());
 

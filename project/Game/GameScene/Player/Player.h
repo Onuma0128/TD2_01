@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "Game/GameScene/Player/PlayerBullet.h"
+#include "Game/GameScene/Player/PlayerSweat.h"
 
 #include "Game/GlobalValues/GlobalValues.h"
 
@@ -53,6 +54,8 @@ public:
 
 	void KnockBack();
 
+	void AddSweat();
+
 	void InvincibleUpdate();
 
 	float EaseOutCubic(float t);
@@ -78,6 +81,8 @@ private:
 	std::vector<std::unique_ptr<PlayerBullet>> bullets_;
 	float attackFrame = 0;
 	std::shared_ptr<SphereCollider> hitCollider;
+
+	std::vector<std::unique_ptr<PlayerSweat>> sweats_;
 
 	// ノックバック
 	float nockBackFrame_ = 0;
