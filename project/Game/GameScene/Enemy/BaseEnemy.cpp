@@ -84,6 +84,7 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
 	ghostMesh->initialize();
 	ghostMesh->set_parent(*this);
 	ghostMesh->get_transform().set_translate({ 0,1,0 });
+	initialY = ghostMesh->get_transform().get_translate().y;
 
 	hitMarkerMesh = eps::CreateUnique<GameObject>("HitMarker.obj");
 	hitMarkerMesh->initialize();
@@ -117,6 +118,9 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
 void BaseEnemy::update() {
 	// 行動の更新
 	behavior.update();
+
+	// 生きてる時の通常アニメーション
+	normal_animation();
 
 	float markingTime = globalValues.get_value<float>("Enemy", "AbsorptionTime");
 	// 付与状態かつビートでない場合
@@ -154,6 +158,13 @@ void BaseEnemy::draw_marker() const {
 		);
 		hitMarkerMesh->draw();
 	}
+}
+
+void BaseEnemy::normal_animation()
+{
+	// 敵がふよふよ浮く感じ
+	waveFrameCount += WorldClock::DeltaSeconds();
+	ghostMesh->get_transform().set_translate_y(initialY + 0.2f * sin(waveFrameCount));
 }
 
 // 被ダメ時コールバック

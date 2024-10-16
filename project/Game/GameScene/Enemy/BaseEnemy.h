@@ -64,6 +64,8 @@ public: // Member function
 	void draw() const;
 	void draw_marker() const;
 
+	void normal_animation();
+
 private:
 	void damaged_callback(const BaseCollider* const other);
 	void attack_callback(const BaseCollider* const other);
@@ -121,6 +123,8 @@ private: // Member values
 	int markedCount;
 	float markingTimer;
 	bool isAttakced;
+	float waveFrameCount;
+	float initialY;
 
 	std::shared_ptr<SphereCollider> hitCollider;
 
