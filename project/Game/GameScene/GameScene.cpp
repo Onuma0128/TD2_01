@@ -120,6 +120,7 @@ void GameScene::finalize() {
 
 void GameScene::begin() {
 	player_->begin();
+	enemyManager->begin();
 }
 
 void GameScene::update() {
@@ -198,6 +199,8 @@ void GameScene::debug_update() {
 	ImGui::End();
 
 	editor->editor_gui();
+
+	enemyManager->debug_gui();
 }
 #endif // _DEBUG
 

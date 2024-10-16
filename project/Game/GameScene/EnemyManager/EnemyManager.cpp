@@ -2,6 +2,12 @@
 
 #include <Engine/Module/Collision/CollisionManager.h>
 
+void EnemyManager::begin() {
+	for (BaseEnemy& enemy : enemies) {
+		enemy.begin();
+	}
+}
+
 void EnemyManager::update() {
 	for (BaseEnemy& enemy : enemies) {
 		enemy.update();
@@ -44,6 +50,19 @@ void EnemyManager::create_enemy(const Vector3& position, const Vector3& forward)
 	collisionManager->register_collider("EnemyMelee", newEnemy.get_melee_collider());
 }
 
+#ifdef _DEBUG
 void EnemyManager::clear() {
 	enemies.clear();
 }
+
+#include <imgui.h>
+
+void EnemyManager::debug_gui() {
+	ImGui::Begin("EnemyManager");
+	for (int i = 0; BaseEnemy & enemy : enemies) {
+		ImGui::Text("[%02d] HP : %d, State : %d", i, enemy.get_hp(), enemy.get_state());
+		++i;
+	}
+	ImGui::End();
+}
+#endif // _DEBUG
