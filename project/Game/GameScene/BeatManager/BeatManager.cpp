@@ -3,6 +3,8 @@
 #include "Game/GameScene/Player/PlayerBullet.h"
 #include "Game/GameScene/Enemy/BaseEnemy.h"
 
+#include <ranges>
+
 void BeatManager::set_next_enemy(BaseEnemy* enemy) {
 	nextPair.enemy = enemy;
 	check_make_pair();
@@ -17,10 +19,22 @@ bool BeatManager::empty_pair() {
 	return enemyBeatPair.empty();
 }
 
-void BeatManager::do_beat() {
+void BeatManager::start_beat() {
 	for (auto& pair : enemyBeatPair) {
-		pair.first->do_beat();
+		pair.first->start_beat();
 		pair.second->BeatAttack();
+	}
+}
+
+void BeatManager::beating() {
+	BaseEnemy* prev = nullptr;
+	for (BaseEnemy* enemy : enemyBeatPair | std::views::elements<0>) {
+		// 重複してびーとさせないようにする
+		if (enemy == prev) {
+			continue;
+		}
+		enemy->beating();
+		prev = enemy;
 	}
 }
 

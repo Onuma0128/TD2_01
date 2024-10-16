@@ -12,9 +12,9 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
 	globalValues.add_value<int>("Heart", "AttackDamage", 30);
 
 	globalValues.add_value<int>("Enemy", "HP", 100);
-	globalValues.add_value<float>("Enemy", "BeatInterval", 1.0f);
 	globalValues.add_value<int>("Enemy", "BeatingDamage", 20);
 	globalValues.add_value<int>("Enemy", "BeatHitDamage", 5);
+	globalValues.add_value<int>("Enemy", "RevivedHitpoint", 30);
 
 	globalValues.add_value<float>("Enemy", "NockbackMag", 3.0f);
 	globalValues.add_value<float>("Enemy", "NockbackFriction", 0.8f);
@@ -114,6 +114,10 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
 	beatCollider->set_radius(3.0f);
 }
 
+void BaseEnemy::begin() {
+	beatCollider->set_active(false);
+}
+
 void BaseEnemy::update() {
 	// 行動の更新
 	behavior.update();
@@ -134,6 +138,12 @@ void BaseEnemy::update() {
 		// 上限を超えないようにする
 		hitpoint = std::min(maxHitpoint, hitpoint);
 		markedCount = 0;
+	}
+	if (hitpoint <= 0) {
+		if (behavior.state() != EnemyBehavior::Down &&
+			behavior.state() != EnemyBehavior::Erase &&
+			behavior.state() != EnemyBehavior::Revive)
+			behavior.request(EnemyBehavior::Down);
 	}
 }
 
@@ -191,7 +201,6 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 			}
 			// HPが0以下になった場合
 			else {
-				hitCollider->set_active(false);
 				behavior.request(EnemyBehavior::Down);
 			}
 		}
@@ -214,7 +223,6 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 			}
 			// HPが0以下になった場合
 			else {
-				hitCollider->set_active(false);
 				behavior.request(EnemyBehavior::Down);
 			}
 		}
@@ -228,8 +236,14 @@ void BaseEnemy::attack_callback(const BaseCollider* const other) {
 	meleeCollider->set_active(false);
 }
 
-void BaseEnemy::do_beat() {
+void BaseEnemy::start_beat() {
 	behavior.request(EnemyBehavior::Beating);
+}
+
+void BaseEnemy::beating() {
+	hitpoint -= globalValues.get_value<int>("Enemy", "BeatingDamage");
+
+	beatCollider->set_active(true);
 }
 
 void BaseEnemy::pause_beat() {
@@ -255,41 +269,38 @@ std::weak_ptr<SphereCollider> BaseEnemy::get_melee_collider() {
 
 // ---------- スポーン処理 ----------
 void BaseEnemy::spawn_initialize() {
-	behaviorValue = SpwanBehaviorWork{
-		{ [&] { behavior.request(EnemyBehavior::Approach); }, 3 }
-	};
+	behaviorTimer = 0;
 }
 
 void BaseEnemy::spawn_update() {
-	SpwanBehaviorWork& value = std::get<SpwanBehaviorWork>(behaviorValue);
-	value.timedCall.update();
+	behaviorTimer += WorldClock::DeltaSeconds();
+	if (behaviorTimer >= 3) {
+		behavior.request(EnemyBehavior::Approach);
+	}
 }
 
 // ---------- 移動処理 ----------
 void BaseEnemy::approach_initialize() {
 	hitCollider->set_active(true);
-	behaviorValue = ApproachBehaviorWork{
-		globalValues.get_value<float>("Enemy", "StartAttackDistance"),
-		globalValues.get_value<float>("Enemy", "ApproachSpeed")
-	};
 }
 
 void BaseEnemy::approach_update() {
 	if (!targetPlayer) {
 		return;
 	}
-	ApproachBehaviorWork& value = std::get<ApproachBehaviorWork>(behaviorValue);
 	// プレイヤーとの距離を算出
 	Vector3 distance = targetPlayer->world_position() - world_position();
 
 	// distanceより近かったら攻撃に移行
-	if (distance.length() <= value.attackDistance) {
+	float attackDistance = globalValues.get_value<float>("Enemy", "StartAttackDistance");
+	if (distance.length() <= attackDistance) {
 		behavior.request(EnemyBehavior::Attack);
 		return;
 	}
 
 	// velocity算出
-	velocity = distance.normalize_safe() * value.speed;
+	float speed = globalValues.get_value<float>("Enemy", "ApproachSpeed");
+	velocity = distance.normalize_safe() * speed;
 	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
 	// player方向を向く
 	look_at(*targetPlayer);
@@ -297,75 +308,55 @@ void BaseEnemy::approach_update() {
 
 // ---------- 攻撃処理 ----------
 void BaseEnemy::attack_initialize() {
-	behaviorValue = AttackBehaviorWork{
-	};
+	behaviorTimer = 0;
 	isAttakced = false;
 	meleeCollider->set_active(true);
 }
 
 void BaseEnemy::attack_update() {
-	AttackBehaviorWork& value = std::get<AttackBehaviorWork>(behaviorValue);
-	value.timer += WorldClock::DeltaSeconds();
-	if (value.timer < 1.0f) {
+	behaviorTimer += WorldClock::DeltaSeconds();
+	if (behaviorTimer < 1.0f) {
 		meleeCollider->set_active(false);
 	}
-	else if (value.timer < 1.5f) {
+	else if (behaviorTimer < 1.5f) {
 		meleeCollider->set_active(true);
 	}
-	else if (value.timer > 3.0f) {
+	else if (behaviorTimer > 3.0f) {
 		behavior.request(EnemyBehavior::Approach);
 	}
 }
 
 // ---------- 鼓動同期時処理 ----------
 void BaseEnemy::beating_initialize() {
-	behaviorValue = BeatingBehaviorWork{
-		0
-	};
-	beatCollider->set_active(true);
 }
 
 void BaseEnemy::beating_update() {
-	BeatingBehaviorWork& value = std::get<BeatingBehaviorWork>(behaviorValue);
-	value.timer += WorldClock::DeltaSeconds();
-	value.timer = std::fmod(value.timer, globalValues.get_value<float>("Enemy", "BeatInterval"));
-	if (value.timer < WorldClock::DeltaSeconds()) {
-		hitpoint -= globalValues.get_value<int>("Enemy", "BeatingDamage");
-		beatCollider->set_active(true);
-	}
-	else {
-		beatCollider->set_active(false);
-	}
-	if (hitpoint <= 0) {
-		behavior.request(EnemyBehavior::Down);
-		beatCollider->set_active(false);
-	}
 }
 
 // ---------- 被ハート時処理 ----------
 void BaseEnemy::damaged_heart_initialize() {
-	behaviorValue = DamagedBehaviorWork{
-		{ [&] { behavior.request(EnemyBehavior::Approach); }, 1 }
-	};
+	behaviorTimer = 0;
 }
 
 void BaseEnemy::damaged_heart_update() {
-	DamagedBehaviorWork& value = std::get<DamagedBehaviorWork>(behaviorValue);
-	value.damagedTimedCall.update();
+	behaviorTimer += WorldClock::DeltaSeconds();
+	if (behaviorTimer >= 1.0f) {
+		behavior.request(EnemyBehavior::Approach);
+	}
 	velocity *= globalValues.get_value<float>("Enemy", "NockbackFriction");
 	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
 }
 
 // ---------- 被ビート時処理 ----------
 void BaseEnemy::damaged_beat_initialize() {
-	behaviorValue = DamagedBehaviorWork{
-		{ [&] { behavior.request(EnemyBehavior::Approach); }, 3 }
-	};
+	behaviorTimer = 0;
 }
 
 void BaseEnemy::damaged_beat_update() {
-	DamagedBehaviorWork& value = std::get<DamagedBehaviorWork>(behaviorValue);
-	value.damagedTimedCall.update();
+	behaviorTimer += WorldClock::DeltaSeconds();
+	if (behaviorTimer >= 1.0f) {
+		behavior.request(EnemyBehavior::Approach);
+	}
 }
 
 // ---------- ダウン時処理 ----------
@@ -376,17 +367,17 @@ void BaseEnemy::down_initialize() {
 	}
 	// ダウンしたらマークを戻す
 	markedCount = 0;
-	behaviorValue = DownBehaviorWork{ 0 };
+	behaviorTimer = 0;
+	// コリジョン無効化
+	beatCollider->set_active(false);
+	meleeCollider->set_active(false);
+	// hitの有効化
+	hitCollider->set_active(true);
 }
 
 void BaseEnemy::down_update() {
-	DownBehaviorWork& value = std::get<DownBehaviorWork>(behaviorValue);
-
-	value.timer += WorldClock::DeltaSeconds();
-	if (value.timer >= 0 && (value.timer - 1.0f) <= WorldClock::DeltaSeconds()) {
-		hitCollider->set_active(true);
-	}
-	if (value.timer >= 6.0f) {
+	behaviorTimer += WorldClock::DeltaSeconds();
+	if (behaviorTimer >= 3.0f) {
 		behavior.request(EnemyBehavior::Erase);
 	}
 }
@@ -394,26 +385,27 @@ void BaseEnemy::down_update() {
 // ---------- 復活時処理 ----------
 void BaseEnemy::revive_initialize() {
 	hitCollider->set_active(false);
-	behaviorValue = ReviveBehaviorWork{
-		// 3秒後にApproachに戻す
-		{ [&] { behavior.request(EnemyBehavior::Approach); }, 3 }
-	};
+	behaviorTimer = 0;
+	// HP強制回復
+	hitpoint = globalValues.get_value<int>("Enemy", "RevivedHitpoint");
 }
 
 void BaseEnemy::revive_update() {
-	ReviveBehaviorWork& value = std::get<ReviveBehaviorWork>(behaviorValue);
-	value.revicedCall.update();
+	behaviorTimer += WorldClock::DeltaSeconds();
+	if (behaviorTimer >= 3.0f) {
+		behavior.request(EnemyBehavior::Approach);
+	}
 }
 
 // ---------- 死亡時処理 ----------
 void BaseEnemy::erase_initialize() {
 	hitCollider->set_active(false);
-	behaviorValue = EraseBehaviorWork{
-		{ [&] { isActive = false; }, 3 }
-	};
+	behaviorTimer = 0;
 }
 
 void BaseEnemy::erase_update() {
-	EraseBehaviorWork& value = std::get<EraseBehaviorWork >(behaviorValue);
-	value.despawnTimedCall.update();
+	behaviorTimer += WorldClock::DeltaSeconds();
+	if (behaviorTimer >= 3.0f) {
+		isActive = false;
+	}
 }

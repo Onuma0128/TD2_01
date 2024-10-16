@@ -15,6 +15,7 @@ public:
 	EnemyManager& operator=(const EnemyManager&) = delete;
 
 public:
+	void begin();
 	void update();
 	void begin_rendering();
 	void draw() const;
@@ -28,6 +29,7 @@ public:
 #ifdef _DEBUG
 public:
 	void clear();
+	void debug_gui();
 #endif // _DEBUG
 
 private:
