@@ -214,21 +214,33 @@ void BaseEnemy::beating_animation() {
 }
 
 void BaseEnemy::down_animetion() {
+	// プレイヤーがひっくり返る回転
 	float t = behaviorTimer;
 	t = std::clamp(t, 0.0f, 1.0f);
-	float angle = -90 * ToRadian;
+	float angle = 180 * ToRadian;
 	Quaternion rotationX = Quaternion::AngleAxis(CVector3::BASIS_X, angle);
-	Quaternion rotate = axisOfQuaternion * rotationX;
+	Quaternion rotate = rotationX * axisOfQuaternion;
 	ghostMesh->get_transform().set_quaternion(Quaternion::Slerp(axisOfQuaternion, rotate, t));
+
+	velocity.y -= 21.0f * WorldClock::DeltaSeconds();
+	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
 }
 
 void BaseEnemy::revive_animation() {
+	// 復活したら回転を戻す
 	float t = behaviorTimer / 3.0f;
 	t = std::clamp(t, 0.0f, 1.0f);
-	float angle = 90 * ToRadian;
+	float angle = -180 * ToRadian;
 	Quaternion rotationX = Quaternion::AngleAxis(CVector3::BASIS_X, angle);
 	Quaternion rotate = axisOfQuaternion * rotationX;
 	ghostMesh->get_transform().set_quaternion(Quaternion::Slerp(axisOfQuaternion, rotate, t));
+	// 元居た高さにラープ
+	Vector3 to = {
+		transform.get_translate().x,
+		0.0f,
+		transform.get_translate().z };
+	Vector3 translate = Vector3::Lerp(transform.get_translate(), to, t);
+	transform.set_translate(translate);
 }
 
 // 被ダメ時コールバック
@@ -458,6 +470,11 @@ void BaseEnemy::down_initialize() {
 	meleeCollider->set_active(false);
 	// hitの有効化
 	hitCollider->set_active(true);
+	// プレイヤーとの距離を算出
+	Vector3 distance = world_position() - targetPlayer->world_position();
+	// velocity算出
+	velocity = distance.normalize_safe();
+	velocity.y = 10.0f;
 	// ダウン時の回転を取得
 	axisOfQuaternion = ghostMesh->get_transform().get_quaternion();
 }
