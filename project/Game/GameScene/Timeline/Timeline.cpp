@@ -11,15 +11,12 @@
 #include "Engine/Debug/Output.h"
 
 #include "Game/GameScene/EnemyManager/EnemyManager.h"
+#include "Game/GameScene/Player/Player.h"
 
 using json = nlohmann::json;
 
 void Timeline::Initialize() {
 	LoadAll();
-	nowWave = waveData.begin();
-	if (!IsEndWaveAll()) {
-		nextPopData = nowWave->popData.begin();
-	}
 	timer = 0;
 }
 
@@ -39,16 +36,10 @@ void Timeline::Update() {
 	// 最後まで湧いていて、全員倒した
 	if (nextPopData == nowWave->popData.end() && enemyManager->get_enemies().empty()) {
 		++nowWave; // ウェーブ進める
-		// 最後まで到達してなかったら次の沸きデータを持ってくる
-		if (!IsEndWaveAll()) {
-			nextPopData = nowWave->popData.begin();
-		}
-		// 範囲外参照しないためにreturn
-		else {
+		ResetNowWave();
+		if (IsEndWaveAll()) {
 			return;
 		}
-		// リセット
-		timer = 0;
 	}
 
 	// 現在ウェーブの更新
@@ -58,6 +49,13 @@ void Timeline::Update() {
 
 		// 次に進める
 		++nextPopData;
+	}
+}
+
+void Timeline::Start() {
+	nowWave = waveData.begin();
+	if (!IsEndWaveAll()) {
+		ResetNowWave();
 	}
 }
 
@@ -78,10 +76,18 @@ void Timeline::Load(const std::filesystem::path& directoryPath) {
 	// 閉じる
 	ifstream.close();
 
-	// データ取得
-	json& data = root.at("PopData");
 	// ウェーブ追加
 	WaveData& newWaveData = waveData.emplace_back();
+	
+	if (root.contains("PlayerHitPoint")) {
+		newWaveData.playerHitpoint = root["PlayerHitPoint"];
+	}
+	if (root.contains("EnemyApproachSpeed")) {
+		newWaveData.enemyApproachSpeed = root["EnemyApproachSpeed"];
+	}
+
+	// データ取得
+	json& data = root.at("PopData");
 
 	for (int i = 0; i < data.size(); ++i) {
 		// 発生データ
@@ -120,21 +126,25 @@ void Timeline::LoadAll() {
 	}
 }
 
-#ifdef _DEBUG
-void Timeline::ResetWave(int wave) {
-	enemyManager->clear();
-	nowWave = waveData.begin() + wave;
+void Timeline::ResetNowWave() {
+	// 最後まで到達してなかったら次の沸きデータを持ってくる
+	if (!IsEndWaveAll()) {
+		nextPopData = nowWave->popData.begin();
+		player->reset_hitpoint(nowWave->playerHitpoint);
+		BaseEnemy::SetApproachSpeed(nowWave->enemyApproachSpeed);
+	}
+	// リセット
 	timer = 0;
-	nextPopData = nowWave->popData.begin();
 }
-#endif // _DEBUG
 
 #ifdef _DEBUG
+
 #include <imgui.h>
+
 void Timeline::debug_gui() {
 	ImGui::Begin("Timeline");
 	if (ImGui::Checkbox("Editor", &isActiveEditor)) {
-		ResetWave(0);
+		ResetWaveDebug(0);
 	}
 	if (isActiveEditor && !isDemoPlay) {
 		ImGui::Text("Editting");
@@ -155,5 +165,11 @@ void Timeline::debug_gui() {
 		}
 	}
 	ImGui::End();
+}
+
+void Timeline::ResetWaveDebug(int wave) {
+	enemyManager->clear();
+	nowWave = waveData.begin() + wave;
+	ResetNowWave();
 }
 #endif // _DEBUG

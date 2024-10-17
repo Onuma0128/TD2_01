@@ -6,20 +6,15 @@
 #include <Engine/Application/WorldClock/WorldClock.h>
 #include <Engine/Utility/SmartPointer.h>
 #include <Engine/Application/Scene/SceneManager.h>
+#include <Engine/Module/Collision/CollisionManager.h>
+
 #include <Game/GameOverScene/GameOverScene.h>
-
 #include "Game/GameScene/Player/PlayerHPManager.h"
-
 #include "Game/GameScene/BeatManager/BeatManager.h"
-
 
 #ifdef _DEBUG
 #include "imgui.h"
 #endif // _DEBUG
-
-Player::Player() {
-	initialize();
-}
 
 void Player::initialize() {
 	globalValues.add_value<float>("Player", "BeatIntervalBase", 1.0f);
@@ -52,18 +47,6 @@ void Player::initialize() {
 	playerMesh = std::make_unique<GameObject>("player_model.obj");
 	playerMesh->initialize();
 	playerMesh->set_parent(*this);
-
-	// 弾の初期化
-	// 弾の数を指定
-	uint32_t numBullets = globalValues.get_value<int>("Player", "NumBullets");
-	for (uint32_t i = 0; i < numBullets; ++i) {
-		std::unique_ptr<PlayerBullet> bullet = std::make_unique<PlayerBullet>();
-		float parametric = static_cast<float>(i) / numBullets;
-		// Playerとペアレント
-		bullet->initialize(*this);
-		bullet->set_angle_offset(PI2 * parametric);
-		bullets_.emplace_back(std::move(bullet));
-	}
 
 	hitCollider = eps::CreateShared<SphereCollider>();
 	hitCollider->initialize();
@@ -108,11 +91,11 @@ void Player::update() {
 	hitCollider->set_radius(globalValues.get_value<float>("Player", "ColliderRadius"));
 
 	// 弾の座標更新
-	for (auto& bullet : bullets_) {
+	for (std::unique_ptr<PlayerBullet>& bullet : bullets_) {
 		bullet->update();
 	}
 
-	for (auto& sweat : sweats_) {
+	for (std::unique_ptr<PlayerSweat>& sweat : sweats_) {
 		sweat->update();
 	}
 	// プレイヤーのHPが0なら死亡処理
@@ -127,10 +110,10 @@ void Player::begin_rendering() noexcept {
 	update_matrix();
 	playerMesh->begin_rendering();
 
-	for (auto& bullet : bullets_) {
+	for (std::unique_ptr<PlayerBullet>& bullet : bullets_) {
 		bullet->begin_rendering();
 	}
-	for (auto& sweat : sweats_) {
+	for (std::unique_ptr<PlayerSweat>& sweat : sweats_) {
 		sweat->begin_rendering();
 	}
 }
@@ -146,11 +129,11 @@ void Player::draw() const {
 		playerMesh->draw();
 	}
 
-	for (auto& bullet : bullets_) {
+	for (const std::unique_ptr<PlayerBullet>& bullet : bullets_) {
 		bullet->draw();
 	}
 
-	for (auto& sweat : sweats_) {
+	for (const std::unique_ptr<PlayerSweat>& sweat : sweats_) {
 		sweat->draw();
 	}
 }
@@ -234,9 +217,9 @@ void Player::Beating() {
 	// 途中でダメージを食らうとインターバルが変わるので、毎回取得する
 	float baseInterval = globalValues.get_value<float>("Player", "BeatIntervalBase");
 	float minInterval = globalValues.get_value<float>("Player", "BeatIntervalMin");
-	int maxHp = globalValues.get_value<int>("Player", "NumBullets");
+	int maxHp = playerHpManager_->get_max_hitpoint() - 1;
 	// インターバル間隔を線形補間で算出
-	float beatAttackInterval = std::lerp(minInterval, baseInterval, (float)playerHpManager_->get_hp() / maxHp);
+	float beatAttackInterval = std::lerp(minInterval, baseInterval, (float)(playerHpManager_->get_hp() - 1) / maxHp);
 	// インターバルより長いならビートを発生させる
 	if (beatingTimer >= beatAttackInterval) {
 		beatingTimer = std::fmod(beatingTimer, beatAttackInterval);
@@ -373,8 +356,25 @@ std::weak_ptr<SphereCollider> Player::get_hit_collider() const {
 	return hitCollider;
 }
 
-const std::vector<std::unique_ptr<PlayerBullet>>& Player::get_bullets() const {
-	return bullets_;
+void Player::reset_hitpoint(int hitpoint_) {
+	if (hitpoint_ < 2) {
+		hitpoint_ = 2;
+	}
+	// 弾の初期化
+	// 弾の数を指定
+	bullets_.clear();
+	bullets_.reserve(hitpoint_);
+	for (int i = 0; i < hitpoint_; ++i) {
+		std::unique_ptr<PlayerBullet>& bullet = bullets_.emplace_back();
+		bullet = eps::CreateUnique<PlayerBullet>();
+		float parametric = static_cast<float>(i) / hitpoint_;
+		// Playerとペアレント
+		bullet->initialize(*this);
+		bullet->set_angle_offset(PI2 * parametric);
+		collisionManager->register_collider("Heart", bullet->get_collider());
+	}
+
+	playerHpManager_->reset_max_hp(hitpoint_);
 }
 
 void Player::OnCollisionCallBack(const BaseCollider* const other) {

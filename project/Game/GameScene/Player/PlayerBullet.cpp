@@ -23,6 +23,7 @@ void PlayerBullet::initialize(const WorldInstance& parent) {
 
 	globalValues.add_value<float>("Animation", "HeartbeatCycle", 0.5f);
 	globalValues.add_value<float>("Animation", "HeartBeatAmplitude", 0.5f);
+	globalValues.add_value<float>("Animation", "HeartbeatMinCycle", 0.2f);
 	globalValues.add_value<float>("Animation", "AngleLapCycle", 6.0f);
 	globalValues.add_value<Vector3>("Animation", "DistanceOffset", { 0.0f,1.0f,1.5f });
 	globalValues.add_value<float>("Animation", "HeartBaseScale", 1.0f);
@@ -105,16 +106,7 @@ void PlayerBullet::update() {
 		break;
 
 	case PlayerBullet::State::BeatAttack:
-	{
-		// ビート攻撃をする
-		// 弾を揺らしたり動かしたりもろもろ
-
-		// ビート攻撃を止めたらAttachに戻る
-
-		// if (敵が死んだら弾を戻す){
-		//     state = State::Comeback;
-		// }
-	}
+		// do nothing
 	break;
 	case PlayerBullet::State::Comeback:
 	{
@@ -145,7 +137,10 @@ void PlayerBullet::update() {
 }
 
 void PlayerBullet::BeatNormal() {
-	float HartbeatCycle = globalValues.get_value<float>("Animation", "HeartbeatCycle") * float(playerHpManager->get_hp()) / 5.0f;
+	float baseCycle = globalValues.get_value<float>("Animation", "HeartbeatCycle");
+	float minCycle = globalValues.get_value<float>("Animation", "HeartbeatMinCycle");
+	float hitpointRaito = (float)(playerHpManager->get_hp() - 1) / (playerHpManager->get_max_hitpoint() - 1);
+	float HartbeatCycle = std::lerp(minCycle, baseCycle, hitpointRaito);
 
 	// 脈拍のようなスケール変化
 	heartbeatTimer += WorldClock::DeltaSeconds();

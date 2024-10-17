@@ -7,6 +7,7 @@
 
 class BaseEnemy;
 class EnemyManager;
+class Player;
 
 class Timeline {
 #ifdef _DEBUG
@@ -20,6 +21,8 @@ class Timeline {
 	};
 
 	struct WaveData {
+		int playerHitpoint;
+		float enemyApproachSpeed;
 		std::vector<PopData> popData;
 	};
 public:
@@ -33,21 +36,25 @@ public:
 	void Initialize();
 	void Update();
 
+	void Start();
+
 private:
 	void Load(const std::filesystem::path& directoryPath);
 	void LoadAll();
 
-#ifdef _DEBUG
-	void ResetWave(int wave = 0);
-#endif // _DEBUG
+	void ResetNowWave();
 
 public:
 	bool IsEndWaveAll() { return nowWave == waveData.end(); };
 	void SetEnemyManager(EnemyManager* enemyManager_) { enemyManager = enemyManager_; };
+	void SetPlayer(Player* player_) { player = player_; };
 
 #ifdef _DEBUG
 public:
 	void debug_gui();
+
+private:
+	void ResetWaveDebug(int wave = 0);
 #endif // _DEBUG
 
 private:
@@ -57,6 +64,7 @@ private:
 	std::vector<WaveData> waveData;
 
 	EnemyManager* enemyManager;
+	Player* player;
 
 #ifdef _DEBUG
 	bool isActiveEditor;

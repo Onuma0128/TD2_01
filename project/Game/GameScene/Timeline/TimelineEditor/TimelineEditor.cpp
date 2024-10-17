@@ -151,6 +151,8 @@ void TimelineEditor::export_json_all() {
 
 	for (int j = 0; auto & wave : timeline->waveData) {
 		json waveJson;
+		waveJson["PlayerHitPoint"] = wave.playerHitpoint;
+		waveJson["EnemyApproachSpeed"] = wave.enemyApproachSpeed;
 		waveJson["PopData"] = json::object();
 		json& popDataJson = waveJson["PopData"];
 		for (int i = 0; auto & pop : wave.popData) {
@@ -216,6 +218,15 @@ void TimelineEditor::wave_editor() {
 			if (i % 5 != 4 && i + 1 != timeline->waveData.size()) {
 				ImGui::SameLine();
 			}
+		}
+		// 編集中ウェーブの設定
+		if (editWave.has_value()) {
+			Timeline::WaveData& wave = timeline->waveData[editWave.value()];
+			ImGui::SetNextItemWidth(100.0f);
+			ImGui::InputInt("PlayerHitpoint", &wave.playerHitpoint);
+			ImGui::SetNextItemWidth(100.0f);
+			ImGui::DragFloat("EnemyApproachSpeed", &wave.enemyApproachSpeed, 0.1f);
+
 		}
 	}
 }
@@ -360,11 +371,12 @@ void TimelineEditor::run_demoplay() {
 	}
 	timeline->isDemoPlay = true;
 	sort_all_wave_deta();
+	auto waveBegin = timeline->waveData.begin();
 	if (isDemoplayEditWave) {
-		timeline->ResetWave(editWave.value());
+		timeline->ResetWaveDebug(editWave.value());
 	}
 	else {
-		timeline->ResetWave(0);
+		timeline->ResetWaveDebug(0);
 	}
 }
 
