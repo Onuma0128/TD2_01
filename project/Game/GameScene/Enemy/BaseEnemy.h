@@ -39,6 +39,9 @@ public: // Member function
 	void draw_marker() const;
 
 	void normal_animation();
+	void beating_animation();
+	void down_animetion();
+	void revive_animation();
 
 private:
 	void damaged_callback(const BaseCollider* const other);
@@ -81,6 +84,7 @@ private: // Member values
 	int hitpoint; // HP
 	int maxHitpoint; // HP
 	Vector3 velocity;
+	Quaternion axisOfQuaternion;
 
 	std::unique_ptr<GameObject> ghostMesh;
 	std::unique_ptr<GameObject> hitMarkerMesh;
@@ -90,10 +94,11 @@ private: // Member values
 	int markedCount;
 	float markingTimer;
 	bool isAttakced;
+	float behaviorTimer;
+
 	float waveFrameCount;
 	float initialY;
-
-	float behaviorTimer;
+	bool isBeatingAnima;
 
 	std::shared_ptr<SphereCollider> hitCollider;
 

@@ -26,7 +26,7 @@ void Player::initialize() {
 	globalValues.add_value<float>("Player", "BeatIntervalMin", 0.1f);
 
 	globalValues.add_value<int>("Enemy", "BeatingDamage", 20);
-	globalValues.add_value<int>("Player", "NumBullets", 10);
+	globalValues.add_value<int>("Player", "NumBullets", 3);
 	globalValues.add_value<float>("Player", "Speed", 3.0f);
 	globalValues.add_value<float>("Player", "ThrowTime", 0.3f);
 	globalValues.add_value<float>("Player", "TurnAroundSpeed", 0.2f);
@@ -341,17 +341,17 @@ void Player::Dead()
 			lastBeat_ = false;
 			downFrame_ = 0.0f;
 			// スケールを完全に元に戻す
-			transform.set_scale(Vector3(1.0f, 1.0f, 1.0f));
+			transform.set_scale(CVector3::BASIS);
 		}
 	}
 	else {
 		float angle = 80.0f * ToRadian;
 
 		// ローカルZ軸に沿った回転クォータニオンを生成
-		Quaternion zRotation = Quaternion::AngleAxis(Vector3(0.0f, 0.0f, 1.0f), angle);
+		Quaternion zRotation = Quaternion::AngleAxis(CVector3::BASIS_Z, angle);
 
 		// ローカルZ軸回転を現在のクォータニオンに掛け合わせて適用
-		Quaternion combinedRotation = zRotation * axisOfQuaternion_;
+		Quaternion combinedRotation = axisOfQuaternion_ * zRotation;
 
 		// Slerpで回転を補間
 		downFrame_ += WorldClock::DeltaSeconds();
