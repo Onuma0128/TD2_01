@@ -322,6 +322,7 @@ void BaseEnemy::attack_update() {
 		meleeCollider->set_active(true);
 	}
 	else if (behaviorTimer > 3.0f) {
+		meleeCollider->set_active(false);
 		behavior.request(EnemyBehavior::Approach);
 	}
 }
