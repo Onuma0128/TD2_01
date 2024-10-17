@@ -1,11 +1,11 @@
 #pragma once
 
-#include <list>
 #include <filesystem>
+#include <vector>
 
+#include "Game/GameScene/Enemy/BaseEnemy.h"
 #include <Engine/Math/Vector3.h>
 
-class BaseEnemy;
 class EnemyManager;
 class Player;
 
@@ -16,6 +16,7 @@ class Timeline {
 
 	struct PopData {
 		float delay;
+		BaseEnemy::Type type;
 		Vector3 translate;
 		Vector3 forward;
 	};

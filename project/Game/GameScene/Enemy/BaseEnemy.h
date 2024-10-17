@@ -2,9 +2,6 @@
 
 #include <Engine/Module/GameObject/GameObject.h>
 
-#include <variant>
-
-#include <Engine/Utility/TimedCall/TimedCall.h>
 #include <Engine/Module/Collision/Collider/SphereCollider.h>
 #include <Engine/Module/Behavior/Behavior.h>
 #include <Engine/DirectX/DirectXResourceObject/ConstantBuffer/ConstantBuffer.h>
@@ -28,10 +25,16 @@ class PlayerHPManager;
 class BeatManager;
 
 class BaseEnemy : public WorldInstance {
+public:
+	enum class Type {
+		Normal,
+		Strong,
+	};
+
 public: // Contsructor/Destructor
 
 public: // Member function
-	void initialize(const Vector3& transform, const Vector3& forward);
+	void initialize(const Vector3& transform, const Vector3& forward, Type type_);
 	void begin();
 	void update();
 	void begin_rendering();
@@ -81,6 +84,9 @@ private: // BehaviorFunctions
 
 private: // Member values
 	bool isDead;
+
+	Type type;
+
 	int hitpoint; // HP
 	int maxHitpoint; // HP
 	Vector3 velocity;
