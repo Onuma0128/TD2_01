@@ -20,7 +20,6 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
 	globalValues.add_value<float>("Enemy", "NockbackFriction", 0.8f);
 
 	globalValues.add_value<float>("Enemy", "StartAttackDistance", 1.0f);
-	globalValues.add_value<float>("Enemy", "ApproachSpeed", 3.0f);
 
 	globalValues.add_value<float>("Enemy", "AbsorptionTime", 3.0f);
 	globalValues.add_value<int>("Enemy", "AbsorptionAmount", 20);
@@ -299,8 +298,7 @@ void BaseEnemy::approach_update() {
 	}
 
 	// velocity算出
-	float speed = globalValues.get_value<float>("Enemy", "ApproachSpeed");
-	velocity = distance.normalize_safe() * speed;
+	velocity = distance.normalize_safe() * approachSpeed;
 	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
 	// player方向を向く
 	look_at(*targetPlayer);

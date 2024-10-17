@@ -2,7 +2,6 @@
     "Enemy": {
         "AbsorptionAmount": 20,
         "AbsorptionTime": 3.0,
-        "ApproachSpeed": 1.0,
         "BeatHitDamage": 10,
         "BeatInterval": 1.0,
         "BeatingDamage": 20,

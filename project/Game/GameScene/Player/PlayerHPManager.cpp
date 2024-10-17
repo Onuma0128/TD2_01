@@ -24,3 +24,8 @@ void PlayerHPManager::set_state(HP_State state) {
 		break;
 	}
 }
+
+void PlayerHPManager::reset_max_hp(int hitpoint) {
+	hp_ = hitpoint;
+	maxHitpoint = hitpoint;
+}

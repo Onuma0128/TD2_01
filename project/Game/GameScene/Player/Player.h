@@ -13,6 +13,7 @@
 class BaseEnemy;
 class BeatManager;
 class PlayerHPManager;
+class CollisionManager;
 
 class Player : public WorldInstance 
 {
@@ -26,8 +27,6 @@ public:
 	};
 
 public:
-	Player();
-
 	void initialize();
 
 	void begin();
@@ -66,7 +65,7 @@ public:
 public:
 	State get_state() const { return state_; }
 	std::weak_ptr<SphereCollider> get_hit_collider() const;
-	const std::vector<std::unique_ptr<PlayerBullet>>& get_bullets() const;
+	void reset_hitpoint(int hitpoint_);
 
 private:
 	void OnCollisionCallBack(const BaseCollider* const other);
@@ -107,4 +106,5 @@ public:
 	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
 	inline static BeatManager* beatManager = nullptr;
 	inline static PlayerHPManager* playerHpManager_ = nullptr;
+	inline static CollisionManager* collisionManager = nullptr;
 };

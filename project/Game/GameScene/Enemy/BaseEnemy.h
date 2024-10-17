@@ -98,9 +98,15 @@ private: // Member values
 
 	ConstantBuffer<float> percentage;
 
+public:
+	static void SetApproachSpeed(float speed) { approachSpeed = speed; };
+
 public: // Static value
 	inline static const WorldInstance* targetPlayer = nullptr;
 	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
 	inline static BeatManager* beatManager = nullptr;
 	inline static PlayerHPManager* playerHpManager_ = nullptr;
+
+private:
+	inline static float approachSpeed = 0.0f;
 };
