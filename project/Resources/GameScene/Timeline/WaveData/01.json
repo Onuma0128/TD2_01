@@ -1,4 +1,6 @@
 {
+	"EnemyApproachSpeed": 1.0,
+	"PlayerHitPoint": 6,
 	"PopData": {
 		"00": {
 			"Delay": 0.0,
