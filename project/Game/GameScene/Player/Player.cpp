@@ -217,9 +217,9 @@ void Player::Beating() {
 	// 途中でダメージを食らうとインターバルが変わるので、毎回取得する
 	float baseInterval = globalValues.get_value<float>("Player", "BeatIntervalBase");
 	float minInterval = globalValues.get_value<float>("Player", "BeatIntervalMin");
-	int maxHp = playerHpManager_->get_max_hitpoint() - 1;
+	float maxHp = (float)playerHpManager_->get_hp() / (float)playerHpManager_->get_max_hitpoint();
 	// インターバル間隔を線形補間で算出
-	float beatAttackInterval = std::lerp(minInterval, baseInterval, (float)(playerHpManager_->get_hp() - 1) / maxHp);
+	float beatAttackInterval = std::lerp(minInterval, baseInterval, maxHp);
 	// インターバルより長いならビートを発生させる
 	if (beatingTimer >= beatAttackInterval) {
 		beatingTimer = std::fmod(beatingTimer, beatAttackInterval);
@@ -284,7 +284,7 @@ void Player::KnockBack()
 
 void Player::AddSweat()
 {
-	if (playerHpManager_->get_hp() < 5) {
+	if (playerHpManager_->get_hp() <= playerHpManager_->get_max_hitpoint() / 2) {
 		uint32_t numSweat = globalValues.get_value<int>("Sweat","NumSweat");
 		for (uint32_t i = 0; i < numSweat; ++i) {
 			std::unique_ptr<PlayerSweat> sweat = std::make_unique<PlayerSweat>();
