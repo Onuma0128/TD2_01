@@ -3,6 +3,7 @@
 #include <Engine/Application/WorldClock/WorldClock.h>
 #include <Engine/Utility/SmartPointer.h>
 #include "Engine/DirectX/DirectXCommand/DirectXCommand.h"
+#include <Engine/Math/Definition.h>
 
 #include "Game/GameScene/Player/PlayerBullet.h"
 #include "Game/GameScene/Player/PlayerHPManager.h"
@@ -20,7 +21,6 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
 	globalValues.add_value<float>("Enemy", "NockbackFriction", 0.8f);
 
 	globalValues.add_value<float>("Enemy", "StartAttackDistance", 1.0f);
-	globalValues.add_value<float>("Enemy", "ApproachSpeed", 3.0f);
 
 	globalValues.add_value<float>("Enemy", "AbsorptionTime", 3.0f);
 	globalValues.add_value<int>("Enemy", "AbsorptionAmount", 20);
@@ -84,6 +84,7 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
 	ghostMesh->initialize();
 	ghostMesh->set_parent(*this);
 	ghostMesh->get_transform().set_translate({ 0,1,0 });
+	initialY = ghostMesh->get_transform().get_translate().y;
 
 	hitMarkerMesh = eps::CreateUnique<GameObject>("HitMarker.obj");
 	hitMarkerMesh->initialize();
@@ -122,6 +123,9 @@ void BaseEnemy::update() {
 	// 行動の更新
 	behavior.update();
 
+	// 生きてる時の通常アニメーション
+	normal_animation();
+
 	float markingTime = globalValues.get_value<float>("Enemy", "AbsorptionTime");
 	// 付与状態かつビートでない場合
 	if (markedCount && behavior.state() != EnemyBehavior::Beating) {
@@ -142,7 +146,8 @@ void BaseEnemy::update() {
 	if (hitpoint <= 0) {
 		if (behavior.state() != EnemyBehavior::Down &&
 			behavior.state() != EnemyBehavior::Erase &&
-			behavior.state() != EnemyBehavior::Revive)
+			behavior.state() != EnemyBehavior::Revive && 
+			!isBeatingAnima)
 			behavior.request(EnemyBehavior::Down);
 	}
 }
@@ -164,6 +169,54 @@ void BaseEnemy::draw_marker() const {
 		);
 		hitMarkerMesh->draw();
 	}
+}
+
+void BaseEnemy::normal_animation()
+{
+	// 敵がふよふよ浮く感じ
+	if (behavior.state() != EnemyBehavior::Down &&
+		behavior.state() != EnemyBehavior::Erase &&
+		behavior.state() != EnemyBehavior::Revive) {
+
+		waveFrameCount += WorldClock::DeltaSeconds();
+		ghostMesh->get_transform().set_translate_y(initialY + 0.2f * sin(waveFrameCount));
+	}
+}
+
+void BaseEnemy::beating_animation()
+{
+	// 一回だけスケールを膨らませる
+	float t = behaviorTimer;
+	// プレイヤーの一回限りの膨張動作
+	float beatScale = 1.0f + 0.5f * (1.0f - std::clamp(t / 0.1f, 0.0f, 1.0f));
+	// プレイヤーのスケールを更新
+	transform.set_scale(Vector3(beatScale, beatScale, beatScale));
+
+	if (behaviorTimer >= 0.1f) {
+		isBeatingAnima = false;
+		// スケールを完全に元に戻す
+		transform.set_scale(CVector3::BASIS);
+	}
+}
+
+void BaseEnemy::down_animetion()
+{
+	float t = behaviorTimer;
+	t = std::clamp(t, 0.0f, 1.0f);
+	float angle = -90 * ToRadian;
+	Quaternion rotationX = Quaternion::AngleAxis(CVector3::BASIS_X, angle);
+	Quaternion rotate = axisOfQuaternion * rotationX;
+	ghostMesh->get_transform().set_quaternion(Quaternion::Slerp(axisOfQuaternion, rotate, t));
+}
+
+void BaseEnemy::revive_animation()
+{
+	float t = behaviorTimer / 3.0f;
+	t = std::clamp(t, 0.0f, 1.0f);
+	float angle = 90 * ToRadian;
+	Quaternion rotationX = Quaternion::AngleAxis(CVector3::BASIS_X, angle);
+	Quaternion rotate = axisOfQuaternion * rotationX;
+	ghostMesh->get_transform().set_quaternion(Quaternion::Slerp(axisOfQuaternion, rotate, t));
 }
 
 // 被ダメ時コールバック
@@ -210,7 +263,7 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 			return;
 		}
 		// 復活処理
-		if (behavior.state() == EnemyBehavior::Down) {
+		if (behavior.state() == EnemyBehavior::Down && behaviorTimer > 1.0f) {
 			behavior.request(EnemyBehavior::Revive);
 			return;
 		}
@@ -282,6 +335,7 @@ void BaseEnemy::spawn_update() {
 // ---------- 移動処理 ----------
 void BaseEnemy::approach_initialize() {
 	hitCollider->set_active(true);
+	transform.set_scale(CVector3::BASIS);
 }
 
 void BaseEnemy::approach_update() {
@@ -299,8 +353,7 @@ void BaseEnemy::approach_update() {
 	}
 
 	// velocity算出
-	float speed = globalValues.get_value<float>("Enemy", "ApproachSpeed");
-	velocity = distance.normalize_safe() * speed;
+	velocity = distance.normalize_safe() * approachSpeed;
 	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
 	// player方向を向く
 	look_at(*targetPlayer);
@@ -322,15 +375,34 @@ void BaseEnemy::attack_update() {
 		meleeCollider->set_active(true);
 	}
 	else if (behaviorTimer > 3.0f) {
+		meleeCollider->set_active(false);
 		behavior.request(EnemyBehavior::Approach);
 	}
 }
 
 // ---------- 鼓動同期時処理 ----------
 void BaseEnemy::beating_initialize() {
+	behaviorTimer = 0;
 }
 
 void BaseEnemy::beating_update() {
+	behaviorTimer += WorldClock::DeltaSeconds();
+	// 途中でダメージを食らうとインターバルが変わるので、毎回取得する
+	if (isBeatingAnima) {
+		beating_animation();
+	}
+	else {
+		float baseInterval = globalValues.get_value<float>("Player", "BeatIntervalBase");
+		float minInterval = globalValues.get_value<float>("Player", "BeatIntervalMin");
+		float maxHp = (float)playerHpManager_->get_hp() / (float)playerHpManager_->get_max_hitpoint();
+		// インターバル間隔を線形補間で算出
+		float beatAttackInterval = std::lerp(minInterval, baseInterval, maxHp);
+		// インターバルより長いならビートを発生させる
+		if (behaviorTimer >= beatAttackInterval) {
+			behaviorTimer = std::fmod(behaviorTimer, beatAttackInterval);
+			isBeatingAnima = true;
+		}
+	}
 }
 
 // ---------- 被ハート時処理 ----------
@@ -340,6 +412,7 @@ void BaseEnemy::damaged_heart_initialize() {
 
 void BaseEnemy::damaged_heart_update() {
 	behaviorTimer += WorldClock::DeltaSeconds();
+	beating_animation();
 	if (behaviorTimer >= 1.0f) {
 		behavior.request(EnemyBehavior::Approach);
 	}
@@ -373,10 +446,15 @@ void BaseEnemy::down_initialize() {
 	meleeCollider->set_active(false);
 	// hitの有効化
 	hitCollider->set_active(true);
+	// ダウン時の回転を取得
+	axisOfQuaternion = ghostMesh->get_transform().get_quaternion();
 }
 
 void BaseEnemy::down_update() {
 	behaviorTimer += WorldClock::DeltaSeconds();
+	if (behaviorTimer <= 1.0f) {
+		down_animetion();
+	}
 	if (behaviorTimer >= 3.0f) {
 		behavior.request(EnemyBehavior::Erase);
 	}
@@ -388,12 +466,17 @@ void BaseEnemy::revive_initialize() {
 	behaviorTimer = 0;
 	// HP強制回復
 	hitpoint = globalValues.get_value<int>("Enemy", "RevivedHitpoint");
+	// 復活時の回転を取得
+	axisOfQuaternion = ghostMesh->get_transform().get_quaternion();
 }
 
 void BaseEnemy::revive_update() {
 	behaviorTimer += WorldClock::DeltaSeconds();
 	if (behaviorTimer >= 3.0f) {
 		behavior.request(EnemyBehavior::Approach);
+	}
+	else {
+		revive_animation();
 	}
 }
 

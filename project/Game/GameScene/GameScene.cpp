@@ -46,6 +46,7 @@ void GameScene::initialize() {
 
 	/*==================== シーン ====================*/
 	collisionManager = eps::CreateUnique<CollisionManager>();
+	Player::collisionManager = collisionManager.get();
 
 	enemyManager = eps::CreateUnique<EnemyManager>();
 	enemyManager->set_collision_manager(collisionManager.get());
@@ -59,7 +60,7 @@ void GameScene::initialize() {
 	timeline = std::make_unique<Timeline>();
 	timeline->Initialize();
 	timeline->SetEnemyManager(enemyManager.get());
-	
+
 	playerHpManager_ = std::make_unique<PlayerHPManager>();
 	playerHpManager_->initialize();
 	
@@ -91,20 +92,19 @@ void GameScene::initialize() {
 	/*==================== ゲームオブジェクト ====================*/
 
 	player_ = std::make_unique<Player>();
+	player_->initialize();
 	PlayerBullet::player = player_.get();
 	PlayerSweat::player = player_.get();
+	timeline->SetPlayer(player_.get());
 
 	collisionManager->register_collider("Player", player_->get_hit_collider());
 
 	create_enemy();
 	create_enemy();
 
-	const auto& bullets = player_->get_bullets();
-	for (const std::unique_ptr<PlayerBullet>& bullet : bullets) {
-		collisionManager->register_collider("Heart", bullet->get_collider());
-	}
-
 	BaseEnemy::targetPlayer = player_.get();
+
+	timeline->Start();
 
 #ifdef _DEBUG
 	editor = eps::CreateUnique<TimelineEditor>();

@@ -38,6 +38,11 @@ public: // Member function
 	void draw() const;
 	void draw_marker() const;
 
+	void normal_animation();
+	void beating_animation();
+	void down_animetion();
+	void revive_animation();
+
 private:
 	void damaged_callback(const BaseCollider* const other);
 	void attack_callback(const BaseCollider* const other);
@@ -79,6 +84,7 @@ private: // Member values
 	int hitpoint; // HP
 	int maxHitpoint; // HP
 	Vector3 velocity;
+	Quaternion axisOfQuaternion;
 
 	std::unique_ptr<GameObject> ghostMesh;
 	std::unique_ptr<GameObject> hitMarkerMesh;
@@ -88,8 +94,11 @@ private: // Member values
 	int markedCount;
 	float markingTimer;
 	bool isAttakced;
-
 	float behaviorTimer;
+
+	float waveFrameCount;
+	float initialY;
+	bool isBeatingAnima;
 
 	std::shared_ptr<SphereCollider> hitCollider;
 
@@ -98,9 +107,15 @@ private: // Member values
 
 	ConstantBuffer<float> percentage;
 
+public:
+	static void SetApproachSpeed(float speed) { approachSpeed = speed; };
+
 public: // Static value
 	inline static const WorldInstance* targetPlayer = nullptr;
 	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
 	inline static BeatManager* beatManager = nullptr;
 	inline static PlayerHPManager* playerHpManager_ = nullptr;
+
+private:
+	inline static float approachSpeed = 0.0f;
 };
