@@ -45,7 +45,7 @@ void Timeline::Update() {
 	// 現在ウェーブの更新
 	while (nextPopData != nowWave->popData.end() && nextPopData->delay <= timer) {
 		// 湧き処理
-		enemyManager->create_enemy(nextPopData->translate, nextPopData->forward);
+		enemyManager->create_enemy(nextPopData->translate, nextPopData->forward, nextPopData->type);
 
 		// 次に進める
 		++nextPopData;
@@ -78,7 +78,7 @@ void Timeline::Load(const std::filesystem::path& directoryPath) {
 
 	// ウェーブ追加
 	WaveData& newWaveData = waveData.emplace_back();
-	
+
 	if (root.contains("PlayerHitPoint")) {
 		newWaveData.playerHitpoint = root["PlayerHitPoint"];
 	}
@@ -95,6 +95,7 @@ void Timeline::Load(const std::filesystem::path& directoryPath) {
 		std::string test = std::format("{:02}", i);
 		json& popJson = data.at(test);
 		popData.delay = popJson["Delay"];
+		popData.type = static_cast<BaseEnemy::Type>(popJson["Type"]);
 		popData.translate = { popJson["Translate"].at(0), popJson["Translate"].at(1),popJson["Translate"].at(2) };
 		popData.forward = { popJson["Forward"].at(0),popJson["Forward"].at(1),popJson["Forward"].at(2) };
 	}

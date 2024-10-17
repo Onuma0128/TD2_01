@@ -5,7 +5,6 @@
         "BeatHitDamage": 10,
         "BeatInterval": 1.0,
         "BeatingDamage": 20,
-        "HP": 100,
         "NockbackFriction": 0.800000011920929,
         "NockbackMag": 3.0,
         "StartAttackDistance": 1.0,

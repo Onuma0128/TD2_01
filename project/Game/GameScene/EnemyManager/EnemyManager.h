@@ -24,7 +24,7 @@ public:
 public:
 	const std::list<BaseEnemy>& get_enemies();
 	void set_collision_manager(CollisionManager* collisionManager_);
-	void create_enemy(const Vector3& position, const Vector3& forward);
+	void create_enemy(const Vector3& position, const Vector3& forward, BaseEnemy::Type type);
 
 #ifdef _DEBUG
 public:

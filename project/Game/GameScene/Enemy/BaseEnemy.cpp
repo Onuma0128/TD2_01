@@ -9,10 +9,11 @@
 #include "Game/GameScene/Player/PlayerHPManager.h"
 #include "Game/GameScene/BeatManager/BeatManager.h"
 
-void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
+void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Type type_) {
 	globalValues.add_value<int>("Heart", "AttackDamage", 30);
 
-	globalValues.add_value<int>("Enemy", "HP", 100);
+	globalValues.add_value<int>("Enemy", "HPNormal", 100);
+	globalValues.add_value<int>("Enemy", "HPStrong", 200);
 	globalValues.add_value<int>("Enemy", "BeatingDamage", 20);
 	globalValues.add_value<int>("Enemy", "BeatHitDamage", 5);
 	globalValues.add_value<int>("Enemy", "RevivedHitpoint", 30);
@@ -28,8 +29,6 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
 	globalValues.add_value<float>("Enemy", "ToDeadDuration", 5.0f);
 
 	markedCount = 0;
-	maxHitpoint = globalValues.get_value<int>("Enemy", "HP");
-	hitpoint = maxHitpoint;
 	transform.set_translate(translate);
 	transform.set_quaternion(Quaternion::LookForward(forward));
 	// behavior初期化
@@ -80,7 +79,7 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
 		std::bind(&BaseEnemy::erase_update, this)
 	);
 
-	ghostMesh = eps::CreateUnique<GameObject>("ghost_model.obj");
+	ghostMesh = eps::CreateUnique<GameObject>();
 	ghostMesh->initialize();
 	ghostMesh->set_parent(*this);
 	ghostMesh->get_transform().set_translate({ 0,1,0 });
@@ -93,7 +92,6 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
 	hitCollider = eps::CreateShared<SphereCollider>();
 	hitCollider->initialize();
 	hitCollider->set_parent(*ghostMesh);
-	hitCollider->set_radius(0.5);
 	hitCollider->set_on_collision_enter(
 		std::bind(&BaseEnemy::damaged_callback, this, std::placeholders::_1)
 	);
@@ -103,7 +101,6 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
 	meleeCollider->initialize();
 	meleeCollider->set_parent(*ghostMesh);
 	meleeCollider->set_active(false);
-	meleeCollider->set_radius(0.5);
 	meleeCollider->set_on_collision_enter(
 		std::bind(&BaseEnemy::attack_callback, this, std::placeholders::_1)
 	);
@@ -113,6 +110,25 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
 	beatCollider->set_parent(*this);
 	beatCollider->set_active(false);
 	beatCollider->set_radius(3.0f);
+
+	type = type_;
+	switch (type) {
+	case BaseEnemy::Type::Normal:
+		maxHitpoint = globalValues.get_value<int>("Enemy", "HPNormal");
+		ghostMesh->reset_object("ghost_model.obj");
+		meleeCollider->set_radius(0.5f);
+		hitCollider->set_radius(0.5f);
+		break;
+	case BaseEnemy::Type::Strong:
+		maxHitpoint = globalValues.get_value<int>("Enemy", "HPStrong");
+		ghostMesh->reset_object("ghost_strong.obj");
+		meleeCollider->set_radius(1.0f);
+		hitCollider->set_radius(1.0f);
+		break;
+	default:
+		break;
+	}
+	hitpoint = maxHitpoint;
 }
 
 void BaseEnemy::begin() {
@@ -146,7 +162,7 @@ void BaseEnemy::update() {
 	if (hitpoint <= 0) {
 		if (behavior.state() != EnemyBehavior::Down &&
 			behavior.state() != EnemyBehavior::Erase &&
-			behavior.state() != EnemyBehavior::Revive && 
+			behavior.state() != EnemyBehavior::Revive &&
 			!isBeatingAnima)
 			behavior.request(EnemyBehavior::Down);
 	}
@@ -171,8 +187,7 @@ void BaseEnemy::draw_marker() const {
 	}
 }
 
-void BaseEnemy::normal_animation()
-{
+void BaseEnemy::normal_animation() {
 	// 敵がふよふよ浮く感じ
 	if (behavior.state() != EnemyBehavior::Down &&
 		behavior.state() != EnemyBehavior::Erase &&
@@ -183,8 +198,7 @@ void BaseEnemy::normal_animation()
 	}
 }
 
-void BaseEnemy::beating_animation()
-{
+void BaseEnemy::beating_animation() {
 	// 一回だけスケールを膨らませる
 	float t = behaviorTimer;
 	// プレイヤーの一回限りの膨張動作
@@ -199,8 +213,7 @@ void BaseEnemy::beating_animation()
 	}
 }
 
-void BaseEnemy::down_animetion()
-{
+void BaseEnemy::down_animetion() {
 	float t = behaviorTimer;
 	t = std::clamp(t, 0.0f, 1.0f);
 	float angle = -90 * ToRadian;
@@ -209,8 +222,7 @@ void BaseEnemy::down_animetion()
 	ghostMesh->get_transform().set_quaternion(Quaternion::Slerp(axisOfQuaternion, rotate, t));
 }
 
-void BaseEnemy::revive_animation()
-{
+void BaseEnemy::revive_animation() {
 	float t = behaviorTimer / 3.0f;
 	t = std::clamp(t, 0.0f, 1.0f);
 	float angle = 90 * ToRadian;
