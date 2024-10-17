@@ -33,9 +33,9 @@ void Player::initialize() {
 
 	// 汗
 	globalValues.add_value<int>("Sweat", "NumSweat", 5);
-	globalValues.add_value<float>("Sweat", "velocityY", 0.1f);
+	globalValues.add_value<float>("Sweat", "velocityY", 3.0f);
 	globalValues.add_value<int>("Sweat", "Radius", 240);
-	globalValues.add_value<float>("Sweat", "AccelerationY", 0.4f);
+	globalValues.add_value<float>("Sweat", "AccelerationY", 8.0f);
 	globalValues.add_value<float>("Sweat", "SmallerScale", 0.25f);
 
 	// 死ぬ時のアニメーション

@@ -13,8 +13,9 @@ public:
 
 private:
 
-	Vector3 offset_ = { 0.0f,1.5f,0.0f };
+	Vector3 offset_ = { 0.0f,1.8f,0.0f };
 	Vector3 velocity_ = { 0.0f,0.1f,0.0f };
+	float acceleration_;
 	// 最初の回転
 	Quaternion initialRotation_{};
 
