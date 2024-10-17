@@ -263,7 +263,7 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 			return;
 		}
 		// 復活処理
-		if (behavior.state() == EnemyBehavior::Down) {
+		if (behavior.state() == EnemyBehavior::Down && behaviorTimer > 1.0f) {
 			behavior.request(EnemyBehavior::Revive);
 			return;
 		}
@@ -394,9 +394,9 @@ void BaseEnemy::beating_update() {
 	else {
 		float baseInterval = globalValues.get_value<float>("Player", "BeatIntervalBase");
 		float minInterval = globalValues.get_value<float>("Player", "BeatIntervalMin");
-		int maxHp = globalValues.get_value<int>("Player", "NumBullets");
+		float maxHp = (float)playerHpManager_->get_hp() / (float)playerHpManager_->get_max_hitpoint();
 		// インターバル間隔を線形補間で算出
-		float beatAttackInterval = std::lerp(minInterval, baseInterval, (float)playerHpManager_->get_hp() / maxHp);
+		float beatAttackInterval = std::lerp(minInterval, baseInterval, maxHp);
 		// インターバルより長いならビートを発生させる
 		if (behaviorTimer >= beatAttackInterval) {
 			behaviorTimer = std::fmod(behaviorTimer, beatAttackInterval);
@@ -412,6 +412,7 @@ void BaseEnemy::damaged_heart_initialize() {
 
 void BaseEnemy::damaged_heart_update() {
 	behaviorTimer += WorldClock::DeltaSeconds();
+	beating_animation();
 	if (behaviorTimer >= 1.0f) {
 		behavior.request(EnemyBehavior::Approach);
 	}
