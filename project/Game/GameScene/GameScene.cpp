@@ -36,6 +36,12 @@ void GameScene::load() {
 
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "wave.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "esc.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "A_button.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "A_button_push.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "Space_button.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "Space_button_push.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "Attack.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "Beat.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "0.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "1.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "2.png");
@@ -84,6 +90,7 @@ void GameScene::initialize() {
 
 	uiManager_ = std::make_unique<UIManager>();
 	uiManager_->initialize();
+	UIManager::enemyManager_ = enemyManager.get();
 	WaveSprite::timeline_ = timeline.get();
 	
 	BaseEnemy::playerHpManager_ = playerHpManager_.get();

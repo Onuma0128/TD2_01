@@ -594,6 +594,9 @@
     <ClCompile Include="Game\GameScene\GameUI\Esc\EscSprite.cpp">
       <Filter>Game\Scene\GameScene\GameUI\Esc</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameScene\GameUI\Button\ButtonSprite.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\WinApp.h">
@@ -898,6 +901,9 @@
     </ClInclude>
     <ClInclude Include="Game\GameScene\GameUI\Esc\EscSprite.h">
       <Filter>Game\Scene\GameScene\GameUI\Esc</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameScene\GameUI\Button\ButtonSprite.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
