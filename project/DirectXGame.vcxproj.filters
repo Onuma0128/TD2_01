@@ -304,6 +304,18 @@
     <Filter Include="Game\Scene\TitleScene">
       <UniqueIdentifier>{4cc1e95d-2c45-4f3f-b898-c4d14c67e34f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Scene\GameScene\GameUI">
+      <UniqueIdentifier>{d6dd7086-c2b4-4c8f-a724-4da59fe2f262}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Scene\GameScene\GameUI\Wave">
+      <UniqueIdentifier>{1d02515a-4d3a-4fc3-9778-b4ef3e4c4ec0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Scene\GameScene\GameUI\Esc">
+      <UniqueIdentifier>{5762f86b-2942-4e50-ba90-2ff6494cc733}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Scene\GameScene\GameUI\Number">
+      <UniqueIdentifier>{f9b2e1b8-414e-4394-a392-5c545b821ba6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\WinApp.cpp">
@@ -569,6 +581,18 @@
     </ClCompile>
     <ClCompile Include="Game\GameScene\Player\PlayerSweat.cpp">
       <Filter>Game\Scene\GameScene\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameScene\GameUI\UIManager.cpp">
+      <Filter>Game\Scene\GameScene\GameUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameScene\GameUI\Number\NumberSprite.cpp">
+      <Filter>Game\Scene\GameScene\GameUI\Number</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameScene\GameUI\Wave\WaveSprite.cpp">
+      <Filter>Game\Scene\GameScene\GameUI\Wave</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameScene\GameUI\Esc\EscSprite.cpp">
+      <Filter>Game\Scene\GameScene\GameUI\Esc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -862,6 +886,18 @@
     </ClInclude>
     <ClInclude Include="Game\GameScene\Player\PlayerSweat.h">
       <Filter>Game\Scene\GameScene\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameScene\GameUI\UIManager.h">
+      <Filter>Game\Scene\GameScene\GameUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameScene\GameUI\Number\NumberSprite.h">
+      <Filter>Game\Scene\GameScene\GameUI\Number</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameScene\GameUI\Wave\WaveSprite.h">
+      <Filter>Game\Scene\GameScene\GameUI\Wave</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameScene\GameUI\Esc\EscSprite.h">
+      <Filter>Game\Scene\GameScene\GameUI\Esc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -28,6 +28,7 @@ private:
 
 public:
 	const Transform2D& get_transform() noexcept;
+	void set_texture(const std::string& textureName);
 	//void update();
 	void begin_rendering() noexcept;
 	void draw() const;
