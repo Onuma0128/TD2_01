@@ -40,6 +40,11 @@ const Transform2D& SpriteObject::get_transform() noexcept {
 	return *transform;
 }
 
+void SpriteObject::set_texture(const std::string& textureName)
+{
+	texture = TextureManager::GetTexture(textureName);
+}
+
 void SpriteObject::begin_rendering() noexcept {
 	*transformMatrix->get_data() = transform->get_matrix4x4_transform() * Camera2D::GetVPMatrix();
 	material->get_data()->uvTransform = uvTransform->get_matrix4x4_transform();

@@ -6,6 +6,7 @@
 #include <Engine/Render/RenderPathManager/RenderPathManager.h>
 #include <Engine/DirectX/DirectXCore.h>
 #include <Engine/Module/PolygonMesh/PolygonMeshManager.h>
+#include <Engine/Module/TextureManager/TextureManager.h>
 #include <Engine/Utility/SmartPointer.h>
 #include <Engine/Application/Input/Input.h>
 
@@ -13,6 +14,7 @@
 #include "Game/TitleScene/TitleScene.h"
 #include "Game/GameOverScene/GameOverScene.h"
 #include "Game/TutorialScene/TutorialScene.h"
+#include "Game/GameScene/GameUI/Wave/WaveSprite.h"
 
 #ifdef _DEBUG
 #include "imgui.h"
@@ -31,11 +33,26 @@ void GameScene::load() {
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models", "hart.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models", "player_model.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/playerSweat", "playerSweat.obj");
+
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "wave.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "esc.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "0.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "1.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "2.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "3.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "4.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "5.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "6.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "7.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "8.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "9.png");
 }
 
 void GameScene::initialize() {
 	GlobalValues::GetInstance().inport_json_all();
 	/*==================== カメラ ====================*/
+
+	Camera2D::Initialize();
 
 	camera3D_ = std::make_unique<Camera3D>();
 	camera3D_->initialize();
@@ -64,6 +81,10 @@ void GameScene::initialize() {
 
 	playerHpManager_ = std::make_unique<PlayerHPManager>();
 	playerHpManager_->initialize();
+
+	uiManager_ = std::make_unique<UIManager>();
+	uiManager_->initialize();
+	WaveSprite::timeline_ = timeline.get();
 	
 	BaseEnemy::playerHpManager_ = playerHpManager_.get();
 	PlayerBullet::playerHpManager = playerHpManager_.get();
@@ -127,18 +148,19 @@ void GameScene::begin() {
 }
 
 void GameScene::update() {
-	//camera3D_->update();
-
 	timeline->Update();
 
 	player_->update();
 	enemyManager->update();
+
+	uiManager_->update();
 }
 
 void GameScene::begin_rendering() {
 	camera3D_->update_matrix();
 	player_->begin_rendering();
 	enemyManager->begin_rendering();
+	uiManager_->begin_rendering();
 
 	collisionManager->update();
 }
@@ -167,6 +189,8 @@ void GameScene::draw() const {
 	// マーカー
 	enemyManager->draw_marker();
 	RenderPathManager::Next();
+	// スプライト
+	uiManager_->draw();
 	RenderPathManager::Next();
 }
 

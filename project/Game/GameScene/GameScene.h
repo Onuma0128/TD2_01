@@ -4,6 +4,7 @@
 #include "Engine/Render/RenderNode/Object3DNode/Object3DNode.h"
 #include "Engine/Render/RenderNode/Sprite/SpriteNode.h"
 #include "Engine/Application/Scene/BaseScene.h"
+#include "Engine/Module/Camera/Camera2D.h"
 #include "Engine/Module/Camera/Camera3D.h"
 #include "Engine/Module/Collision/CollisionManager.h"
 #include "Game/GameScene/Player/Player.h"
@@ -11,6 +12,7 @@
 #include "Game/GameScene/Player/PlayerSweat.h"
 #include "Game/GameScene/BeatManager/BeatManager.h"
 #include "Game/GameScene/Timeline/Timeline.h"
+#include "Game/GameScene/GameUI/UIManager.h"
 #include "Game/GameScene/EnemyManager/EnemyManager.h"
 #include "Game/GameScene/RenderNode/CircleGauge/CircleGaugeNode.h"
 
@@ -53,6 +55,7 @@ private:
 	std::unique_ptr<Camera3D> camera3D_ = nullptr;
 	std::unique_ptr<Player> player_ = nullptr;
 	std::unique_ptr<PlayerHPManager> playerHpManager_ = nullptr;
+	std::unique_ptr<UIManager> uiManager_ = nullptr;
 
 	std::shared_ptr<Object3DNode> object3dNode_ = nullptr;
 	std::shared_ptr<CircleGaugeNode> circleGaugeNode = nullptr;

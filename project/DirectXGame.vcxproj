@@ -188,6 +188,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Utility\BackgroundLoader\BackgroundLoader.cpp" />
     <ClCompile Include="Engine\Utility\ConvertString.cpp" />
     <ClCompile Include="Engine\WinApp.cpp" />
+    <ClCompile Include="Game\GameScene\GameUI\Esc\EscSprite.cpp" />
+    <ClCompile Include="Game\GameScene\GameUI\UIManager.cpp" />
     <ClCompile Include="Game\GameOverScene\GameOverScene.cpp" />
     <ClCompile Include="Game\GameScene\BeatManager\BeatManager.cpp" />
     <ClCompile Include="Game\GameScene\EnemyManager\EnemyManager.cpp" />
@@ -202,9 +204,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Game\GameScene\Player\PlayerHPManager.cpp" />
     <ClCompile Include="Game\GameScene\Player\PlayerSweat.cpp" />
+    <ClCompile Include="Game\GameScene\GameUI\Number\NumberSprite.cpp" />
     <ClCompile Include="TestCode\SceneDemo.cpp" />
     <ClCompile Include="Game\TitleScene\TitleScene.cpp" />
     <ClCompile Include="Game\TutorialScene\TutorialScene.cpp" />
+    <ClCompile Include="Game\GameScene\GameUI\Wave\WaveSprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Application\Audio\AudioManager.h" />
@@ -287,6 +291,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Utility\SmartPointer.h" />
     <ClInclude Include="Engine\Utility\TimedCall\TimedCall.h" />
     <ClInclude Include="Engine\WinApp.h" />
+    <ClInclude Include="Game\GameScene\GameUI\Esc\EscSprite.h" />
+    <ClInclude Include="Game\GameScene\GameUI\UIManager.h" />
     <ClInclude Include="Game\GameOverScene\GameOverScene.h" />
     <ClInclude Include="Game\GameScene\BeatManager\BeatManager.h" />
     <ClInclude Include="Game\GameScene\EnemyManager\EnemyManager.h" />
@@ -301,9 +307,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\WorldSystemValue.h" />
     <ClInclude Include="Game\GameScene\Player\PlayerHPManager.h" />
     <ClInclude Include="Game\GameScene\Player\PlayerSweat.h" />
+    <ClInclude Include="Game\GameScene\GameUI\Number\NumberSprite.h" />
     <ClInclude Include="TestCode\SceneDemo.h" />
     <ClInclude Include="Game\TitleScene\TitleScene.h" />
     <ClInclude Include="Game\TutorialScene\TutorialScene.h" />
+    <ClInclude Include="Game\GameScene\GameUI\Wave\WaveSprite.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="EngineResources\HLSL\3DObject\Object3d.PS.hlsl">
