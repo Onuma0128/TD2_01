@@ -147,6 +147,7 @@ void BaseEnemy::update() {
 	if (markedCount && behavior.state() != EnemyBehavior::Beating) {
 		markingTimer += WorldClock::DeltaSeconds();
 		*percentage.get_data() = 1 - markingTimer / markingTime;
+		isBeatUI_ = true;
 	}
 
 	// 付与状態でカウンタが達成した場合
@@ -158,6 +159,7 @@ void BaseEnemy::update() {
 		// 上限を超えないようにする
 		hitpoint = std::min(maxHitpoint, hitpoint);
 		markedCount = 0;
+		isBeatUI_ = false;
 	}
 	if (hitpoint <= 0) {
 		if (behavior.state() != EnemyBehavior::Down &&
@@ -477,6 +479,7 @@ void BaseEnemy::down_initialize() {
 	velocity.y = 10.0f;
 	// ダウン時の回転を取得
 	axisOfQuaternion = ghostMesh->get_transform().get_quaternion();
+	isBeatUI_ = false;
 }
 
 void BaseEnemy::down_update() {

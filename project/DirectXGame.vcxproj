@@ -117,6 +117,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\GameScene\GameUI\Button\ButtonSprite.cpp" />
     <ClCompile Include="Engine\Application\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Application\Audio\AudioPlayer.cpp" />
     <ClCompile Include="Engine\Application\Audio\AudioResource.cpp" />
@@ -211,6 +212,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameScene\GameUI\Wave\WaveSprite.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\GameScene\GameUI\Button\ButtonSprite.h" />
     <ClInclude Include="Engine\Application\Audio\AudioManager.h" />
     <ClInclude Include="Engine\Application\Audio\AudioPlayer.h" />
     <ClInclude Include="Engine\Application\Audio\AudioResource.h" />

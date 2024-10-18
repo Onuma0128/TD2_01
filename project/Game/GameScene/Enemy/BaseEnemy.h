@@ -53,6 +53,7 @@ private:
 public: // Getter/Setter
 	int get_hp() const { return hitpoint; };
 	int get_state() const { return static_cast<int>(behavior.state()); };
+	bool get_isBeatUI()const { return isBeatUI_; }
 	// ビート状態にする
 	void start_beat();
 	void beating();
@@ -105,6 +106,7 @@ private: // Member values
 	float waveFrameCount;
 	float initialY;
 	bool isBeatingAnima;
+	bool isBeatUI_ = false;
 
 	std::shared_ptr<SphereCollider> hitCollider;
 

@@ -40,7 +40,7 @@ void WaveSprite::draw() const
 
 void WaveSprite::WaveCount()
 {
-	int waveNumber = static_cast<int>(std::distance(timeline_->GetWaveData().begin(), timeline_->GetNowWave()));
+	int waveNumber = static_cast<int>(std::distance(timeline_->GetWaveData().begin(), timeline_->GetNowWave())) + 1;
 
 	switch (waveNumber)
 	{
