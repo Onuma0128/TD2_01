@@ -44,7 +44,7 @@ void Player::initialize() {
 
 
 	// 描画オブジェクトを設定
-	playerMesh = std::make_unique<GameObject>("player_model.obj");
+	playerMesh = std::make_unique<GameObject>("player.obj");
 	playerMesh->initialize();
 	playerMesh->set_parent(*this);
 

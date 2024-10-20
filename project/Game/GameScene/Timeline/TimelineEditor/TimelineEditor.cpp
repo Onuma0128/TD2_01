@@ -274,7 +274,7 @@ void TimelineEditor::detail_window() {
 		popData.forward = CVector3::BASIS_Z * Quaternion::EulerDegree(0, forawardAngle, 0);
 	}
 	if (ImGui::RadioButton("Normal##Detail", reinterpret_cast<int*>(&popData.type), static_cast<int>(BaseEnemy::Type::Normal))) {
-		previews[selectPopData.value()].reset_object("ghost_model.obj");
+		previews[selectPopData.value()].reset_object("enemy.obj");
 		popData.type = BaseEnemy::Type::Normal;
 	}
 	ImGui::SameLine();
@@ -307,7 +307,7 @@ void TimelineEditor::operation() {
 				CVector3::BASIS_Z
 			);
 			newData.translate.y = 0;
-			previews.emplace_back("ghost_model.obj");
+			previews.emplace_back("enemy.obj");
 		}
 		break;
 
@@ -363,7 +363,7 @@ void TimelineEditor::reset_wave(std::optional<int> wave) {
 		previews.resize(waveData.popData.size());
 		for (int i = 0; i < waveData.popData.size(); ++i) {
 			previews[i].get_transform().set_translate(waveData.popData[i].translate);
-			previews[i].reset_object("ghost_model.obj");
+			previews[i].reset_object("enemy.obj");
 		}
 	}
 	else {
