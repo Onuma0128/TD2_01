@@ -42,6 +42,7 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "Space_button_push.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "Attack.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "Beat.png");
+	// Wave用
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "0.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "1.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "2.png");
@@ -52,6 +53,17 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "7.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "8.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "9.png");
+	// HP用
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_0.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_1.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_2.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_3.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_4.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_5.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_6.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_7.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_8.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_9.png");
 }
 
 void GameScene::initialize() {
@@ -91,6 +103,7 @@ void GameScene::initialize() {
 	uiManager_ = std::make_unique<UIManager>();
 	uiManager_->initialize();
 	UIManager::enemyManager_ = enemyManager.get();
+	UIManager::playerHPManager_ = playerHpManager_.get();
 	WaveSprite::timeline_ = timeline.get();
 	
 	BaseEnemy::playerHpManager_ = playerHpManager_.get();

@@ -12,6 +12,8 @@ class NumberSprite : public SpriteObject
 public:
 	NumberSprite(const std::string& textureName, const Vector2& pivot = Vector2{ 0.5f,0.5f }) noexcept(false);
 
+	void initialize(const std::string& guiName);
+
 	void update();
 
 	void begin_rendering() noexcept;
@@ -21,6 +23,8 @@ public:
 	void set_number(const std::string& textureName);
 
 private:
+
+	std::string guiName_;
 
 public:
 	inline static GlobalValues& globalValues = GlobalValues::GetInstance();

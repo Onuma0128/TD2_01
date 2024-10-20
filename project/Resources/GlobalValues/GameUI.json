@@ -1,0 +1,24 @@
+{
+    "GameUI": {
+        "ButtonSize": 1.0,
+        "ButtonX": 1160,
+        "ButtonY": 576,
+        "EscX": 96,
+        "EscY": 656,
+        "PlayerActionSize": 1.0,
+        "PlayerActionX": 1160,
+        "PlayerActionY": 480,
+        "PlayerHPNumberSize": 0.9800000190734863,
+        "PlayerHPNumberX": 640,
+        "PlayerHPNumberY": 640,
+        "SpaceSize": 1.0,
+        "SpaceX": 1160,
+        "SpaceY": 672,
+        "WaveNumberSize": 0.0,
+        "WaveNumberX": 192,
+        "WaveNumberY": 0,
+        "WaveSize": 1.0,
+        "WaveX": 128,
+        "WaveY": 64
+    }
+}
