@@ -42,9 +42,12 @@ public: // Member function
 	void draw_marker() const;
 
 	void normal_animation();
+	void attack_animation();
 	void beating_animation();
 	void down_animetion();
 	void revive_animation();
+
+	float easeInBack(float t);
 
 private:
 	void damaged_callback(const BaseCollider* const other);
