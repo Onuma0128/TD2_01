@@ -172,6 +172,13 @@ void BaseEnemy::update() {
 			!isBeatingAnima)
 			behavior.request(EnemyBehavior::Down);
 	}
+	// HPが50以下ならモデルを差し替え
+	if (hitpoint <= 50) {
+		ghostMesh->reset_object("enemyDamage.obj");
+	}
+	else {
+		ghostMesh->reset_object("enemy.obj");
+	}
 }
 
 void BaseEnemy::begin_rendering() {
@@ -408,6 +415,7 @@ void BaseEnemy::approach_update() {
 	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
 	// player方向を向く
 	look_at(*targetPlayer);
+	axisOfQuaternion = ghostMesh->get_transform().get_quaternion();
 }
 
 // ---------- 攻撃処理 ----------
@@ -501,7 +509,6 @@ void BaseEnemy::down_initialize() {
 	// コリジョン無効化
 	beatCollider->set_active(false);
 	meleeCollider->set_active(false);
-	ghostMesh->reset_object("enemyDamage.obj");
 	// hitの有効化
 	hitCollider->set_active(true);
 	// プレイヤーとの距離を算出
@@ -528,7 +535,6 @@ void BaseEnemy::down_update() {
 // ---------- 復活時処理 ----------
 void BaseEnemy::revive_initialize() {
 	hitCollider->set_active(false);
-	ghostMesh->reset_object("enemy.obj");
 	behaviorTimer = 0;
 	// HP強制回復
 	hitpoint = globalValues.get_value<int>("Enemy", "RevivedHitpoint");
