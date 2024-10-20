@@ -27,12 +27,14 @@ GameScene::~GameScene() = default;
 void GameScene::load() {
 	std::string ResourceDirectory = "./Resources/GameScene/";
 	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models", "Sphere.obj");
-	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/Ghost", "ghost_model.obj");
+	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/enemy", "enemy.obj");
+	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/enemyDamage", "enemyDamage.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/Ghost", "ghost_strong.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/HitMarker", "HitMarker.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models", "hart.obj");
-	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models", "player_model.obj");
+	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/player", "player.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/playerSweat", "playerSweat.obj");
+	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/ground", "ground.obj");
 
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "wave.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "esc.png");

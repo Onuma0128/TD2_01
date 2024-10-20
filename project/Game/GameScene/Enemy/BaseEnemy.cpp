@@ -119,7 +119,7 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Typ
 	switch (type) {
 	case BaseEnemy::Type::Normal:
 		maxHitpoint = globalValues.get_value<int>("Enemy", "HPNormal");
-		ghostMesh->reset_object("ghost_model.obj");
+		ghostMesh->reset_object("enemy.obj");
 		meleeCollider->set_radius(0.5f);
 		hitCollider->set_radius(0.5f);
 		break;
@@ -498,6 +498,7 @@ void BaseEnemy::down_initialize() {
 	// コリジョン無効化
 	beatCollider->set_active(false);
 	meleeCollider->set_active(false);
+	ghostMesh->reset_object("enemyDamage.obj");
 	// hitの有効化
 	hitCollider->set_active(true);
 	// プレイヤーとの距離を算出
@@ -523,6 +524,7 @@ void BaseEnemy::down_update() {
 // ---------- 復活時処理 ----------
 void BaseEnemy::revive_initialize() {
 	hitCollider->set_active(false);
+	ghostMesh->reset_object("enemy.obj");
 	behaviorTimer = 0;
 	// HP強制回復
 	hitpoint = globalValues.get_value<int>("Enemy", "RevivedHitpoint");
