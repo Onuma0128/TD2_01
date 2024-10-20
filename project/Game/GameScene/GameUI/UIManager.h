@@ -11,6 +11,7 @@
 #include "Game/GameScene/GameUI/Button/ButtonSprite.h"
 
 class EnemyManager;
+class PlayerHPManager;
 
 class UIManager
 {
@@ -26,6 +27,8 @@ public:
 
 	void input_update();
 
+	void hp_update();
+
 private:
 
 	std::unique_ptr<WaveSprite> waveSprite_ = nullptr;
@@ -33,10 +36,12 @@ private:
 	std::unique_ptr<ButtonSprite> buttonSprite_ = nullptr;
 	std::unique_ptr<ButtonSprite> spaceSprite_ = nullptr;
 	std::unique_ptr<ButtonSprite> actionSprite_ = nullptr;
+	std::unique_ptr<NumberSprite> playerHpSprite_ = nullptr;
 
 public:
 
 	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
 	inline static EnemyManager* enemyManager_ = nullptr;
+	inline static PlayerHPManager* playerHPManager_ = nullptr;
 
 };

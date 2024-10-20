@@ -28,6 +28,10 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Typ
 
 	globalValues.add_value<float>("Enemy", "ToDeadDuration", 5.0f);
 
+	globalValues.add_value<float>("Enemy", "DownVelocityY", 40.0f);
+	globalValues.add_value<float>("Enemy", "DownAccelerationY", 12.2f);
+	globalValues.add_value<float>("Enemy", "DownAccelerationSpeed", 6.5f);
+
 	markedCount = 0;
 	transform.set_translate(translate);
 	transform.set_quaternion(Quaternion::LookForward(forward));
@@ -224,7 +228,8 @@ void BaseEnemy::down_animetion() {
 	Quaternion rotate = rotationX * axisOfQuaternion;
 	ghostMesh->get_transform().set_quaternion(Quaternion::Slerp(axisOfQuaternion, rotate, t));
 
-	velocity.y -= 21.0f * WorldClock::DeltaSeconds();
+	velocity.y -= globalValues.get_value<float>("Enemy", "DownAccelerationY") * WorldClock::DeltaSeconds() *
+		globalValues.get_value<float>("Enemy", "DownAccelerationSpeed");
 	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
 }
 
@@ -476,7 +481,7 @@ void BaseEnemy::down_initialize() {
 	Vector3 distance = world_position() - targetPlayer->world_position();
 	// velocity算出
 	velocity = distance.normalize_safe();
-	velocity.y = 10.0f;
+	velocity.y = globalValues.get_value<float>("Enemy", "DownVelocityY");
 	// ダウン時の回転を取得
 	axisOfQuaternion = ghostMesh->get_transform().get_quaternion();
 	isBeatUI_ = false;

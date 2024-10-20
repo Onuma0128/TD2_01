@@ -7,17 +7,24 @@ WaveSprite::WaveSprite(const std::string& textureName, const Vector2& pivot) noe
 {
 	globalValues.add_value<int>("GameUI", "WaveX", 128);
 	globalValues.add_value<int>("GameUI", "WaveY", 64);
+	globalValues.add_value<float>("GameUI", "WaveSize", 1.0f);
 
-	numberSprite_ = std::make_unique<NumberSprite>("0.png");
+	numberSprite_ = std::make_unique<NumberSprite>("1.png");
+	numberSprite_->initialize("Wave");
 }
 
 void WaveSprite::update()
 {
+	Vector2 scale = {
+		globalValues.get_value<float>("GameUI", "WaveSize"),
+		globalValues.get_value<float>("GameUI", "WaveSize")
+	};
 	Vector2 translate = {
 		static_cast<float>(globalValues.get_value<int>("GameUI", "WaveX")),
 		static_cast<float>(globalValues.get_value<int>("GameUI", "WaveY"))
 	};
-	transform->set_translate(Vector2{ translate.x,translate.y });
+	transform->set_scale(scale);
+	transform->set_translate(translate);
 
 	WaveCount();
 

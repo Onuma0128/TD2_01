@@ -16,6 +16,7 @@ public:
 
 	void draw() const;
 
+	void set_size(const float size) { transform->set_scale({ size,size }); }
 
 	void set_translate(const Vector2& translate) { transform->set_translate(translate); }
 
