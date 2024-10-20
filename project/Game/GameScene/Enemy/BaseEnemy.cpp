@@ -204,6 +204,17 @@ void BaseEnemy::normal_animation() {
 	}
 }
 
+void BaseEnemy::attack_animation()
+{
+	// プレイヤー攻撃する
+	float t = easeInBack(behaviorTimer - 0.5f);
+	t = std::clamp(t, -1.0f, 3.0f);
+	float angle = 120 * ToRadian;
+	Quaternion rotationX = Quaternion::AngleAxis(CVector3::BASIS_X, angle);
+	Quaternion rotate = rotationX * axisOfQuaternion;
+	ghostMesh->get_transform().set_quaternion(Quaternion::Slerp(axisOfQuaternion, rotate, t));
+}
+
 void BaseEnemy::beating_animation() {
 	// 一回だけスケールを膨らませる
 	float t = behaviorTimer;
@@ -249,6 +260,14 @@ void BaseEnemy::revive_animation() {
 	Vector3 translate = Vector3::Lerp(transform.get_translate(), to, t);
 	transform.set_translate(translate);
 }
+
+float BaseEnemy::easeInBack(float t)
+{
+	const float c1 = 3.70158f;
+	const float c3 = c1 + 2.0f;
+
+	return c3 * t * t * t - c1 * t * t;
+};
 
 // 被ダメ時コールバック
 void BaseEnemy::damaged_callback(const BaseCollider* const other) {
@@ -395,10 +414,14 @@ void BaseEnemy::attack_initialize() {
 	behaviorTimer = 0;
 	isAttakced = false;
 	meleeCollider->set_active(true);
+	axisOfQuaternion = ghostMesh->get_transform().get_quaternion();
 }
 
 void BaseEnemy::attack_update() {
 	behaviorTimer += WorldClock::DeltaSeconds();
+	if (behaviorTimer >= 0.5f && behaviorTimer <= 3.0f) {
+		attack_animation();
+	}
 	if (behaviorTimer < 1.0f) {
 		meleeCollider->set_active(false);
 	}
