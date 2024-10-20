@@ -11,7 +11,7 @@ void NumberSprite::initialize(const std::string& guiName)
 	guiName_ = guiName;
 	globalValues.add_value<int>("GameUI", guiName_ + "NumberX", 192);
 	globalValues.add_value<int>("GameUI", guiName_ + "NumberY", 0);
-	if (guiName_ == "Wave") {
+	if (guiName_ == "Wave" || guiName_ == "PlayerHP") {
 		globalValues.add_value<float>("GameUI", guiName_ + "NumberSize", 0.0f);
 	}
 	else {
@@ -36,6 +36,20 @@ void NumberSprite::update()
 			static_cast<float>(globalValues.get_value<int>("GameUI", "WaveX")),
 			static_cast<float>(globalValues.get_value<int>("GameUI",guiName_ + "NumberY")) +
 			static_cast<float>(globalValues.get_value<int>("GameUI", "WaveY"))
+		};
+	}
+	else if(guiName_ == "PlayerHP") {
+		scale = {
+			globalValues.get_value<float>("GameUI",guiName_ + "NumberSize") +
+			globalValues.get_value<float>("GameUI", "PlayerHpUI_Size"),
+			globalValues.get_value<float>("GameUI",guiName_ + "NumberSize") +
+			globalValues.get_value<float>("GameUI", "PlayerHpUI_Size")
+		};
+		translate = {
+			static_cast<float>(globalValues.get_value<int>("GameUI",guiName_ + "NumberX")) +
+			static_cast<float>(globalValues.get_value<int>("GameUI", "PlayerHpUI_X")),
+			static_cast<float>(globalValues.get_value<int>("GameUI",guiName_ + "NumberY")) +
+			static_cast<float>(globalValues.get_value<int>("GameUI", "PlayerHpUI_Y"))
 		};
 	}
 	else {
@@ -65,4 +79,11 @@ void NumberSprite::draw() const
 void NumberSprite::set_number(const std::string& textureName)
 {
 	SpriteObject::set_texture(textureName);
+}
+
+void NumberSprite::set_color(const Vector3& color)
+{
+	this->color.red = color.x;
+	this->color.green = color.y;
+	this->color.blue = color.z;
 }

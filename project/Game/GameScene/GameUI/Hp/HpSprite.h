@@ -7,12 +7,15 @@
 
 #include "Game/GlobalValues/GlobalValues.h"
 
-class NumberSprite : public SpriteObject
+#include "Game/GameScene/GameUI/Number/NumberSprite.h"
+
+class PlayerHPManager;
+
+class HpSprite : public SpriteObject
 {
 public:
-	NumberSprite(const std::string& textureName, const Vector2& pivot = Vector2{ 0.5f,0.5f }) noexcept(false);
 
-	void initialize(const std::string& guiName);
+	HpSprite(const std::string& textureName, const Vector2& pivot = Vector2{ 0.5f,0.5f }) noexcept(false);
 
 	void update();
 
@@ -20,16 +23,14 @@ public:
 
 	void draw() const;
 
-	void set_number(const std::string& textureName);
-
-	void set_color(const Vector3& color);
+	void hp_update();
 
 private:
 
-	std::string guiName_;
+	std::unique_ptr<NumberSprite> numberSprite_ = nullptr;
 
 public:
 	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
+	inline static PlayerHPManager* playerHPManager_ = nullptr;
 
 };
-

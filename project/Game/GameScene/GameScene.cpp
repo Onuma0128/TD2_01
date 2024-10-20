@@ -14,7 +14,9 @@
 #include "Game/TitleScene/TitleScene.h"
 #include "Game/GameOverScene/GameOverScene.h"
 #include "Game/TutorialScene/TutorialScene.h"
+
 #include "Game/GameScene/GameUI/Wave/WaveSprite.h"
+#include "Game/GameScene/GameUI/Hp/HpSprite.h"
 
 #ifdef _DEBUG
 #include "imgui.h"
@@ -37,6 +39,7 @@ void GameScene::load() {
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/ground", "ground.obj");
 
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "wave.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "hp.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "esc.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "A_button.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "A_button_push.png");
@@ -106,7 +109,7 @@ void GameScene::initialize() {
 	uiManager_ = std::make_unique<UIManager>();
 	uiManager_->initialize();
 	UIManager::enemyManager_ = enemyManager.get();
-	UIManager::playerHPManager_ = playerHpManager_.get();
+	HpSprite::playerHPManager_ = playerHpManager_.get();
 	WaveSprite::timeline_ = timeline.get();
 	
 	BaseEnemy::playerHpManager_ = playerHpManager_.get();
