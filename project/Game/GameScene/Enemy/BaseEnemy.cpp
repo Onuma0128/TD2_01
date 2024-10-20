@@ -227,6 +227,7 @@ void BaseEnemy::beating_animation() {
 		isBeatingAnima = false;
 		// スケールを完全に元に戻す
 		transform.set_scale(CVector3::BASIS);
+		ghostMesh->get_transform().set_quaternion(axisOfQuaternion);
 	}
 }
 
@@ -477,6 +478,8 @@ void BaseEnemy::damaged_heart_update() {
 // ---------- 被ビート時処理 ----------
 void BaseEnemy::damaged_beat_initialize() {
 	behaviorTimer = 0;
+	ghostMesh->get_transform().set_quaternion(axisOfQuaternion);
+	meleeCollider->set_active(false);
 }
 
 void BaseEnemy::damaged_beat_update() {
@@ -507,6 +510,7 @@ void BaseEnemy::down_initialize() {
 	velocity = distance.normalize_safe();
 	velocity.y = globalValues.get_value<float>("Enemy", "DownVelocityY");
 	// ダウン時の回転を取得
+	ghostMesh->get_transform().set_quaternion(axisOfQuaternion);
 	axisOfQuaternion = ghostMesh->get_transform().get_quaternion();
 	isBeatUI_ = false;
 }

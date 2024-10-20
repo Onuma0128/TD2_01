@@ -66,6 +66,7 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_7.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_8.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_9.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_10.png");
 }
 
 void GameScene::initialize() {
