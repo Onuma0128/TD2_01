@@ -18,6 +18,12 @@ void BeatManager::initalize() {
 	BeatParticleMvements::beatManager = this;
 
 	globalValues.add_value<Vector3>("BeatParticle", "EmitOffset", CVector3::BASIS_Y);
+	globalValues.add_value<float>("BeatParticle", "InitialMaxSpeed", 3.0f);
+	globalValues.add_value<float>("BeatParticle", "InitialMaxAngle", 3.0f);
+	globalValues.add_value<float>("BeatParticle", "LifeTime", 2.0f);
+	globalValues.add_value<float>("BeatParticle", "CoefficientOfRestitution", -0.8f);
+	globalValues.add_value<float>("BeatParticle", "MinSpeed", 4.5f);
+	globalValues.add_value<float>("BeatParticle", "ColliderRadius", 0.5f);
 }
 
 void BeatManager::update() {
@@ -190,7 +196,7 @@ void BeatManager::make_collider(Particle* const particle, BaseEnemy* const enemy
 		)
 	);
 	// 半径設定
-	newCollider->set_radius(0.5f);
+	newCollider->set_radius(globalValues.get_value<float>("BeatParticle", "ColliderRadius"));
 	// CollisionManagerに登録
 	collisionManager->register_collider("BeatParticle", newCollider);
 

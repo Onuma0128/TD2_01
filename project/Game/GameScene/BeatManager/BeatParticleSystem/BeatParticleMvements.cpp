@@ -37,8 +37,10 @@ void BeatParticleMvements::initialize(Particle* const particle) {
 		beatManager->make_collider(particle, emitEnemy, this);
 	}
 
-	velocity = ConeRandomBias(PI/3, CVector3::BASIS_Y) * 3.0f;
-	lifeTime = 2.0f;
+	float InitialAngle = BeatManager::globalValues.get_value<float>("BeatParticle", "InitialMaxAngle") * ToRadian;
+	float InitialSpeed = BeatManager::globalValues.get_value<float>("BeatParticle", "InitialMaxSpeed");
+	velocity = ConeRandomBias(InitialAngle, CVector3::BASIS_Y) * InitialSpeed;
+	lifeTime = BeatManager::globalValues.get_value<float>("BeatParticle", "LifeTime");;
 }
 
 void BeatParticleMvements::move(Particle* const particle) {
@@ -47,7 +49,9 @@ void BeatParticleMvements::move(Particle* const particle) {
 	particle->get_transform().plus_translate(velocity * WorldClock::DeltaSeconds());
 	if (particle->get_transform().get_translate().y <= 0) {
 		particle->get_transform().set_translate_y(0.0f);
-		velocity.y = std::max(4.5f, velocity.y * -0.8f);
+		float coefficientOfRestitution = BeatManager::globalValues.get_value<float>("BeatParticle", "CoefficientOfRestitution");
+		float MinSpeed = BeatManager::globalValues.get_value<float>("BeatParticle", "MinSpeed");
+		velocity.y = std::max(MinSpeed, velocity.y * coefficientOfRestitution);
 	}
 	particle->get_transform().set_scale(
 		Lerp(CVector3::BASIS, CVector3::ZERO, Easing::In::Quint(std::clamp(timer / lifeTime, 0.0f, 1.0f)))
