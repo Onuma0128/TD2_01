@@ -40,6 +40,21 @@ const Transform2D& SpriteObject::get_transform() noexcept {
 	return *transform;
 }
 
+void SpriteObject::set_scale(const Vector2& scale)
+{
+	transform->set_scale(scale);
+}
+
+void SpriteObject::set_rotate(const float& rotate)
+{
+	transform->set_rotate(rotate);
+}
+
+void SpriteObject::set_translate(const Vector2& translate)
+{
+	transform->set_translate(translate);
+}
+
 void SpriteObject::set_texture(const std::string& textureName)
 {
 	texture = TextureManager::GetTexture(textureName);

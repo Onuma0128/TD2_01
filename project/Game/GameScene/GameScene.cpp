@@ -47,6 +47,7 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "Space_button_push.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "Attack.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "Beat.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "gameOver.png");
 	// Wave用
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "0.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "1.png");
@@ -154,6 +155,14 @@ void GameScene::initialize() {
 
 	timeline->Start();
 
+	ground_ = std::make_unique<GameObject>("ground.obj");
+	ground_->initialize();
+
+	gameOverCamera_ = std::make_unique<GameOverCamera>();
+	gameOverCamera_->camera3d_ = camera3D_.get();
+	gameOverCamera_->player_ = player_.get();
+	gameOverCamera_->initialize();
+
 #ifdef _DEBUG
 	editor = eps::CreateUnique<TimelineEditor>();
 	editor->initialize(timeline.get(), camera3D_.get());
@@ -180,6 +189,8 @@ void GameScene::update() {
 	enemyManager->update();
 
 	uiManager_->update();
+
+	gameOverCamera_->update();
 }
 
 void GameScene::begin_rendering() {
@@ -189,6 +200,9 @@ void GameScene::begin_rendering() {
 	uiManager_->begin_rendering();
 
 	collisionManager->update();
+
+	ground_->begin_rendering();
+	gameOverCamera_->begin_rendering();
 }
 
 void GameScene::late_update() {
@@ -209,7 +223,8 @@ void GameScene::draw() const {
 	editor->draw_preview();
 #endif // _DEBUG
 
-	DirectXCore::ShowGrid();
+	//DirectXCore::ShowGrid();
+	ground_->draw();
 
 	RenderPathManager::Next();
 	// マーカー
@@ -217,6 +232,8 @@ void GameScene::draw() const {
 	RenderPathManager::Next();
 	// スプライト
 	uiManager_->draw();
+
+	gameOverCamera_->draw();
 	RenderPathManager::Next();
 }
 
