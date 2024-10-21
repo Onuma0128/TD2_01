@@ -2,8 +2,14 @@
 
 #include "Engine/Module/Camera/Camera3D.h"
 #include "Engine/Application/WorldClock/WorldClock.h"
+#include "Engine/Application/Scene/SceneManager.h"
+#include "Engine/Application/Input/Input.h"
+#include "Engine/Application/Input/InputEnum.h"
 
 #include "Game/GameScene/Player/Player.h"
+#include "Game/GameOverScene/GameOverScene.h"
+#include "Game/GameScene/GameScene.h"
+
 
 void GameOverCamera::initialize()
 {
@@ -27,6 +33,11 @@ void GameOverCamera::update()
 		break;
 	case GameOverCamera::CameraState::GameOverSprite:
 		SpriteMove();
+		if (cameraFrame_ > 3.0f) {
+			if (Input::IsTriggerKey(KeyID::Space) || Input::IsTriggerPad(PadID::A)) {
+				SceneManager::SetSceneChange(std::make_unique<GameScene>(), 0, false);
+			}
+		}
 		break;
 	default:
 		break;

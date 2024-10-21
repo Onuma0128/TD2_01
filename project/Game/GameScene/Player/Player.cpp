@@ -328,10 +328,6 @@ void Player::Dead()
 		}
 	}
 	else {
-		if (downFrame_ == 0.0f) {
-			// 死んだらシーン切り替え
-			SceneManager::SetSceneChange(std::make_unique<GameOverScene>(), 5, false);
-		}
 		float angle = 80.0f * ToRadian;
 
 		// ローカルZ軸に沿った回転クォータニオンを生成

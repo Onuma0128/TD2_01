@@ -1,8 +1,11 @@
 #include "WaveSprite.h"
+#include <vector>
+#include <list>
 
 #include <Engine/Application/WorldClock/WorldClock.h>
 
 #include "Game/GameScene/Timeline/Timeline.h"
+#include "Game/GameScene/Enemy/BaseEnemy.h"
 #include "Game/GameScene/EnemyManager/EnemyManager.h"
 
 WaveSprite::WaveSprite(const std::string& textureName, const Vector2& pivot) noexcept(false)
@@ -33,16 +36,7 @@ void WaveSprite::update()
 	switch (state_)
 	{
 	case WaveState::Normal:
-		isAddWave_ = true;
-		for (auto& enemy : enemyManager_->get_enemies()) {
-			if (enemy.get_hp() > 0) {
-				isAddWave_ = false;
-			}
-		}
-		if (isAddWave_) {
-			state_ = WaveState::Return;
-			returnPosition_ = transform->get_translate();
-		}
+		Normal();
 		break;
 	case WaveState::Return:
 		Return();
@@ -118,46 +112,69 @@ void WaveSprite::WaveCount()
 	}
 }
 
+void WaveSprite::Normal()
+{
+	isAddWave_ = true;
+	for (auto& enemy : enemyManager_->get_enemies()) {
+		if (enemy.get_hp() > 0 || enemy.get_now_behavior() == EnemyBehavior::Revive) {
+			isAddWave_ = false;
+			break;
+		}
+	}
+	if (isAddWave_) {
+		clearWaveFrame_ += WorldClock::DeltaSeconds();
+	}
+	else {
+		clearWaveFrame_ = 0.0f;
+	}
+	if (clearWaveFrame_ > 0.75f) {
+		state_ = WaveState::Return;
+		returnPosition_ = transform->get_translate();
+		clearWaveFrame_ = 0.0f;
+	}
+	
+}
+
 void WaveSprite::Return()
 {
 	clearWaveFrame_ += WorldClock::DeltaSeconds();
-	if (clearWaveFrame_ >= 0.5f) {
+	if (clearWaveFrame_ >= 0.0f) {
 		// WaveSpriteが画面からフェードアウト
 		if (!isClearSpriteMove_) {
-			float t = easeInBack(clearWaveFrame_ - 0.5f);
+			float t = easeInBack(clearWaveFrame_);
 			t = std::clamp(t, -1.0f, 1.0f);
 			transform->set_translate(Vector2::Lerp(returnPosition_, Vector2{ returnPosition_.x - 360,returnPosition_.y }, t));
 		}
-		if (clearWaveFrame_ >= 1.5f) {
+		if (clearWaveFrame_ >= 1.0f) {
 			isClearSpriteMove_ = true;
 			returnPosition_ = { 2000.0f,360.0f };
 		}
 		// ClearSpriteが画面に出てくる処理
-		if (clearWaveFrame_ > 1.5f && clearWaveFrame_ <= 3.0f) {
-			float t = (clearWaveFrame_ - 2.0f) / 1.0f;
+		if (clearWaveFrame_ > 1.0f && clearWaveFrame_ <= 2.5f) {
+			float t = (clearWaveFrame_ - 1.5f) / 1.0f;
 			t = std::clamp(t, 0.0f, 1.0f);
 
 			float easedT = easeOutBack(t);
 			clearSprite_->set_translate(Vector2::Lerp(returnPosition_, { 640.0f,360.0f }, easedT));
 			transform->set_translate({ clearSprite_->get_transform().get_translate().x - 240.0f,100.0f });
 
-			t = easeOutQuint(clearWaveFrame_ - 1.5f);
+			t = easeOutQuint(clearWaveFrame_ - 1.0f);
 			t = std::clamp(t, 0.0f, 1.0f);
 			clearBackSprite_->set_translate(Vector2::Lerp(returnPosition_, { 640.0f,360.0f }, t));
 		}
 		// ClearSpriteが画面からフェードアウトする処理
-		else if(clearWaveFrame_ > 3.0f && clearWaveFrame_ <= 4.3f) {
-			float t = easeInBack(clearWaveFrame_ - 3.0f);
+		else if(clearWaveFrame_ > 2.5f && clearWaveFrame_ <= 3.8f) {
+			float t = easeInBack(clearWaveFrame_ - 2.5f);
 			t = std::clamp(t, -1.0f, 1.0f);
 			clearSprite_->set_translate(Vector2::Lerp({ 640.0f,360.0f }, { -700.0f,360.0f }, t));
 			transform->set_translate({ clearSprite_->get_transform().get_translate().x - 240.0f,100.0f });
 
-			t = easeInExpo(clearWaveFrame_ - 3.3f);
+			t = easeInExpo(clearWaveFrame_ - 2.8f);
 			t = std::clamp(t, 0.0f, 1.0f);
 			clearBackSprite_->set_translate(Vector2::Lerp({ 640.0f,360.0f }, { -700.0f,360.0f }, t));
 		}
 		// 全部のSpriteが画面から出たらStateを更新
-		if (clearWaveFrame_ >= 4.3f) {
+		if (clearWaveFrame_ >= 3.8f) {
 			state_ = WaveState::Reappear;
 			clearWaveFrame_ = 0;
 			++waveNumber_;
