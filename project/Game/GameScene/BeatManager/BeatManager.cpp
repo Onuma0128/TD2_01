@@ -19,11 +19,13 @@ void BeatManager::initalize() {
 
 	globalValues.add_value<Vector3>("BeatParticle", "EmitOffset", CVector3::BASIS_Y);
 	globalValues.add_value<float>("BeatParticle", "InitialMaxSpeed", 3.0f);
-	globalValues.add_value<float>("BeatParticle", "InitialMaxAngle", 3.0f);
+	globalValues.add_value<float>("BeatParticle", "InitialMaxAngle", 45.0f);
 	globalValues.add_value<float>("BeatParticle", "LifeTime", 2.0f);
 	globalValues.add_value<float>("BeatParticle", "CoefficientOfRestitution", -0.8f);
 	globalValues.add_value<float>("BeatParticle", "MinSpeed", 4.5f);
-	globalValues.add_value<float>("BeatParticle", "ColliderRadius", 0.5f);
+	globalValues.add_value<float>("BeatParticle", "ColliderRadius", 0.24f);
+	globalValues.add_value<float>("BeatParticle", "EmitterDuration", 0.1f);
+	globalValues.add_value<int>("BeatParticle", "EmitsNum", 1);
 }
 
 void BeatManager::update() {

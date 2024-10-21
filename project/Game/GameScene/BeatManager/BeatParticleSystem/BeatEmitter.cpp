@@ -2,10 +2,13 @@
 
 #include "Engine/Module/ParticleSystem/Particle/Particle.h"
 
+#include <Game/GlobalValues/GlobalValues.h>
+
 void BeatEmitter::initialize() {
+	static GlobalValues& globalValues = GlobalValues::GetInstance();
 	isLoop = false;
-	duration = 0.1f;
-	numEmits = 1;
+	duration = globalValues.get_value<float>("BeatParticle", "EmitterDuration");
+	numEmits = globalValues.get_value<int>("BeatParticle", "EmitsNum");
 	isEmit = true;
 }
 
