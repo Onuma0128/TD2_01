@@ -9,12 +9,15 @@
 #include <Engine/Module/TextureManager/TextureManager.h>
 #include <Engine/Utility/SmartPointer.h>
 #include <Engine/Application/Input/Input.h>
+#include <Engine/Render/RenderTargetGroup/SwapChainRenderTargetGroup.h>
 
 #include "Game/GlobalValues/GlobalValues.h"
 #include "Game/TitleScene/TitleScene.h"
 #include "Game/GameOverScene/GameOverScene.h"
 #include "Game/TutorialScene/TutorialScene.h"
+
 #include "Game/GameScene/GameUI/Wave/WaveSprite.h"
+#include "Game/GameScene/GameUI/Hp/HpSprite.h"
 
 #ifdef _DEBUG
 #include "imgui.h"
@@ -38,6 +41,7 @@ void GameScene::load() {
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/Particle", "beat-particle.obj");
 
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "wave.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "hp.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "esc.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "A_button.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "A_button_push.png");
@@ -45,6 +49,7 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "Space_button_push.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "Attack.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "Beat.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "gameOver.png");
 	// Wave用
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "0.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "1.png");
@@ -109,12 +114,17 @@ void GameScene::initialize() {
 	uiManager_ = std::make_unique<UIManager>();
 	uiManager_->initialize();
 	UIManager::enemyManager_ = enemyManager.get();
-	UIManager::playerHPManager_ = playerHpManager_.get();
+	HpSprite::playerHPManager_ = playerHpManager_.get();
 	WaveSprite::timeline_ = timeline.get();
 
 	BaseEnemy::playerHpManager_ = playerHpManager_.get();
 	PlayerBullet::playerHpManager = playerHpManager_.get();
 	Player::playerHpManager_ = playerHpManager_.get();
+
+	GlobalValues::GetInstance().add_value<Vector3>("GameConfig", "BackgroundColor", { 0.015f, 0.015f, 0.015f });
+	Vector3 clearColor = GlobalValues::GetInstance().get_value<Vector3>("GameConfig", "BackgroundColor");
+
+	DirectXSwapChain::SetClearColor({ clearColor.x, clearColor.y, clearColor.z, 1.0f });
 
 	object3dNode_ = std::make_unique<Object3DNode>();
 	object3dNode_->initialize();
@@ -159,6 +169,14 @@ void GameScene::initialize() {
 
 	timeline->Start();
 
+	ground_ = std::make_unique<GameObject>("ground.obj");
+	ground_->initialize();
+
+	gameOverCamera_ = std::make_unique<GameOverCamera>();
+	gameOverCamera_->camera3d_ = camera3D_.get();
+	gameOverCamera_->player_ = player_.get();
+	gameOverCamera_->initialize();
+
 #ifdef _DEBUG
 	editor = eps::CreateUnique<TimelineEditor>();
 	editor->initialize(timeline.get(), camera3D_.get());
@@ -176,6 +194,13 @@ void GameScene::finalize() {
 void GameScene::begin() {
 	player_->begin();
 	enemyManager->begin();
+
+#ifdef _DEBUG
+	Vector3 clearColor = GlobalValues::GetInstance().get_value<Vector3>("GameConfig", "BackgroundColor");
+
+	DirectXSwapChain::SetClearColor({ clearColor.x, clearColor.y, clearColor.z, 1.0f });
+#endif // _DEBUG
+
 }
 
 void GameScene::update() {
@@ -187,6 +212,8 @@ void GameScene::update() {
 	beatManager->update();
 
 	uiManager_->update();
+
+	gameOverCamera_->update();
 }
 
 void GameScene::begin_rendering() {
@@ -197,6 +224,9 @@ void GameScene::begin_rendering() {
 	uiManager_->begin_rendering();
 
 	collisionManager->update();
+
+	ground_->begin_rendering();
+	gameOverCamera_->begin_rendering();
 }
 
 void GameScene::late_update() {
@@ -218,7 +248,8 @@ void GameScene::draw() const {
 	editor->draw_preview();
 #endif // _DEBUG
 
-	DirectXCore::ShowGrid();
+	//DirectXCore::ShowGrid();
+	ground_->draw();
 
 	RenderPathManager::Next();
 	// 3Dパーティクル
@@ -232,6 +263,8 @@ void GameScene::draw() const {
 	RenderPathManager::Next();
 	// スプライト
 	uiManager_->draw();
+
+	gameOverCamera_->draw();
 	RenderPathManager::Next();
 }
 

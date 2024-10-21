@@ -122,6 +122,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Math\Easing.cpp" />
     <ClCompile Include="Game\GameScene\BeatManager\BeatParticleSystem\BeatEmitter.cpp" />
     <ClCompile Include="Game\GameScene\BeatManager\BeatParticleSystem\BeatParticleMvements.cpp" />
+    <ClCompile Include="Game\GameScene\GameOverCamera\GameOverCamera.cpp" />
     <ClCompile Include="Game\GameScene\GameUI\Button\ButtonSprite.cpp" />
     <ClCompile Include="Engine\Application\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Application\Audio\AudioPlayer.cpp" />
@@ -213,6 +214,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameScene\Timeline\Timeline.cpp" />
     <ClCompile Include="Game\GameScene\Timeline\TimelineEditor\TimelineEditor.cpp" />
     <ClCompile Include="Game\GlobalValues\GlobalValues.cpp" />
+    <ClCompile Include="Game\GameScene\GameUI\Hp\HpSprite.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TestCode\EmitterSample.cpp" />
     <ClCompile Include="TestCode\ParticleSample.cpp" />
@@ -228,6 +230,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Math\Easing.h" />
     <ClInclude Include="Game\GameScene\BeatManager\BeatParticleSystem\BeatEmitter.h" />
     <ClInclude Include="Game\GameScene\BeatManager\BeatParticleSystem\BeatParticleMvements.h" />
+    <ClInclude Include="Game\GameScene\GameOverCamera\GameOverCamera.h" />
     <ClInclude Include="Game\GameScene\GameUI\Button\ButtonSprite.h" />
     <ClInclude Include="Engine\Application\Audio\AudioManager.h" />
     <ClInclude Include="Engine\Application\Audio\AudioPlayer.h" />
@@ -337,6 +340,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameScene\Player\PlayerHPManager.h" />
     <ClInclude Include="Game\GameScene\Player\PlayerSweat.h" />
     <ClInclude Include="Game\GameScene\GameUI\Number\NumberSprite.h" />
+    <ClInclude Include="Game\GameScene\GameUI\Hp\HpSprite.h" />
     <ClInclude Include="TestCode\SceneDemo.h" />
     <ClInclude Include="Game\TitleScene\TitleScene.h" />
     <ClInclude Include="Game\TutorialScene\TutorialScene.h" />

@@ -40,7 +40,7 @@ void Player::initialize() {
 
 	// 死ぬ時のアニメーション
 	globalValues.add_value<float>("DeadAnimation", "BeatScale", 0.5f);
-	globalValues.add_value<float>("DeadAnimation", "DownCount", 1.0f);
+	globalValues.add_value<float>("DeadAnimation", "DownCount", 2.0f);
 
 
 	// 描画オブジェクトを設定
@@ -328,6 +328,10 @@ void Player::Dead()
 		}
 	}
 	else {
+		if (downFrame_ == 0.0f) {
+			// 死んだらシーン切り替え
+			SceneManager::SetSceneChange(std::make_unique<GameOverScene>(), 5, false);
+		}
 		float angle = 80.0f * ToRadian;
 
 		// ローカルZ軸に沿った回転クォータニオンを生成
@@ -341,9 +345,6 @@ void Player::Dead()
 		downFrame_ = std::clamp(downFrame_, 0.0f, 1.0f);
 
 		transform.set_quaternion(Quaternion::Slerp(axisOfQuaternion_, combinedRotation, downFrame_));
-
-		// 死んだらシーン切り替え
-		SceneManager::SetSceneChange(std::make_unique<GameOverScene>(), 2, false);
 	}
 }
 
