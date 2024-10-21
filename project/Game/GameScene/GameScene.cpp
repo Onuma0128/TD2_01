@@ -32,7 +32,8 @@ void GameScene::load() {
 	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models", "Sphere.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/enemy", "enemy.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/enemyDamage", "enemyDamage.obj");
-	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/Ghost", "ghost_strong.obj");
+	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/bigEnemy", "bigEnemy.obj");
+	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/bigEnemyDamage", "bigEnemyDamage.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/HitMarker", "HitMarker.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models", "hart.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/player", "player.obj");
@@ -50,6 +51,8 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "Attack.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "Beat.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "gameOver.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "clear.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "clearback.png");
 	// Wave用
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "0.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "1.png");
@@ -116,7 +119,8 @@ void GameScene::initialize() {
 	UIManager::enemyManager_ = enemyManager.get();
 	HpSprite::playerHPManager_ = playerHpManager_.get();
 	WaveSprite::timeline_ = timeline.get();
-
+	WaveSprite::enemyManager_ = enemyManager.get();
+	
 	BaseEnemy::playerHpManager_ = playerHpManager_.get();
 	PlayerBullet::playerHpManager = playerHpManager_.get();
 	Player::playerHpManager_ = playerHpManager_.get();

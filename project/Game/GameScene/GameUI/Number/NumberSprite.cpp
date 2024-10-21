@@ -6,64 +6,17 @@ NumberSprite::NumberSprite(const std::string& textureName, const Vector2& pivot)
 {
 }
 
-void NumberSprite::initialize(const std::string& guiName)
+void NumberSprite::initialize(const Vector2 translate)
 {
-	guiName_ = guiName;
-	globalValues.add_value<int>("GameUI", guiName_ + "NumberX", 192);
-	globalValues.add_value<int>("GameUI", guiName_ + "NumberY", 0);
-	if (guiName_ == "Wave" || guiName_ == "PlayerHP") {
-		globalValues.add_value<float>("GameUI", guiName_ + "NumberSize", 0.0f);
-	}
-	else {
-		globalValues.add_value<float>("GameUI", guiName_ + "NumberSize", 1.0f);
-	}
 }
 
 void NumberSprite::update()
 {
-	Vector2 scale{};
+	/*Vector2 scale{};
 	Vector2 translate{};
 
-	if (guiName_ == "Wave") {
-		scale = {
-			globalValues.get_value<float>("GameUI",guiName_ + "NumberSize") +
-			globalValues.get_value<float>("GameUI", "WaveSize"),
-			globalValues.get_value<float>("GameUI",guiName_ + "NumberSize") +
-			globalValues.get_value<float>("GameUI", "WaveSize")
-		};
-		translate = {
-			static_cast<float>(globalValues.get_value<int>("GameUI",guiName_ + "NumberX")) +
-			static_cast<float>(globalValues.get_value<int>("GameUI", "WaveX")),
-			static_cast<float>(globalValues.get_value<int>("GameUI",guiName_ + "NumberY")) +
-			static_cast<float>(globalValues.get_value<int>("GameUI", "WaveY"))
-		};
-	}
-	else if(guiName_ == "PlayerHP") {
-		scale = {
-			globalValues.get_value<float>("GameUI",guiName_ + "NumberSize") +
-			globalValues.get_value<float>("GameUI", "PlayerHpUI_Size"),
-			globalValues.get_value<float>("GameUI",guiName_ + "NumberSize") +
-			globalValues.get_value<float>("GameUI", "PlayerHpUI_Size")
-		};
-		translate = {
-			static_cast<float>(globalValues.get_value<int>("GameUI",guiName_ + "NumberX")) +
-			static_cast<float>(globalValues.get_value<int>("GameUI", "PlayerHpUI_X")),
-			static_cast<float>(globalValues.get_value<int>("GameUI",guiName_ + "NumberY")) +
-			static_cast<float>(globalValues.get_value<int>("GameUI", "PlayerHpUI_Y"))
-		};
-	}
-	else {
-		scale = {
-			globalValues.get_value<float>("GameUI",guiName_ + "NumberSize"),
-			globalValues.get_value<float>("GameUI",guiName_ + "NumberSize")
-		};
-		translate = {
-			static_cast<float>(globalValues.get_value<int>("GameUI",guiName_ + "NumberX")),
-			static_cast<float>(globalValues.get_value<int>("GameUI",guiName_ + "NumberY"))
-		};
-	}
 	transform->set_scale(scale);
-	transform->set_translate(Vector2{ translate.x,translate.y });
+	transform->set_translate(Vector2{ translate.x,translate.y });*/
 }
 
 void NumberSprite::begin_rendering() noexcept

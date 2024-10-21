@@ -279,7 +279,7 @@ void TimelineEditor::detail_window() {
 	}
 	ImGui::SameLine();
 	if (ImGui::RadioButton("Strong##Detail", reinterpret_cast<int*>(&popData.type), static_cast<int>(BaseEnemy::Type::Strong))) {
-		previews[selectPopData.value()].reset_object("ghost_strong.obj");
+		previews[selectPopData.value()].reset_object("bigEnemy.obj");
 		popData.type = BaseEnemy::Type::Strong;
 	}
 

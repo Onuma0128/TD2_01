@@ -125,7 +125,7 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Typ
 		break;
 	case BaseEnemy::Type::Strong:
 		maxHitpoint = globalValues.get_value<int>("Enemy", "HPStrong");
-		ghostMesh->reset_object("ghost_strong.obj");
+		ghostMesh->reset_object("bigEnemy.obj");
 		meleeCollider->set_radius(1.0f);
 		hitCollider->set_radius(1.0f);
 		break;
@@ -174,10 +174,20 @@ void BaseEnemy::update() {
 	}
 	// HPが50以下ならモデルを差し替え
 	if (hitpoint <= 50) {
-		ghostMesh->reset_object("enemyDamage.obj");
+		if (type == Type::Normal) {
+			ghostMesh->reset_object("enemyDamage.obj");
+		}
+		else {
+			ghostMesh->reset_object("bigEnemyDamage.obj");
+		}
 	}
 	else {
-		ghostMesh->reset_object("enemy.obj");
+		if (type == Type::Normal) {
+			ghostMesh->reset_object("enemy.obj");
+		}
+		else {
+			ghostMesh->reset_object("bigEnemy.obj");
+		}
 	}
 }
 
