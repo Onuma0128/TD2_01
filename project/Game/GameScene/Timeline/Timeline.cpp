@@ -12,11 +12,20 @@
 
 #include "Game/GameScene/EnemyManager/EnemyManager.h"
 #include "Game/GameScene/Player/Player.h"
+#include "Game/GameScene/Timeline/GameState.h"
 
 using json = nlohmann::json;
 
 void Timeline::Initialize() {
 	LoadAll();
+	// シングルトンから現在のWave番号を取得し、そのWaveからスタート
+	int currentWave = GameState::getInstance().getCurrentWave();
+	if (currentWave < waveData.size()) {
+		nowWave = waveData.begin() + currentWave;
+	}
+	else {
+		nowWave = waveData.begin();
+	}
 	timer = 0;
 }
 
@@ -37,6 +46,9 @@ void Timeline::Update() {
 	if (nextPopData == nowWave->popData.end() && enemyManager->get_enemies().empty()) {
 		++nowWave; // ウェーブ進める
 		ResetNowWave();
+		// 現在のWave番号をシングルトンに保存
+		GameState::getInstance().setCurrentWave(static_cast<int>(std::distance(waveData.begin(), nowWave)));
+
 		if (IsEndWaveAll()) {
 			return;
 		}
@@ -53,7 +65,9 @@ void Timeline::Update() {
 }
 
 void Timeline::Start() {
-	nowWave = waveData.begin();
+	// シングルトンからWave番号をロードして開始
+	int currentWave = GameState::getInstance().getCurrentWave();
+	nowWave = waveData.begin() + currentWave;
 	if (!IsEndWaveAll()) {
 		ResetNowWave();
 	}

@@ -11,6 +11,7 @@
 
 #include "Game/GlobalValues/GlobalValues.h"
 #include "Game/GameScene/GameScene.h"
+#include "Game/GameScene/Timeline/GameState.h"
 
 #ifdef _DEBUG
 #include "imgui.h"
@@ -51,6 +52,8 @@ void TitleScene::initialize() {
 
 	RenderPathManager::RegisterPath("GameScene" + std::to_string(reinterpret_cast<std::uint64_t>(this)), std::move(path));
 	RenderPathManager::SetPath("GameScene" + std::to_string(reinterpret_cast<std::uint64_t>(this)));
+
+	GameState::getInstance().setCurrentWave(0);
 }
 
 void TitleScene::poped() {
@@ -65,7 +68,7 @@ void TitleScene::begin() {
 
 void TitleScene::update() {
 	//camera3D_->update();
-	if (Input::IsTriggerKey(KeyID::Return)) {
+	if (Input::IsReleaseKey(KeyID::Space) || Input::IsReleasePad(PadID::A)) {
 		SceneManager::SetSceneChange(std::make_unique<GameScene>(), 1, false);
 	}
 }

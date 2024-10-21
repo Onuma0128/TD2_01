@@ -7,13 +7,14 @@
 #include "Game/GameScene/Timeline/Timeline.h"
 #include "Game/GameScene/Enemy/BaseEnemy.h"
 #include "Game/GameScene/EnemyManager/EnemyManager.h"
+#include "Game/GameScene/Timeline/GameState.h"
 
 WaveSprite::WaveSprite(const std::string& textureName, const Vector2& pivot) noexcept(false)
 : SpriteObject(textureName, pivot) 
 {
 	state_ = WaveState::Reappear;
 
-	waveNumber_ = 1;
+	waveNumber_ = GameState::getInstance().getCurrentWave() + 1;
 
 	clearWaveFrame_ = -1.0f;
 	transform->set_scale(Vector2{ 1.5f,1.5f });
@@ -122,14 +123,15 @@ void WaveSprite::Normal()
 		}
 	}
 	if (isAddWave_) {
-		clearWaveFrame_ += WorldClock::DeltaSeconds();
+		clearCheckerFrame_ += WorldClock::DeltaSeconds();
 	}
 	else {
-		clearWaveFrame_ = 0.0f;
+		clearCheckerFrame_ = 0.0f;
 	}
-	if (clearWaveFrame_ > 0.75f) {
+	if (clearCheckerFrame_ > 0.75f) {
 		state_ = WaveState::Return;
 		returnPosition_ = transform->get_translate();
+		clearCheckerFrame_ = 0.0f;
 		clearWaveFrame_ = 0.0f;
 	}
 	
@@ -151,7 +153,7 @@ void WaveSprite::Return()
 		}
 		// ClearSpriteが画面に出てくる処理
 		if (clearWaveFrame_ > 1.0f && clearWaveFrame_ <= 2.5f) {
-			float t = (clearWaveFrame_ - 1.5f) / 1.0f;
+			float t = (clearWaveFrame_ - 1.3f) / 1.0f;
 			t = std::clamp(t, 0.0f, 1.0f);
 
 			float easedT = easeOutBack(t);
@@ -200,14 +202,13 @@ void WaveSprite::Reappear()
 		float easedT = easeOutBack(t);
 		transform->set_translate(Vector2::Lerp(returnPosition_, Vector2{ 600.0f, 360.0f }, easedT));
 	}
-	else {
-		float t = easeInBack(clearWaveFrame_ - 1.0f);
+	else if (clearWaveFrame_ >= 1.5f) {
+		float t = easeInBack(clearWaveFrame_ - 1.5f);
 		t = std::clamp(t, -1.0f, 1.0f);
 		transform->set_scale(Vector2::Lerp(Vector2{ 1.5f,1.5f }, Vector2{ 1.0f,1.0f }, t));
 		transform->set_translate(Vector2::Lerp(Vector2{ 600.0f, 360.0f }, Vector2{ 128.0f,64.0f }, t));
-		if (clearWaveFrame_ >= 4.0f) {
+		if (clearWaveFrame_ >= 2.5f) {
 			state_ = WaveState::Normal;
-			clearWaveFrame_ = 0;
 			transform->set_scale(Vector2{ 1.0f,1.0f });
 			transform->set_translate(Vector2{ 128.0f,64.0f });
 		}

@@ -38,6 +38,9 @@ public:
 
 	void Reappear();
 
+	float get_clearWaveFrame() { return clearWaveFrame_; }
+
+	WaveState get_state()const { return state_; }
 
 	/*========== イージング関数 ==========*/
 
@@ -56,8 +59,10 @@ private:
 
 	int waveNumber_ = 0;
 	bool isAddWave_ = false;
-	float clearWaveFrame_ = 0;
 	bool isClearSpriteMove_ = false;
+
+	float clearCheckerFrame_ = 0;
+	float clearWaveFrame_ = 0;
 
 	Vector2 returnPosition_{};
 	

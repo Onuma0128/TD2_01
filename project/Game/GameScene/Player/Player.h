@@ -14,6 +14,7 @@ class BaseEnemy;
 class BeatManager;
 class PlayerHPManager;
 class CollisionManager;
+class WaveSprite;
 
 class Player : public WorldInstance 
 {
@@ -66,6 +67,9 @@ public:
 	State get_state() const { return state_; }
 	std::weak_ptr<SphereCollider> get_hit_collider() const;
 	void reset_hitpoint(int hitpoint_);
+	const std::vector<std::unique_ptr<PlayerBullet>>& get_bullets() const {
+		return bullets_;
+	}
 
 private:
 	void OnCollisionCallBack(const BaseCollider* const other);
@@ -107,4 +111,5 @@ public:
 	inline static BeatManager* beatManager = nullptr;
 	inline static PlayerHPManager* playerHpManager_ = nullptr;
 	inline static CollisionManager* collisionManager = nullptr;
+	inline static WaveSprite* waveSprite_ = nullptr;
 };

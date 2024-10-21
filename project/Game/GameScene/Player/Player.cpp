@@ -11,6 +11,7 @@
 #include <Game/GameOverScene/GameOverScene.h>
 #include "Game/GameScene/Player/PlayerHPManager.h"
 #include "Game/GameScene/BeatManager/BeatManager.h"
+#include "Game/GameScene/GameUI/Wave/WaveSprite.h"
 
 #ifdef _DEBUG
 #include "imgui.h"
@@ -61,7 +62,9 @@ void Player::begin() {
 	// 再代入
 	releaseButton = false;
 	input = CVector2::ZERO;
-	InputPad();
+	if (waveSprite_->get_clearWaveFrame() >= 1.5f && waveSprite_->get_state() != WaveSprite::WaveState::Return) {
+		InputPad();
+	}
 }
 
 void Player::update() {

@@ -29,6 +29,8 @@ public:
 
 	void draw();
 
+	/*========== メンバ関数 ==========*/
+
 	float easeOutQuint(float t);
 
 	void Move();
