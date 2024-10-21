@@ -1,5 +1,6 @@
 #include "UIManager.h"
 
+#include <Engine/Application/WorldClock/WorldClock.h>
 #include <Engine/Application/Input/Input.h>
 #include <Engine/Application/Input/InputEnum.h>
 
@@ -16,7 +17,11 @@ void UIManager::initialize()
 	buttonSprite_ = std::make_unique<ButtonSprite>("A_button.png");
 	spaceSprite_ = std::make_unique<ButtonSprite>("Space_button.png");
 	actionSprite_ = std::make_unique<ButtonSprite>("Attack.png");
+	beatCommentSprite_ = std::make_unique<SpriteObject>("beatComment.png", Vector2{ 0.5f,0.5f });
 
+	globalValues.add_value<int>("GameUI", "BeatCommentX", 1160);
+	globalValues.add_value<int>("GameUI", "BeatCommentY", 380);
+	globalValues.add_value<float>("GameUI", "BeatCommentSize", 1.0f);
 	globalValues.add_value<int>("GameUI", "PlayerActionX", 1160);
 	globalValues.add_value<int>("GameUI", "PlayerActionY", 480);
 	globalValues.add_value<float>("GameUI", "PlayerActionSize", 1.0f);
@@ -48,6 +53,7 @@ void UIManager::begin_rendering()
 	buttonSprite_->begin_rendering();
 	spaceSprite_->begin_rendering();
 	actionSprite_->begin_rendering();
+	beatCommentSprite_->begin_rendering();
 }
 
 void UIManager::draw()
@@ -58,6 +64,9 @@ void UIManager::draw()
 	spaceSprite_->draw();
 	actionSprite_->draw();
 
+	if (isBeatComment_) {
+		beatCommentSprite_->draw();
+	}
 	waveSprite_->draw();
 }
 
@@ -101,9 +110,17 @@ void UIManager::input_update()
 	}
 	if (isBeatUI) {
 		actionSprite_->set_texture("Beat.png");
+		isBeatComment_ = true;
+		if (Input::IsPressPad(PadID::A) || Input::IsPressKey(KeyID::Space)) {
+			beatCommentFrame_ += WorldClock::DeltaSeconds();
+		}
+		if (beatCommentFrame_ > 10.0f) {
+			isBeatComment_ = false;
+		}
 	}
 	else {
 		actionSprite_->set_texture("Attack.png");
+		isBeatComment_ = false;
 	}
 	translate = {
 		static_cast<float>(globalValues.get_value<int>("GameUI", "PlayerActionX")),
@@ -111,4 +128,14 @@ void UIManager::input_update()
 	};
 	actionSprite_->set_size(globalValues.get_value<float>("GameUI", "PlayerActionSize"));
 	actionSprite_->set_translate(translate);
+
+	translate = {
+		static_cast<float>(globalValues.get_value<int>("GameUI", "BeatCommentX")),
+		static_cast<float>(globalValues.get_value<int>("GameUI", "BeatCommentY"))
+	};
+	beatCommentSprite_->set_scale({
+		globalValues.get_value<float>("GameUI", "BeatCommentSize"),
+		globalValues.get_value<float>("GameUI", "BeatCommentSize") 
+	});
+	beatCommentSprite_->set_translate(translate);
 }
