@@ -7,6 +7,7 @@
 #include "Engine/Module/Camera/Camera2D.h"
 #include "Engine/Module/Camera/Camera3D.h"
 #include "Engine/Module/Collision/CollisionManager.h"
+
 #include "Game/GameScene/Player/Player.h"
 #include "Game/GameScene/Player/PlayerHPManager.h"
 #include "Game/GameScene/Player/PlayerSweat.h"
@@ -15,6 +16,7 @@
 #include "Game/GameScene/GameUI/UIManager.h"
 #include "Game/GameScene/EnemyManager/EnemyManager.h"
 #include "Game/GameScene/RenderNode/CircleGauge/CircleGaugeNode.h"
+#include "Game/GameScene/GameOverCamera/GameOverCamera.h"
 
 #ifdef _DEBUG
 #include "Game/GameScene/Timeline/TimelineEditor/TimelineEditor.h"
@@ -53,6 +55,8 @@ private:
 	std::unique_ptr<EnemyManager> enemyManager = nullptr;
 
 	std::unique_ptr<Camera3D> camera3D_ = nullptr;
+	std::unique_ptr<GameObject> ground_ = nullptr;
+	std::unique_ptr<GameOverCamera> gameOverCamera_ = nullptr;
 	std::unique_ptr<Player> player_ = nullptr;
 	std::unique_ptr<PlayerHPManager> playerHpManager_ = nullptr;
 	std::unique_ptr<UIManager> uiManager_ = nullptr;
