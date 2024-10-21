@@ -5,27 +5,14 @@
 HpSprite::HpSprite(const std::string& textureName, const Vector2& pivot) noexcept(false)
 : SpriteObject(textureName, pivot)
 {
-	globalValues.add_value<int>("GameUI", "PlayerHpUI_X", 582);
-	globalValues.add_value<int>("GameUI", "PlayerHpUI_Y", 656);
-	globalValues.add_value<float>("GameUI", "PlayerHpUI_Size", 1.0f);
+	transform->set_translate({ 582.0f,656.0f });
 
 	numberSprite_ = std::make_unique<NumberSprite>("hp_0.png");
-	numberSprite_->initialize("PlayerHP");
+	numberSprite_->set_translate({ transform->get_translate().x + 128.0f,transform->get_translate().y });
 }
 
 void HpSprite::update()
 {
-	Vector2 scale = {
-		globalValues.get_value<float>("GameUI", "PlayerHpUI_Size"),
-		globalValues.get_value<float>("GameUI", "PlayerHpUI_Size")
-	};
-	Vector2 translate = {
-		static_cast<float>(globalValues.get_value<int>("GameUI", "PlayerHpUI_X")),
-		static_cast<float>(globalValues.get_value<int>("GameUI", "PlayerHpUI_Y"))
-	};
-	transform->set_scale(scale);
-	transform->set_translate(translate);
-
 	hp_update();
 
 	numberSprite_->update();

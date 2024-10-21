@@ -30,7 +30,6 @@ private:
 	std::unique_ptr<NumberSprite> numberSprite_ = nullptr;
 
 public:
-	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
 	inline static PlayerHPManager* playerHPManager_ = nullptr;
 
 };
