@@ -183,6 +183,7 @@ void BeatManager::unregister_particle(const ParticleSystemModel& particleSystem)
 void BeatManager::make_collider(Particle* const particle, BaseEnemy* const enemy, BeatParticleMvements* const movements_) {
 	// メモリ確保
 	auto&& newCollider = eps::CreateShared<SphereCollider>();
+	newCollider->initialize();
 	// パーティクルにColliderをペアレント
 	newCollider->set_parent(*particle);
 	// Callback関数の設定
