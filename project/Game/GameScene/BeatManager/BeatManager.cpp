@@ -16,6 +16,8 @@
 void BeatManager::initalize() {
 	// ParticleMovementsに登録
 	BeatParticleMvements::beatManager = this;
+
+	globalValues.add_value<Vector3>("BeatParticle", "EmitOffset", CVector3::BASIS_Y);
 }
 
 void BeatManager::update() {
@@ -49,6 +51,7 @@ void BeatManager::draw() const {
 		particleSystem.draw();
 	}
 }
+
 
 // ハートとエネミーが衝突した際に記録
 void BeatManager::set_next_enemy(BaseEnemy* enemy) {
@@ -89,7 +92,8 @@ void BeatManager::beating() {
 		// 攻撃パーティクルの初期化
 		// エミッター初期化
 		auto&& emitter = eps::CreateUnique<BeatEmitter>();
-		emitter->get_transform().set_translate(enemy->world_position() + Vector3{ 0,1.0f,0.0f });
+		Vector3 emitoffset = globalValues.get_value<Vector3>("BeatParticle", "EmitOffset");
+		emitter->get_transform().set_translate(enemy->world_position() + emitoffset);
 		emitter->update_matrix();
 		// Mvements初期化
 		auto&& movement = eps::CreateUnique<BeatParticleMvements>();

@@ -6,6 +6,8 @@
 
 #include <Engine/Module/ParticleSystem/ParticleSystemModel.h>
 
+#include <Game/GlobalValues/GlobalValues.h>
+
 class BaseEnemy;
 class PlayerBullet;
 class BaseCollider;
@@ -73,4 +75,5 @@ private:
 
 public:
 	inline static CollisionManager* collisionManager = nullptr;
+	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
 };
