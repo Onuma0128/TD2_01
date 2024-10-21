@@ -7,7 +7,9 @@
 #include "Engine/Application/Input/InputEnum.h"
 
 #include "Game/GameScene/Player/Player.h"
+#include "Game/GameScene/Player/PlayerBullet.h"
 #include "Game/GameOverScene/GameOverScene.h"
+#include "Game/TitleScene/TitleScene.h"
 #include "Game/GameScene/GameScene.h"
 
 
@@ -34,8 +36,11 @@ void GameOverCamera::update()
 	case GameOverCamera::CameraState::GameOverSprite:
 		SpriteMove();
 		if (cameraFrame_ > 3.0f) {
-			if (Input::IsTriggerKey(KeyID::Space) || Input::IsTriggerPad(PadID::A)) {
+			if (Input::IsReleaseKey(KeyID::Space) || Input::IsReleasePad(PadID::A)) {
 				SceneManager::SetSceneChange(std::make_unique<GameScene>(), 0, false);
+			}
+			if (Input::IsTriggerKey(KeyID::Escape)) {
+				SceneManager::SetSceneChange(std::make_unique<TitleScene>(), 0, false);
 			}
 		}
 		break;
@@ -69,6 +74,17 @@ void GameOverCamera::Stop()
 		oldPos_ = camera3d_->get_transform().get_translate();
 		playerPos_ = (player_->get_transform().get_translate() + globalValues.get_value<Vector3>("gameOverCamera", "CameraOffset")) * player_->get_transform().get_quaternion();
 		state_ = CameraState::Move;
+	}
+	int playerHpCount = 0;
+	for (const auto& bullet : player_->get_bullets()) {
+		if (bullet->is_active()) {
+			++playerHpCount;
+		}
+	}
+	if (playerHpCount <= 1 && state_ == CameraState::Stop) {
+		state_ = CameraState::GameOverSprite;
+		cameraFrame_ = 0.0f;
+		oldSpritePos_ = gameOverSprite_->get_transform().get_translate();
 	}
 }
 

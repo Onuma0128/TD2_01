@@ -52,12 +52,13 @@ void UIManager::begin_rendering()
 
 void UIManager::draw()
 {
-	waveSprite_->draw();
 	hpSprite_->draw();
 	escSprite_->draw();
 	buttonSprite_->draw();
 	spaceSprite_->draw();
 	actionSprite_->draw();
+
+	waveSprite_->draw();
 }
 
 void UIManager::input_update()

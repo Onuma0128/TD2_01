@@ -120,6 +120,7 @@ void GameScene::initialize() {
 	HpSprite::playerHPManager_ = playerHpManager_.get();
 	WaveSprite::timeline_ = timeline.get();
 	WaveSprite::enemyManager_ = enemyManager.get();
+	Player::waveSprite_ = uiManager_.get()->get_waveSprite();
 	
 	BaseEnemy::playerHpManager_ = playerHpManager_.get();
 	PlayerBullet::playerHpManager = playerHpManager_.get();

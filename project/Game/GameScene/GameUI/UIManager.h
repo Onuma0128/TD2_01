@@ -28,6 +28,8 @@ public:
 
 	void input_update();
 
+	WaveSprite* get_waveSprite()const { return waveSprite_.get(); }
+
 private:
 
 	std::unique_ptr<WaveSprite> waveSprite_ = nullptr;
