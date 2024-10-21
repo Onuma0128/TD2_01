@@ -32,6 +32,8 @@ public:
 
 	void WaveCount();
 
+	void Normal();
+
 	void Return();
 
 	void Reappear();
