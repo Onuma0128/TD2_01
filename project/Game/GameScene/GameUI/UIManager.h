@@ -39,6 +39,10 @@ private:
 	std::unique_ptr<ButtonSprite> spaceSprite_ = nullptr;
 	std::unique_ptr<ButtonSprite> actionSprite_ = nullptr;
 
+	bool isBeatComment_ = false;
+	float beatCommentFrame_ = 0;
+	std::unique_ptr<SpriteObject> beatCommentSprite_ = nullptr;
+
 public:
 
 	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
