@@ -1,12 +1,16 @@
 #pragma once
 #include <memory>
 
-#include "Engine/Render/RenderNode/Object3DNode/Object3DNode.h"
-#include "Engine/Render/RenderNode/Sprite/SpriteNode.h"
 #include "Engine/Application/Scene/BaseScene.h"
+
 #include "Engine/Module/Camera/Camera2D.h"
 #include "Engine/Module/Camera/Camera3D.h"
 #include "Engine/Module/Collision/CollisionManager.h"
+
+#include "Engine/Render/RenderNode/Object3DNode/Object3DNode.h"
+#include "Engine/Render/RenderNode/Sprite/SpriteNode.h"
+#include "Engine/Render/RenderNode/Particle/ParticleMeshNode/ParticleMeshNode.h"
+
 #include "Game/GameScene/Player/Player.h"
 #include "Game/GameScene/Player/PlayerHPManager.h"
 #include "Game/GameScene/Player/PlayerSweat.h"
@@ -58,6 +62,7 @@ private:
 	std::unique_ptr<UIManager> uiManager_ = nullptr;
 
 	std::shared_ptr<Object3DNode> object3dNode_ = nullptr;
+	std::shared_ptr<ParticleMeshNode> particleMeshNode;
 	std::shared_ptr<CircleGaugeNode> circleGaugeNode = nullptr;
 	std::shared_ptr<SpriteNode> spriteNode_ = nullptr;
 

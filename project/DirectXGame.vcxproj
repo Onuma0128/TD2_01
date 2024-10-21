@@ -119,6 +119,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Math\Easing.cpp" />
+    <ClCompile Include="Game\GameScene\BeatManager\BeatParticleSystem\BeatEmitter.cpp" />
+    <ClCompile Include="Game\GameScene\BeatManager\BeatParticleSystem\BeatParticleMvements.cpp" />
     <ClCompile Include="Game\GameScene\GameUI\Button\ButtonSprite.cpp" />
     <ClCompile Include="Engine\Application\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Application\Audio\AudioPlayer.cpp" />
@@ -222,6 +225,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameScene\GameUI\Wave\WaveSprite.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Math\Easing.h" />
+    <ClInclude Include="Game\GameScene\BeatManager\BeatParticleSystem\BeatEmitter.h" />
+    <ClInclude Include="Game\GameScene\BeatManager\BeatParticleSystem\BeatParticleMvements.h" />
     <ClInclude Include="Game\GameScene\GameUI\Button\ButtonSprite.h" />
     <ClInclude Include="Engine\Application\Audio\AudioManager.h" />
     <ClInclude Include="Engine\Application\Audio\AudioPlayer.h" />

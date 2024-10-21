@@ -35,6 +35,7 @@ void GameScene::load() {
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/player", "player.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/playerSweat", "playerSweat.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/ground", "ground.obj");
+	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/Particle", "beat-particle.obj");
 
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "wave.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "esc.png");
@@ -86,16 +87,18 @@ void GameScene::initialize() {
 	/*==================== シーン ====================*/
 	collisionManager = eps::CreateUnique<CollisionManager>();
 	Player::collisionManager = collisionManager.get();
+	BeatManager::collisionManager = collisionManager.get();
 
 	enemyManager = eps::CreateUnique<EnemyManager>();
 	enemyManager->set_collision_manager(collisionManager.get());
-	
+
 	beatManager = eps::CreateUnique<BeatManager>();
+	beatManager->initalize();
 
 	BaseEnemy::beatManager = beatManager.get();
 	PlayerBullet::beatManager = beatManager.get();
 	Player::beatManager = beatManager.get();
-	
+
 	timeline = std::make_unique<Timeline>();
 	timeline->Initialize();
 	timeline->SetEnemyManager(enemyManager.get());
@@ -108,7 +111,7 @@ void GameScene::initialize() {
 	UIManager::enemyManager_ = enemyManager.get();
 	UIManager::playerHPManager_ = playerHpManager_.get();
 	WaveSprite::timeline_ = timeline.get();
-	
+
 	BaseEnemy::playerHpManager_ = playerHpManager_.get();
 	PlayerBullet::playerHpManager = playerHpManager_.get();
 	Player::playerHpManager_ = playerHpManager_.get();
@@ -117,6 +120,11 @@ void GameScene::initialize() {
 	object3dNode_->initialize();
 	object3dNode_->set_config(eps::to_bitflag(RenderNodeConfig::ContinueDrawBefore) | RenderNodeConfig::ContinueUseDpehtBefore);
 	object3dNode_->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+
+	particleMeshNode = std::make_unique<ParticleMeshNode>();
+	particleMeshNode->initialize();
+	particleMeshNode->set_config(eps::to_bitflag(RenderNodeConfig::ContinueDrawBefore) | RenderNodeConfig::ContinueUseDpehtBefore | RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueUseDpehtAfter);
+	particleMeshNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 
 	circleGaugeNode = std::make_unique<CircleGaugeNode>();
 	circleGaugeNode->initialize();
@@ -129,7 +137,7 @@ void GameScene::initialize() {
 	spriteNode_->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 
 	RenderPath path{};
-	path.initialize({ object3dNode_,circleGaugeNode,spriteNode_ });
+	path.initialize({ object3dNode_,particleMeshNode,circleGaugeNode,spriteNode_ });
 
 	RenderPathManager::RegisterPath("GameScene" + std::to_string(reinterpret_cast<std::uint64_t>(this)), std::move(path));
 	RenderPathManager::SetPath("GameScene" + std::to_string(reinterpret_cast<std::uint64_t>(this)));
@@ -176,6 +184,8 @@ void GameScene::update() {
 	player_->update();
 	enemyManager->update();
 
+	beatManager->update();
+
 	uiManager_->update();
 }
 
@@ -183,6 +193,7 @@ void GameScene::begin_rendering() {
 	camera3D_->update_matrix();
 	player_->begin_rendering();
 	enemyManager->begin_rendering();
+	beatManager->begin_rendering();
 	uiManager_->begin_rendering();
 
 	collisionManager->update();
@@ -191,6 +202,7 @@ void GameScene::begin_rendering() {
 void GameScene::late_update() {
 	collisionManager->collision("Player", "EnemyMelee"); // プレイヤーとエネミー近接
 	collisionManager->collision("EnemyHit", "Beat"); // エネミーとビート
+	collisionManager->collision("EnemyHit", "BeatParticle"); // エネミーとビートパーティクル
 	collisionManager->collision("EnemyHit", "Heart"); // ハートとエネミー
 }
 
@@ -209,7 +221,13 @@ void GameScene::draw() const {
 	DirectXCore::ShowGrid();
 
 	RenderPathManager::Next();
+	// 3Dパーティクル
+	camera3D_->set_command(1);
+	beatManager->draw();
+
+	RenderPathManager::Next();
 	// マーカー
+	camera3D_->set_command(1);
 	enemyManager->draw_marker();
 	RenderPathManager::Next();
 	// スプライト
@@ -237,7 +255,7 @@ void GameScene::debug_update() {
 	player_->debug_gui();
 
 	timeline->debug_gui();
-	
+
 	ImGui::Begin("HP");
 	ImGui::Text("HP : %d", playerHpManager_->get_hp());
 	ImGui::End();

@@ -204,8 +204,7 @@ void BaseEnemy::normal_animation() {
 	}
 }
 
-void BaseEnemy::attack_animation()
-{
+void BaseEnemy::attack_animation() {
 	// プレイヤー攻撃する
 	float t = easeInBack(behaviorTimer - 0.5f);
 	t = std::clamp(t, -1.0f, 3.0f);
@@ -262,8 +261,7 @@ void BaseEnemy::revive_animation() {
 	transform.set_translate(translate);
 }
 
-float BaseEnemy::easeInBack(float t)
-{
+float BaseEnemy::easeInBack(float t) {
 	const float c1 = 3.70158f;
 	const float c3 = c1 + 2.0f;
 
@@ -318,6 +316,15 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 			behavior.request(EnemyBehavior::Revive);
 			return;
 		}
+	}
+	else if (group == "BeatParticle") {
+		// 自分が出したパーティクルならスキップさせる
+		// ダウン時は処理しない
+		if (beatManager->is_self_particle(this, other) ||
+			behavior.state() == EnemyBehavior::Down) {
+			return;
+		}
+
 		hitpoint -= globalValues.get_value<int>("Enemy", "BeatHitDamage");
 		// ビート状態だった場合はリアクションさせない
 		if (behavior.state() != EnemyBehavior::Beating) {
@@ -330,6 +337,7 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 				behavior.request(EnemyBehavior::Down);
 			}
 		}
+
 	}
 }
 

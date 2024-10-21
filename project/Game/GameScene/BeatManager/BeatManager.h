@@ -1,10 +1,18 @@
 #pragma once
 
 #include <unordered_map>
+#include <memory>
+#include <list>
+
+#include <Engine/Module/ParticleSystem/ParticleSystemModel.h>
 
 class BaseEnemy;
 class PlayerBullet;
 class BaseCollider;
+class Particle;
+class SphereCollider;
+class CollisionManager;
+class BeatParticleMvements;
 
 class BeatManager {
 private:
@@ -13,15 +21,17 @@ private:
 		PlayerBullet* heart;
 	};
 
-	struct EnemyPairMaker {
-		BaseEnemy* enemy;
-		const BaseCollider* otherCollider;
+	struct BeatColliderInvolved {
+		BaseEnemy* emitEnemy;
+		Particle* parentParticle;
+		BeatParticleMvements* movements;
 	};
 
-	struct HeartPairMaker {
-		PlayerBullet* heart;
-		const BaseCollider* otherCollider;
-	};
+public:
+	void initalize();
+	void update();
+	void begin_rendering();
+	void draw() const;
 
 public:
 	void set_next_enemy(BaseEnemy* enemy);
@@ -34,12 +44,33 @@ public:
 	void enemy_down(BaseEnemy* enemy);
 	void recovery(BaseEnemy* enemy);
 
+public:
+	bool is_self_particle(BaseEnemy* const enemy, const BaseCollider* const other);
+	void unregister_particle(const ParticleSystemModel& particleSystem);
+	void make_collider(Particle* const particle, BaseEnemy* const enemy, BeatParticleMvements* const movements_);
+	void destroy_collider(const Particle* particle);
+
 private:
 	void check_make_pair();
+
+private:
+	void particle_on_collision(
+		const BaseCollider* const other, 
+		SphereCollider* thisCollider,
+		const BaseCollider* const enemyCollider
+	);
 
 private:
 	BeatPair nextPair;
 
 	std::unordered_multimap<BaseEnemy*, PlayerBullet*> enemyBeatPair;
 	std::unordered_map<PlayerBullet*, BaseEnemy*> heartBeatPair;
+
+	std::list<ParticleSystemModel> particleSystems;
+
+	std::unordered_map<const Particle*, std::shared_ptr<SphereCollider>> beatCollider;
+	std::unordered_map<const BaseCollider*, BeatColliderInvolved> involeder;
+
+public:
+	inline static CollisionManager* collisionManager = nullptr;
 };
