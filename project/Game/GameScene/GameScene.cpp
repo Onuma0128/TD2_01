@@ -9,6 +9,7 @@
 #include <Engine/Module/TextureManager/TextureManager.h>
 #include <Engine/Utility/SmartPointer.h>
 #include <Engine/Application/Input/Input.h>
+#include <Engine/Render/RenderTargetGroup/SwapChainRenderTargetGroup.h>
 
 #include "Game/GlobalValues/GlobalValues.h"
 #include "Game/TitleScene/TitleScene.h"
@@ -93,13 +94,13 @@ void GameScene::initialize() {
 
 	enemyManager = eps::CreateUnique<EnemyManager>();
 	enemyManager->set_collision_manager(collisionManager.get());
-	
+
 	beatManager = eps::CreateUnique<BeatManager>();
 
 	BaseEnemy::beatManager = beatManager.get();
 	PlayerBullet::beatManager = beatManager.get();
 	Player::beatManager = beatManager.get();
-	
+
 	timeline = std::make_unique<Timeline>();
 	timeline->Initialize();
 	timeline->SetEnemyManager(enemyManager.get());
@@ -112,10 +113,15 @@ void GameScene::initialize() {
 	UIManager::enemyManager_ = enemyManager.get();
 	HpSprite::playerHPManager_ = playerHpManager_.get();
 	WaveSprite::timeline_ = timeline.get();
-	
+
 	BaseEnemy::playerHpManager_ = playerHpManager_.get();
 	PlayerBullet::playerHpManager = playerHpManager_.get();
 	Player::playerHpManager_ = playerHpManager_.get();
+
+	GlobalValues::GetInstance().add_value<Vector3>("GameConfig", "BackgroundColor", { 0.015f, 0.015f, 0.015f });
+	Vector3 clearColor = GlobalValues::GetInstance().get_value<Vector3>("GameConfig", "BackgroundColor");
+
+	DirectXSwapChain::SetClearColor({ clearColor.x, clearColor.y, clearColor.z, 1.0f });
 
 	object3dNode_ = std::make_unique<Object3DNode>();
 	object3dNode_->initialize();
@@ -180,6 +186,13 @@ void GameScene::finalize() {
 void GameScene::begin() {
 	player_->begin();
 	enemyManager->begin();
+
+#ifdef _DEBUG
+	Vector3 clearColor = GlobalValues::GetInstance().get_value<Vector3>("GameConfig", "BackgroundColor");
+
+	DirectXSwapChain::SetClearColor({ clearColor.x, clearColor.y, clearColor.z, 1.0f });
+#endif // _DEBUG
+
 }
 
 void GameScene::update() {
@@ -257,7 +270,7 @@ void GameScene::debug_update() {
 	player_->debug_gui();
 
 	timeline->debug_gui();
-	
+
 	ImGui::Begin("HP");
 	ImGui::Text("HP : %d", playerHpManager_->get_hp());
 	ImGui::End();
