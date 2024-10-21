@@ -8,12 +8,14 @@
 WaveSprite::WaveSprite(const std::string& textureName, const Vector2& pivot) noexcept(false)
 : SpriteObject(textureName, pivot) 
 {
-	state_ = WaveState::Normal;
+	state_ = WaveState::Reappear;
 
 	waveNumber_ = 1;
 
-	transform->set_scale({ 1.0f,1.0f });
-	transform->set_translate({ 128,64 });
+	clearWaveFrame_ = -1.0f;
+	transform->set_scale(Vector2{ 1.5f,1.5f });
+	transform->set_translate(Vector2{ 1500.0f,360.0f });
+	returnPosition_ = transform->get_translate();
 
 	numberSprite_ = std::make_unique<NumberSprite>("1.png");
 	numberSprite_->set_translate({ transform->get_translate().x + 160 * transform->get_scale().x,transform->get_translate().y});
