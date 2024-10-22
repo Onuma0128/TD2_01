@@ -134,6 +134,7 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Typ
 		break;
 	}
 
+	auto& materials = ghostMesh->get_materials();
 	for (auto& material : materials) {
 		material.lighingType = LighingType::None;
 	}
@@ -145,8 +146,6 @@ void BaseEnemy::begin() {
 }
 
 void BaseEnemy::update() {
-	auto& materials = ghostMesh->get_materials();
-
 	// 行動の更新
 	behavior.update();
 
@@ -288,6 +287,7 @@ void BaseEnemy::enemy_resetObject()
 		}
 	}
 
+	auto& materials = ghostMesh->get_materials();
 	for (auto& material : materials) {
 		material.lighingType = LighingType::None;
 	}
