@@ -46,6 +46,7 @@ public: // Member function
 	void beating_animation();
 	void down_animetion();
 	void revive_animation();
+	void enemy_resetObject();
 
 	float easeInBack(float t);
 	float CustomEase(float t);
