@@ -30,7 +30,7 @@ public:
 
 	void draw() const;
 
-	void WaveCount();
+	void WaveTextureNumbers();
 
 	void Normal();
 
