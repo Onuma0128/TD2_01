@@ -13,7 +13,7 @@ void EnemyManager::update() {
 		enemy.update();
 	}
 
-	enemies.remove_if([](const BaseEnemy& enemy) {return !enemy.is_active(); });
+	enemies.remove_if([&](const BaseEnemy& enemy) {return !enemy.is_active(); });
 }
 
 void EnemyManager::begin_rendering() {

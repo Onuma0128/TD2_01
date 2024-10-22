@@ -226,6 +226,7 @@ void GameScene::initialize() {
 #ifdef _DEBUG
 	editor = eps::CreateUnique<TimelineEditor>();
 	editor->initialize(timeline.get(), camera3D_.get());
+	timeline->waveSprite = uiManager_->get_waveSprite();
 #endif // _DEBUG
 
 }

@@ -59,7 +59,6 @@ void WaveSprite::clear_animation_reset()
 void WaveSprite::update()
 {
 	if (timeline_->GetIsActiveEditor() && !timeline_->GetisDemoPlay()) {
-		reset();
 		return;
 	}
 

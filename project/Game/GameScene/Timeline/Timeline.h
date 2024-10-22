@@ -7,6 +7,7 @@
 #include <Engine/Math/Vector3.h>
 
 class EnemyManager;
+class WaveSprite;
 class Player;
 
 class Timeline {
@@ -82,4 +83,9 @@ private:
 	{ "./Resources/GameScene/Timeline/" };
 	static const inline std::filesystem::path LoadPath
 	{ TimelinePath.string() + "WaveData/" };
+
+#ifdef _DEBUG
+public:
+	WaveSprite* waveSprite = nullptr;
+#endif // _DEBUG
 };

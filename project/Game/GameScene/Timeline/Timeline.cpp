@@ -13,6 +13,7 @@
 #include "Game/GameScene/EnemyManager/EnemyManager.h"
 #include "Game/GameScene/Player/Player.h"
 #include "Game/GameScene/Timeline/GameState.h"
+#include "Game/GameScene/GameUI/Wave/WaveSprite.h"
 
 using json = nlohmann::json;
 
@@ -187,5 +188,6 @@ void Timeline::ResetWaveDebug(int wave) {
 	enemyManager->clear();
 	nowWave = waveData.begin() + wave;
 	ResetNowWave();
+	waveSprite->reset();
 }
 #endif // _DEBUG
