@@ -57,6 +57,11 @@ void TitleScene::initialize() {
 
 	fadeSprite_ = std::make_unique<Fade>();
 	fadeSprite_->initialize();
+
+	titleSprite_ = std::make_unique<SpriteObject>("title.png", Vector2{ 0.5f,0.5f });
+	titleBackSprite_ = std::make_unique<SpriteObject>("titleBack.png", Vector2{ 0.5f,0.5f });
+	titleSprite_->set_translate({ 640,360 });
+	titleBackSprite_->set_translate({ 640,360 });
 }
 
 void TitleScene::poped() {
@@ -82,6 +87,8 @@ void TitleScene::update() {
 void TitleScene::begin_rendering() {
 	camera3D_->update_matrix();
 
+	titleBackSprite_->begin_rendering();
+	titleSprite_->begin_rendering();
 	fadeSprite_->begin_rendering();
 }
 
@@ -100,6 +107,8 @@ void TitleScene::draw() const {
 
 	RenderPathManager::Next();
 
+	titleBackSprite_->draw();
+	titleSprite_->draw();
 	fadeSprite_->draw();
 	RenderPathManager::Next();
 }
