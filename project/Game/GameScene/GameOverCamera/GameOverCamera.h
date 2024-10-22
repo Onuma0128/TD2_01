@@ -10,6 +10,7 @@
 
 class Camera3D;
 class Player;
+class Fade;
 
 class GameOverCamera
 {
@@ -57,5 +58,6 @@ public:
 	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
 	inline static Camera3D* camera3d_ = nullptr;
 	inline static Player* player_ = nullptr;
+	inline static Fade* fadeSprite_ = nullptr;
 
 };

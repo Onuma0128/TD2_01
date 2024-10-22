@@ -125,6 +125,7 @@
     <ClCompile Include="Game\TutorialScene\TutorialScene.cpp" />
     <ClCompile Include="Game\GameScene\GameUI\Wave\WaveSprite.cpp" />
     <ClCompile Include="Game\GameScene\Timeline\GameState.cpp" />
+    <ClCompile Include="Game\GameScene\GameUI\Fade\Fade.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Math\Easing.h" />
@@ -246,6 +247,7 @@
     <ClInclude Include="Game\TutorialScene\TutorialScene.h" />
     <ClInclude Include="Game\GameScene\GameUI\Wave\WaveSprite.h" />
     <ClInclude Include="Game\GameScene\Timeline\GameState.h" />
+    <ClInclude Include="Game\GameScene\GameUI\Fade\Fade.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="EngineResources\HLSL\3DObject\Object3d.hlsli" />

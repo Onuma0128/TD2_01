@@ -8,6 +8,7 @@
 
 #include "Game/GameScene/Player/Player.h"
 #include "Game/GameScene/Player/PlayerBullet.h"
+#include "Game/GameScene/GameUI/Fade/Fade.h"
 #include "Game/GameOverScene/GameOverScene.h"
 #include "Game/TitleScene/TitleScene.h"
 #include "Game/GameScene/GameScene.h"
@@ -37,10 +38,12 @@ void GameOverCamera::update()
 		SpriteMove();
 		if (cameraFrame_ > 3.0f) {
 			if (Input::IsReleaseKey(KeyID::Space) || Input::IsReleasePad(PadID::A)) {
-				SceneManager::SetSceneChange(std::make_unique<GameScene>(), 0, false);
+				SceneManager::SetSceneChange(std::make_unique<GameScene>(), 1, false);
+				fadeSprite_->set_state(Fade::FadeState::FadeIN);
 			}
 			if (Input::IsTriggerKey(KeyID::Escape)) {
-				SceneManager::SetSceneChange(std::make_unique<TitleScene>(), 0, false);
+				SceneManager::SetSceneChange(std::make_unique<TitleScene>(), 1, false);
+				fadeSprite_->set_state(Fade::FadeState::FadeIN);
 			}
 		}
 		break;
