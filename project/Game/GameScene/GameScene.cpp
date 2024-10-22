@@ -236,6 +236,7 @@ void GameScene::poped() {
 }
 
 void GameScene::finalize() {
+	renderTarget->finalize();
 	object3dNode_->finalize();
 	particleMeshNode->finalize();
 	circleGaugeNode->finalize();
@@ -244,6 +245,7 @@ void GameScene::finalize() {
 	gaussianBlurNode->finalize();
 	bloomNode->finalize();
 	chromaticAberrationNode->finalize();
+	RenderPathManager::UnregisterPath("GameScene" + std::to_string(reinterpret_cast<std::uint64_t>(this)));
 }
 
 void GameScene::begin() {
