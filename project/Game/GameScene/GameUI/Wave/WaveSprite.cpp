@@ -13,6 +13,11 @@
 WaveSprite::WaveSprite(const std::string& textureName, const Vector2& pivot) noexcept(false)
 : SpriteObject(textureName, pivot) 
 {
+	reset();
+}
+
+void WaveSprite::reset()
+{
 	state_ = WaveState::Reappear;
 
 	waveNumber_ = GameState::getInstance().getCurrentWave() + 1;
@@ -23,7 +28,7 @@ WaveSprite::WaveSprite(const std::string& textureName, const Vector2& pivot) noe
 	returnPosition_ = transform->get_translate();
 
 	numberSprite_ = std::make_unique<NumberSprite>("1.png");
-	numberSprite_->set_translate({ transform->get_translate().x + 160 * transform->get_scale().x,transform->get_translate().y});
+	numberSprite_->set_translate({ transform->get_translate().x + 160 * transform->get_scale().x,transform->get_translate().y });
 	numberSprite_->set_scale(transform->get_scale());
 	WaveTextureNumbers();
 
@@ -32,15 +37,31 @@ WaveSprite::WaveSprite(const std::string& textureName, const Vector2& pivot) noe
 
 	clearBackSprite_ = std::make_unique<SpriteObject>("clearback.png", Vector2{ 0.5f,0.5f });
 	clearBackSprite_->set_translate({ 2000.0f,360.0f });
+
+	isClearSpriteMove_ = false;
+}
+
+void WaveSprite::clear_animation_reset()
+{
+	state_ = WaveState::Reappear;
+	clearWaveFrame_ = 0;
+	++waveNumber_;
+	WaveTextureNumbers();
+	transform->set_scale(Vector2{ 1.5f,1.5f });
+	transform->set_translate(Vector2{ 1500.0f,360.0f });
+	returnPosition_ = transform->get_translate();
+
+	clearSprite_->set_translate({ -700.0f,360.0f });
+	clearBackSprite_->set_translate({ -700.0f,360.0f });
+	isClearSpriteMove_ = false;
 }
 
 void WaveSprite::update()
 {
-#ifdef DEBUG
 	if (timeline_->GetIsActiveEditor() && !timeline_->GetisDemoPlay()) {
+		reset();
 		return;
 	}
-#endif // DEBUG
 
 	switch (state_)
 	{
@@ -73,6 +94,9 @@ void WaveSprite::begin_rendering() noexcept
 
 void WaveSprite::draw() const
 {
+	if (timeline_->GetIsActiveEditor() && !timeline_->GetisDemoPlay()) {
+		return;
+	}
 	clearBackSprite_->draw();
 	clearSprite_->draw();
 	SpriteObject::draw();
@@ -148,17 +172,7 @@ void WaveSprite::Return()
 		}
 		// 全部のSpriteが画面から出たらStateを更新
 		if (clearWaveFrame_ >= 3.8f) {
-			state_ = WaveState::Reappear;
-			clearWaveFrame_ = 0;
-			++waveNumber_;
-			WaveTextureNumbers();
-			transform->set_scale(Vector2{ 1.5f,1.5f });
-			transform->set_translate(Vector2{ 1500.0f,360.0f });
-			returnPosition_ = transform->get_translate();
-
-			clearSprite_->set_translate({ -700.0f,360.0f });
-			clearBackSprite_->set_translate({ -700.0f,360.0f });
-			isClearSpriteMove_ = false;
+			clear_animation_reset();
 		}
 	}
 }

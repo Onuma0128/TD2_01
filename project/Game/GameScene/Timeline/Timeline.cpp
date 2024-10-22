@@ -46,8 +46,6 @@ void Timeline::Update() {
 	if (nextPopData == nowWave->popData.end() && enemyManager->get_enemies().empty()) {
 		++nowWave; // ウェーブ進める
 		ResetNowWave();
-		// 現在のWave番号をシングルトンに保存
-		GameState::getInstance().setCurrentWave(static_cast<int>(std::distance(waveData.begin(), nowWave)));
 
 		if (IsEndWaveAll()) {
 			return;
@@ -147,6 +145,9 @@ void Timeline::ResetNowWave() {
 		nextPopData = nowWave->popData.begin();
 		player->reset_hitpoint(nowWave->playerHitpoint);
 		BaseEnemy::SetApproachSpeed(nowWave->enemyApproachSpeed);
+		// 現在のWave番号をシングルトンに保存
+		GameState::getInstance().setCurrentWave(static_cast<int>(std::distance(waveData.begin(), nowWave)));
+
 	}
 	// リセット
 	timer = 0;
