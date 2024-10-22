@@ -133,6 +133,10 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Typ
 	default:
 		break;
 	}
+
+	for (auto& material : materials) {
+		material.lighingType = LighingType::None;
+	}
 	hitpoint = maxHitpoint;
 }
 
@@ -174,26 +178,6 @@ void BaseEnemy::update() {
 			behavior.state() != EnemyBehavior::Revive &&
 			!isBeatingAnima)
 			behavior.request(EnemyBehavior::Down);
-	}
-	// HPが50以下ならモデルを差し替え
-	if (hitpoint <= 50) {
-		if (type == Type::Normal) {
-			ghostMesh->reset_object("enemyDamage.obj");
-		}
-		else {
-			ghostMesh->reset_object("bigEnemyDamage.obj");
-		}
-	}
-	else {
-		if (type == Type::Normal) {
-			ghostMesh->reset_object("enemy.obj");
-		}
-		else {
-			ghostMesh->reset_object("bigEnemy.obj");
-		}
-	}
-	for (auto& material : materials) {
-		material.lighingType = LighingType::None;
 	}
 }
 
@@ -284,6 +268,31 @@ void BaseEnemy::revive_animation() {
 	transform.set_translate(translate);
 }
 
+void BaseEnemy::enemy_resetObject()
+{
+	// HPが50以下ならモデルを差し替え
+	if (hitpoint <= 50) {
+		if (type == Type::Normal) {
+			ghostMesh->reset_object("enemyDamage.obj");
+		}
+		else {
+			ghostMesh->reset_object("bigEnemyDamage.obj");
+		}
+	}
+	else {
+		if (type == Type::Normal) {
+			ghostMesh->reset_object("enemy.obj");
+		}
+		else {
+			ghostMesh->reset_object("bigEnemy.obj");
+		}
+	}
+
+	for (auto& material : materials) {
+		material.lighingType = LighingType::None;
+	}
+}
+
 float BaseEnemy::easeInBack(float t) {
 	const float c1 = 3.70158f;
 	const float c3 = c1 + 2.0f;
@@ -323,6 +332,7 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 			return;
 		}
 		hitpoint -= globalValues.get_value<int>("Heart", "AttackDamage");
+		enemy_resetObject();
 		// マークされたのを記録
 		++markedCount;
 		// カウンタをリセット
@@ -371,6 +381,7 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 		}
 
 		hitpoint -= globalValues.get_value<int>("Enemy", "BeatHitDamage");
+		enemy_resetObject();
 		// ビート状態だった場合はリアクションさせない
 		if (behavior.state() != EnemyBehavior::Beating) {
 			// まだ生きてる場合
@@ -399,7 +410,7 @@ void BaseEnemy::start_beat() {
 
 void BaseEnemy::beating() {
 	hitpoint -= globalValues.get_value<int>("Enemy", "BeatingDamage");
-
+	enemy_resetObject();
 	beatCollider->set_active(true);
 }
 

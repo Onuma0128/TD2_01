@@ -1,6 +1,7 @@
 #include "WaveSprite.h"
 #include <vector>
 #include <list>
+#include <format>
 
 #include <Engine/Application/WorldClock/WorldClock.h>
 
@@ -12,6 +13,11 @@
 WaveSprite::WaveSprite(const std::string& textureName, const Vector2& pivot) noexcept(false)
 : SpriteObject(textureName, pivot) 
 {
+	reset();
+}
+
+void WaveSprite::reset()
+{
 	state_ = WaveState::Reappear;
 
 	waveNumber_ = GameState::getInstance().getCurrentWave() + 1;
@@ -22,18 +28,41 @@ WaveSprite::WaveSprite(const std::string& textureName, const Vector2& pivot) noe
 	returnPosition_ = transform->get_translate();
 
 	numberSprite_ = std::make_unique<NumberSprite>("1.png");
-	numberSprite_->set_translate({ transform->get_translate().x + 160 * transform->get_scale().x,transform->get_translate().y});
+	numberSprite_->set_translate({ transform->get_translate().x + 160 * transform->get_scale().x,transform->get_translate().y });
 	numberSprite_->set_scale(transform->get_scale());
+	WaveTextureNumbers();
 
 	clearSprite_ = std::make_unique<SpriteObject>("clear.png", Vector2{ 0.5f,0.5f });
 	clearSprite_->set_translate({ 2000.0f,360.0f });
 
 	clearBackSprite_ = std::make_unique<SpriteObject>("clearback.png", Vector2{ 0.5f,0.5f });
 	clearBackSprite_->set_translate({ 2000.0f,360.0f });
+
+	isClearSpriteMove_ = false;
+}
+
+void WaveSprite::clear_animation_reset()
+{
+	state_ = WaveState::Reappear;
+	clearWaveFrame_ = 0;
+	++waveNumber_;
+	WaveTextureNumbers();
+	transform->set_scale(Vector2{ 1.5f,1.5f });
+	transform->set_translate(Vector2{ 1500.0f,360.0f });
+	returnPosition_ = transform->get_translate();
+
+	clearSprite_->set_translate({ -700.0f,360.0f });
+	clearBackSprite_->set_translate({ -700.0f,360.0f });
+	isClearSpriteMove_ = false;
 }
 
 void WaveSprite::update()
 {
+	if (timeline_->GetIsActiveEditor() && !timeline_->GetisDemoPlay()) {
+		reset();
+		return;
+	}
+
 	switch (state_)
 	{
 	case WaveState::Normal:
@@ -47,9 +76,6 @@ void WaveSprite::update()
 
 		break;
 	}
-
-
-	WaveCount();
 
 	numberSprite_->set_translate({ transform->get_translate().x + 180 * transform->get_scale().x,transform->get_translate().y });
 	numberSprite_->set_scale(transform->get_scale());
@@ -68,49 +94,18 @@ void WaveSprite::begin_rendering() noexcept
 
 void WaveSprite::draw() const
 {
+	if (timeline_->GetIsActiveEditor() && !timeline_->GetisDemoPlay()) {
+		return;
+	}
 	clearBackSprite_->draw();
 	clearSprite_->draw();
 	SpriteObject::draw();
 	numberSprite_->draw();
 }
 
-void WaveSprite::WaveCount()
+void WaveSprite::WaveTextureNumbers()
 {
-	switch (waveNumber_)
-	{
-	case 0:
-		numberSprite_->set_texture("0.png");
-		break;
-	case 1:
-		numberSprite_->set_texture("1.png");
-		break;
-	case 2:
-		numberSprite_->set_texture("2.png");
-		break;
-	case 3:
-		numberSprite_->set_texture("3.png");
-		break;
-	case 4:
-		numberSprite_->set_texture("4.png");
-		break;
-	case 5:
-		numberSprite_->set_texture("5.png");
-		break;
-	case 6:
-		numberSprite_->set_texture("6.png");
-		break;
-	case 7:
-		numberSprite_->set_texture("7.png");
-		break;
-	case 8:
-		numberSprite_->set_texture("8.png");
-		break;
-	case 9:
-		numberSprite_->set_texture("9.png");
-		break;
-	default:
-		break;
-	}
+	numberSprite_->set_texture(std::format("{}.png", waveNumber_));
 }
 
 void WaveSprite::Normal()
@@ -177,16 +172,7 @@ void WaveSprite::Return()
 		}
 		// 全部のSpriteが画面から出たらStateを更新
 		if (clearWaveFrame_ >= 3.8f) {
-			state_ = WaveState::Reappear;
-			clearWaveFrame_ = 0;
-			++waveNumber_;
-			transform->set_scale(Vector2{ 1.5f,1.5f });
-			transform->set_translate(Vector2{ 1500.0f,360.0f });
-			returnPosition_ = transform->get_translate();
-
-			clearSprite_->set_translate({ -700.0f,360.0f });
-			clearBackSprite_->set_translate({ -700.0f,360.0f });
-			isClearSpriteMove_ = false;
+			clear_animation_reset();
 		}
 	}
 }
