@@ -1,12 +1,13 @@
 #pragma once
 
-#include <list>
 #include <filesystem>
+#include <vector>
 
+#include "Game/GameScene/Enemy/BaseEnemy.h"
 #include <Engine/Math/Vector3.h>
 
-class BaseEnemy;
 class EnemyManager;
+class WaveSprite;
 class Player;
 
 class Timeline {
@@ -16,6 +17,7 @@ class Timeline {
 
 	struct PopData {
 		float delay;
+		BaseEnemy::Type type;
 		Vector3 translate;
 		Vector3 forward;
 	};
@@ -48,6 +50,11 @@ public:
 	bool IsEndWaveAll() { return nowWave == waveData.end(); };
 	void SetEnemyManager(EnemyManager* enemyManager_) { enemyManager = enemyManager_; };
 	void SetPlayer(Player* player_) { player = player_; };
+	bool GetIsActiveEditor()const { return isActiveEditor; }
+	bool GetisDemoPlay()const { return isDemoPlay; }
+
+	const std::vector<WaveData>& GetWaveData() { return waveData; }
+	std::vector<WaveData>::const_iterator GetNowWave() const { return nowWave; }
 
 #ifdef _DEBUG
 public:
@@ -76,4 +83,9 @@ private:
 	{ "./Resources/GameScene/Timeline/" };
 	static const inline std::filesystem::path LoadPath
 	{ TimelinePath.string() + "WaveData/" };
+
+#ifdef _DEBUG
+public:
+	WaveSprite* waveSprite = nullptr;
+#endif // _DEBUG
 };

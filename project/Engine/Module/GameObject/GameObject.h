@@ -12,6 +12,7 @@ class PolygonMesh;
 class Texture;
 class TransformMatrix;
 class Color;
+enum class LighingType;
 
 class GameObject : public WorldInstance {
 public:
@@ -66,6 +67,7 @@ private:
 
 		std::unique_ptr<Material> material;
 		Color& color;
+		LighingType lightingType;
 
 		Transform2D uvTransform;
 
@@ -77,9 +79,10 @@ private:
 
 protected:
 	struct MaterialDataRef {
-		MaterialDataRef(Color& color_, Transform2D& uvTransform_);
+		MaterialDataRef(Color& color_, Transform2D& uvTransform_, LighingType& lighingType);
 		Color& color;
 		Transform2D& uvTransform;
+		LighingType& lighingType;
 	};
 
 	std::vector<MaterialDataRef> materialData;

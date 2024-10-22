@@ -5,9 +5,14 @@
         "BeatHitDamage": 10,
         "BeatInterval": 1.0,
         "BeatingDamage": 20,
-        "HP": 100,
+        "DownAccelerationSpeed": 6.5,
+        "DownAccelerationY": 12.199999809265137,
+        "DownVelocityY": 40.0,
+        "HPNormal": 100,
+        "HPStrong": 200,
         "NockbackFriction": 0.800000011920929,
         "NockbackMag": 3.0,
+        "RevivedHitpoint": 30,
         "StartAttackDistance": 1.0,
         "ToDeadDuration": 5.0
     }

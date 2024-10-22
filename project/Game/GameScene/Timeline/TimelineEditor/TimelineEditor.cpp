@@ -159,6 +159,7 @@ void TimelineEditor::export_json_all() {
 			std::string objName = std::format("{:02}", i);
 			popDataJson[objName] = json::object();
 			popDataJson[objName]["Delay"] = pop.delay;
+			popDataJson[objName]["Type"] = pop.type;
 			popDataJson[objName]["Translate"] = json::array({ pop.translate.x,pop.translate.y,pop.translate.z });
 			popDataJson[objName]["Forward"] = json::array({ pop.forward.x,pop.forward.y,pop.forward.z });
 			++i;
@@ -272,6 +273,15 @@ void TimelineEditor::detail_window() {
 	if (ImGui::DragFloat("Forward", &forawardAngle, 0.1f)) {
 		popData.forward = CVector3::BASIS_Z * Quaternion::EulerDegree(0, forawardAngle, 0);
 	}
+	if (ImGui::RadioButton("Normal##Detail", reinterpret_cast<int*>(&popData.type), static_cast<int>(BaseEnemy::Type::Normal))) {
+		previews[selectPopData.value()].reset_object("enemy.obj");
+		popData.type = BaseEnemy::Type::Normal;
+	}
+	ImGui::SameLine();
+	if (ImGui::RadioButton("Strong##Detail", reinterpret_cast<int*>(&popData.type), static_cast<int>(BaseEnemy::Type::Strong))) {
+		previews[selectPopData.value()].reset_object("bigEnemy.obj");
+		popData.type = BaseEnemy::Type::Strong;
+	}
 
 	ImGui::End();
 
@@ -290,9 +300,14 @@ void TimelineEditor::operation() {
 		// 生成
 	case TimelineEditor::Create:
 		if (Input::IsTriggerMouse(MouseID::Left)) {
-			auto& newData = timeline->waveData[editWave.value()].popData.emplace_back(0.0f, groundPosition, CVector3::BASIS_Z);
+			auto& newData = timeline->waveData[editWave.value()].popData.emplace_back(
+				0.0f,
+				BaseEnemy::Type::Normal,
+				groundPosition,
+				CVector3::BASIS_Z
+			);
 			newData.translate.y = 0;
-			previews.emplace_back("ghost_model.obj");
+			previews.emplace_back("enemy.obj");
 		}
 		break;
 
@@ -348,7 +363,7 @@ void TimelineEditor::reset_wave(std::optional<int> wave) {
 		previews.resize(waveData.popData.size());
 		for (int i = 0; i < waveData.popData.size(); ++i) {
 			previews[i].get_transform().set_translate(waveData.popData[i].translate);
-			previews[i].reset_object("ghost_model.obj");
+			previews[i].reset_object("enemy.obj");
 		}
 	}
 	else {

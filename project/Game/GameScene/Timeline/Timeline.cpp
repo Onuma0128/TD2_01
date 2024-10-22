@@ -12,11 +12,21 @@
 
 #include "Game/GameScene/EnemyManager/EnemyManager.h"
 #include "Game/GameScene/Player/Player.h"
+#include "Game/GameScene/Timeline/GameState.h"
+#include "Game/GameScene/GameUI/Wave/WaveSprite.h"
 
 using json = nlohmann::json;
 
 void Timeline::Initialize() {
 	LoadAll();
+	// シングルトンから現在のWave番号を取得し、そのWaveからスタート
+	int currentWave = GameState::getInstance().getCurrentWave();
+	if (currentWave < waveData.size()) {
+		nowWave = waveData.begin() + currentWave;
+	}
+	else {
+		nowWave = waveData.begin();
+	}
 	timer = 0;
 }
 
@@ -37,6 +47,7 @@ void Timeline::Update() {
 	if (nextPopData == nowWave->popData.end() && enemyManager->get_enemies().empty()) {
 		++nowWave; // ウェーブ進める
 		ResetNowWave();
+
 		if (IsEndWaveAll()) {
 			return;
 		}
@@ -45,7 +56,7 @@ void Timeline::Update() {
 	// 現在ウェーブの更新
 	while (nextPopData != nowWave->popData.end() && nextPopData->delay <= timer) {
 		// 湧き処理
-		enemyManager->create_enemy(nextPopData->translate, nextPopData->forward);
+		enemyManager->create_enemy(nextPopData->translate, nextPopData->forward, nextPopData->type);
 
 		// 次に進める
 		++nextPopData;
@@ -53,7 +64,9 @@ void Timeline::Update() {
 }
 
 void Timeline::Start() {
-	nowWave = waveData.begin();
+	// シングルトンからWave番号をロードして開始
+	int currentWave = GameState::getInstance().getCurrentWave();
+	nowWave = waveData.begin() + currentWave;
 	if (!IsEndWaveAll()) {
 		ResetNowWave();
 	}
@@ -78,7 +91,7 @@ void Timeline::Load(const std::filesystem::path& directoryPath) {
 
 	// ウェーブ追加
 	WaveData& newWaveData = waveData.emplace_back();
-	
+
 	if (root.contains("PlayerHitPoint")) {
 		newWaveData.playerHitpoint = root["PlayerHitPoint"];
 	}
@@ -95,11 +108,12 @@ void Timeline::Load(const std::filesystem::path& directoryPath) {
 		std::string test = std::format("{:02}", i);
 		json& popJson = data.at(test);
 		popData.delay = popJson["Delay"];
+		popData.type = static_cast<BaseEnemy::Type>(popJson["Type"]);
 		popData.translate = { popJson["Translate"].at(0), popJson["Translate"].at(1),popJson["Translate"].at(2) };
 		popData.forward = { popJson["Forward"].at(0),popJson["Forward"].at(1),popJson["Forward"].at(2) };
 	}
 
-	Console("[Timeline] Successed open wave data. \'{}\'", directoryPath.string());
+	Console("[Timeline] Successed open wave data. \'{}\'\n", directoryPath.string());
 }
 
 void Timeline::LoadAll() {
@@ -109,7 +123,7 @@ void Timeline::LoadAll() {
 
 	// 開けなかったらログを出す
 	if (ifstream.fail()) {
-		std::string message = std::format("[Timeline] Failed open Timeline file. \'{}\'", settingFile.string());
+		std::string message = std::format("[Timeline] Failed open Timeline file. \'{}\'\n", settingFile.string());
 		ConsoleA(message);
 		MessageBoxA(nullptr, message.c_str(), "Timeline", MB_OK | MB_ICONEXCLAMATION);
 		return;
@@ -132,6 +146,9 @@ void Timeline::ResetNowWave() {
 		nextPopData = nowWave->popData.begin();
 		player->reset_hitpoint(nowWave->playerHitpoint);
 		BaseEnemy::SetApproachSpeed(nowWave->enemyApproachSpeed);
+		// 現在のWave番号をシングルトンに保存
+		GameState::getInstance().setCurrentWave(static_cast<int>(std::distance(waveData.begin(), nowWave)));
+
 	}
 	// リセット
 	timer = 0;
@@ -171,5 +188,6 @@ void Timeline::ResetWaveDebug(int wave) {
 	enemyManager->clear();
 	nowWave = waveData.begin() + wave;
 	ResetNowWave();
+	waveSprite->reset();
 }
 #endif // _DEBUG

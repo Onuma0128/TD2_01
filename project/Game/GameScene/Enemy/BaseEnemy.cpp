@@ -4,15 +4,17 @@
 #include <Engine/Utility/SmartPointer.h>
 #include "Engine/DirectX/DirectXCommand/DirectXCommand.h"
 #include <Engine/Math/Definition.h>
+#include <Engine/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h>
 
 #include "Game/GameScene/Player/PlayerBullet.h"
 #include "Game/GameScene/Player/PlayerHPManager.h"
 #include "Game/GameScene/BeatManager/BeatManager.h"
 
-void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
+void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Type type_) {
 	globalValues.add_value<int>("Heart", "AttackDamage", 30);
 
-	globalValues.add_value<int>("Enemy", "HP", 100);
+	globalValues.add_value<int>("Enemy", "HPNormal", 100);
+	globalValues.add_value<int>("Enemy", "HPStrong", 200);
 	globalValues.add_value<int>("Enemy", "BeatingDamage", 20);
 	globalValues.add_value<int>("Enemy", "BeatHitDamage", 5);
 	globalValues.add_value<int>("Enemy", "RevivedHitpoint", 30);
@@ -27,9 +29,11 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
 
 	globalValues.add_value<float>("Enemy", "ToDeadDuration", 5.0f);
 
+	globalValues.add_value<float>("Enemy", "DownVelocityY", 40.0f);
+	globalValues.add_value<float>("Enemy", "DownAccelerationY", 12.2f);
+	globalValues.add_value<float>("Enemy", "DownAccelerationSpeed", 6.5f);
+
 	markedCount = 0;
-	maxHitpoint = globalValues.get_value<int>("Enemy", "HP");
-	hitpoint = maxHitpoint;
 	transform.set_translate(translate);
 	transform.set_quaternion(Quaternion::LookForward(forward));
 	// behavior初期化
@@ -80,7 +84,7 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
 		std::bind(&BaseEnemy::erase_update, this)
 	);
 
-	ghostMesh = eps::CreateUnique<GameObject>("ghost_model.obj");
+	ghostMesh = eps::CreateUnique<GameObject>();
 	ghostMesh->initialize();
 	ghostMesh->set_parent(*this);
 	ghostMesh->get_transform().set_translate({ 0,1,0 });
@@ -93,7 +97,6 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
 	hitCollider = eps::CreateShared<SphereCollider>();
 	hitCollider->initialize();
 	hitCollider->set_parent(*ghostMesh);
-	hitCollider->set_radius(0.5);
 	hitCollider->set_on_collision_enter(
 		std::bind(&BaseEnemy::damaged_callback, this, std::placeholders::_1)
 	);
@@ -103,7 +106,6 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
 	meleeCollider->initialize();
 	meleeCollider->set_parent(*ghostMesh);
 	meleeCollider->set_active(false);
-	meleeCollider->set_radius(0.5);
 	meleeCollider->set_on_collision_enter(
 		std::bind(&BaseEnemy::attack_callback, this, std::placeholders::_1)
 	);
@@ -113,6 +115,30 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward) {
 	beatCollider->set_parent(*this);
 	beatCollider->set_active(false);
 	beatCollider->set_radius(3.0f);
+
+	type = type_;
+	switch (type) {
+	case BaseEnemy::Type::Normal:
+		maxHitpoint = globalValues.get_value<int>("Enemy", "HPNormal");
+		ghostMesh->reset_object("enemy.obj");
+		meleeCollider->set_radius(0.5f);
+		hitCollider->set_radius(0.5f);
+		break;
+	case BaseEnemy::Type::Strong:
+		maxHitpoint = globalValues.get_value<int>("Enemy", "HPStrong");
+		ghostMesh->reset_object("bigEnemy.obj");
+		meleeCollider->set_radius(1.0f);
+		hitCollider->set_radius(1.0f);
+		break;
+	default:
+		break;
+	}
+
+	auto& materials = ghostMesh->get_materials();
+	for (auto& material : materials) {
+		material.lighingType = LighingType::None;
+	}
+	hitpoint = maxHitpoint;
 }
 
 void BaseEnemy::begin() {
@@ -131,6 +157,7 @@ void BaseEnemy::update() {
 	if (markedCount && behavior.state() != EnemyBehavior::Beating) {
 		markingTimer += WorldClock::DeltaSeconds();
 		*percentage.get_data() = 1 - markingTimer / markingTime;
+		isBeatUI_ = true;
 	}
 
 	// 付与状態でカウンタが達成した場合
@@ -142,11 +169,12 @@ void BaseEnemy::update() {
 		// 上限を超えないようにする
 		hitpoint = std::min(maxHitpoint, hitpoint);
 		markedCount = 0;
+		isBeatUI_ = false;
 	}
 	if (hitpoint <= 0) {
 		if (behavior.state() != EnemyBehavior::Down &&
 			behavior.state() != EnemyBehavior::Erase &&
-			behavior.state() != EnemyBehavior::Revive && 
+			behavior.state() != EnemyBehavior::Revive &&
 			!isBeatingAnima)
 			behavior.request(EnemyBehavior::Down);
 	}
@@ -171,8 +199,7 @@ void BaseEnemy::draw_marker() const {
 	}
 }
 
-void BaseEnemy::normal_animation()
-{
+void BaseEnemy::normal_animation() {
 	// 敵がふよふよ浮く感じ
 	if (behavior.state() != EnemyBehavior::Down &&
 		behavior.state() != EnemyBehavior::Erase &&
@@ -183,8 +210,17 @@ void BaseEnemy::normal_animation()
 	}
 }
 
-void BaseEnemy::beating_animation()
-{
+void BaseEnemy::attack_animation() {
+	// プレイヤー攻撃する
+	float t = easeInBack(behaviorTimer - 0.5f);
+	t = std::clamp(t, -1.0f, 3.0f);
+	float angle = 120 * ToRadian;
+	Quaternion rotationX = Quaternion::AngleAxis(CVector3::BASIS_X, angle);
+	Quaternion rotate = rotationX * axisOfQuaternion;
+	ghostMesh->get_transform().set_quaternion(Quaternion::Slerp(axisOfQuaternion, rotate, t));
+}
+
+void BaseEnemy::beating_animation() {
 	// 一回だけスケールを膨らませる
 	float t = behaviorTimer;
 	// プレイヤーの一回限りの膨張動作
@@ -196,27 +232,94 @@ void BaseEnemy::beating_animation()
 		isBeatingAnima = false;
 		// スケールを完全に元に戻す
 		transform.set_scale(CVector3::BASIS);
+		ghostMesh->get_transform().set_quaternion(axisOfQuaternion);
 	}
 }
 
-void BaseEnemy::down_animetion()
-{
+void BaseEnemy::down_animetion() {
+	// プレイヤーがひっくり返る回転
 	float t = behaviorTimer;
 	t = std::clamp(t, 0.0f, 1.0f);
-	float angle = -90 * ToRadian;
+	float angle = 180 * ToRadian;
 	Quaternion rotationX = Quaternion::AngleAxis(CVector3::BASIS_X, angle);
-	Quaternion rotate = axisOfQuaternion * rotationX;
+	Quaternion rotate = rotationX * axisOfQuaternion;
 	ghostMesh->get_transform().set_quaternion(Quaternion::Slerp(axisOfQuaternion, rotate, t));
+
+	velocity.y -= globalValues.get_value<float>("Enemy", "DownAccelerationY") * WorldClock::DeltaSeconds() *
+		globalValues.get_value<float>("Enemy", "DownAccelerationSpeed");
+	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
 }
 
-void BaseEnemy::revive_animation()
-{
+void BaseEnemy::revive_animation() {
+	// 復活したら回転を戻す
 	float t = behaviorTimer / 3.0f;
 	t = std::clamp(t, 0.0f, 1.0f);
-	float angle = 90 * ToRadian;
+	float angle = -180 * ToRadian;
 	Quaternion rotationX = Quaternion::AngleAxis(CVector3::BASIS_X, angle);
 	Quaternion rotate = axisOfQuaternion * rotationX;
 	ghostMesh->get_transform().set_quaternion(Quaternion::Slerp(axisOfQuaternion, rotate, t));
+	// 元居た高さにラープ
+	Vector3 to = {
+		transform.get_translate().x,
+		0.0f,
+		transform.get_translate().z };
+	Vector3 translate = Vector3::Lerp(transform.get_translate(), to, t);
+	transform.set_translate(translate);
+}
+
+void BaseEnemy::enemy_resetObject()
+{
+	// HPが50以下ならモデルを差し替え
+	if (hitpoint <= 50) {
+		if (type == Type::Normal) {
+			ghostMesh->reset_object("enemyDamage.obj");
+		}
+		else {
+			ghostMesh->reset_object("bigEnemyDamage.obj");
+		}
+	}
+	else {
+		if (type == Type::Normal) {
+			ghostMesh->reset_object("enemy.obj");
+		}
+		else {
+			ghostMesh->reset_object("bigEnemy.obj");
+		}
+	}
+
+	auto& materials = ghostMesh->get_materials();
+	for (auto& material : materials) {
+		material.lighingType = LighingType::None;
+	}
+}
+
+float BaseEnemy::easeInBack(float t) {
+	const float c1 = 3.70158f;
+	const float c3 = c1 + 2.0f;
+
+	return c3 * t * t * t - c1 * t * t;
+}
+float BaseEnemy::CustomEase(float t) {
+	float scale = 1.0f;
+
+	if (t <= 0.5f) {
+		// 最初の50%で1.0から1.2に広がる
+		float startScale = 1.0f;
+		float peakScale = 1.2f;
+
+		// イージング（例えば Ease Out）
+		scale = startScale + (peakScale - startScale) * (1 - std::powf(1 - t * 2.0f, 3.0f));
+	}
+	else {
+		// 残りの50%で1.2から0に縮小
+		float peakScale = 1.2f;
+		float endScale = 0.0f;
+
+		// イージング（例えば Cubic Ease In）
+		scale = peakScale + (endScale - peakScale) * std::powf((t - 0.5f) * 2.0f, 3.0f);
+	}
+
+	return scale;
 }
 
 // 被ダメ時コールバック
@@ -229,6 +332,7 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 			return;
 		}
 		hitpoint -= globalValues.get_value<int>("Heart", "AttackDamage");
+		enemy_resetObject();
 		// マークされたのを記録
 		++markedCount;
 		// カウンタをリセット
@@ -267,7 +371,17 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 			behavior.request(EnemyBehavior::Revive);
 			return;
 		}
+	}
+	else if (group == "BeatParticle") {
+		// 自分が出したパーティクルならスキップさせる
+		// ダウン時は処理しない
+		if (beatManager->is_self_particle(this, other) ||
+			behavior.state() == EnemyBehavior::Down) {
+			return;
+		}
+
 		hitpoint -= globalValues.get_value<int>("Enemy", "BeatHitDamage");
+		enemy_resetObject();
 		// ビート状態だった場合はリアクションさせない
 		if (behavior.state() != EnemyBehavior::Beating) {
 			// まだ生きてる場合
@@ -279,6 +393,7 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 				behavior.request(EnemyBehavior::Down);
 			}
 		}
+
 	}
 }
 
@@ -295,7 +410,7 @@ void BaseEnemy::start_beat() {
 
 void BaseEnemy::beating() {
 	hitpoint -= globalValues.get_value<int>("Enemy", "BeatingDamage");
-
+	enemy_resetObject();
 	beatCollider->set_active(true);
 }
 
@@ -357,6 +472,7 @@ void BaseEnemy::approach_update() {
 	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
 	// player方向を向く
 	look_at(*targetPlayer);
+	axisOfQuaternion = ghostMesh->get_transform().get_quaternion();
 }
 
 // ---------- 攻撃処理 ----------
@@ -364,10 +480,14 @@ void BaseEnemy::attack_initialize() {
 	behaviorTimer = 0;
 	isAttakced = false;
 	meleeCollider->set_active(true);
+	axisOfQuaternion = ghostMesh->get_transform().get_quaternion();
 }
 
 void BaseEnemy::attack_update() {
 	behaviorTimer += WorldClock::DeltaSeconds();
+	if (behaviorTimer >= 0.5f && behaviorTimer <= 3.0f) {
+		attack_animation();
+	}
 	if (behaviorTimer < 1.0f) {
 		meleeCollider->set_active(false);
 	}
@@ -423,6 +543,8 @@ void BaseEnemy::damaged_heart_update() {
 // ---------- 被ビート時処理 ----------
 void BaseEnemy::damaged_beat_initialize() {
 	behaviorTimer = 0;
+	ghostMesh->get_transform().set_quaternion(axisOfQuaternion);
+	meleeCollider->set_active(false);
 }
 
 void BaseEnemy::damaged_beat_update() {
@@ -446,8 +568,15 @@ void BaseEnemy::down_initialize() {
 	meleeCollider->set_active(false);
 	// hitの有効化
 	hitCollider->set_active(true);
+	// プレイヤーとの距離を算出
+	Vector3 distance = world_position() - targetPlayer->world_position();
+	// velocity算出
+	velocity = distance.normalize_safe();
+	velocity.y = globalValues.get_value<float>("Enemy", "DownVelocityY");
 	// ダウン時の回転を取得
+	ghostMesh->get_transform().set_quaternion(axisOfQuaternion);
 	axisOfQuaternion = ghostMesh->get_transform().get_quaternion();
+	isBeatUI_ = false;
 }
 
 void BaseEnemy::down_update() {
@@ -488,6 +617,11 @@ void BaseEnemy::erase_initialize() {
 
 void BaseEnemy::erase_update() {
 	behaviorTimer += WorldClock::DeltaSeconds();
+	if (behaviorTimer >= 2.5f) {
+		float t = CustomEase((behaviorTimer - 2.5f) * 2.0f);
+		t = std::clamp(t, 0.0f, 1.5f);
+		ghostMesh->get_transform().set_scale({ t,t,t });
+	}
 	if (behaviorTimer >= 3.0f) {
 		isActive = false;
 	}

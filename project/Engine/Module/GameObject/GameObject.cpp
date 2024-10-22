@@ -44,6 +44,7 @@ void GameObject::begin_rendering() noexcept {
 	// Materialに転送
 	for (int i = 0; i < meshMaterials.size(); ++i) {
 		meshMaterials[i].material->set_uv_transform(meshMaterials[i].uvTransform.get_matrix4x4_transform());
+		meshMaterials[i].material->get_data()->lighting = static_cast<int>(meshMaterials[i].lightingType);
 	}
 }
 
@@ -63,9 +64,9 @@ void GameObject::draw() const {
 		commandList->SetGraphicsRootConstantBufferView(0, transformMatrix->get_resource()->GetGPUVirtualAddress()); // Matrix
 		commandList->SetGraphicsRootConstantBufferView(2, meshMaterials[i].material->get_resource()->GetGPUVirtualAddress()); // Color
 		const auto& lockedTexture = meshMaterials[i].texture.lock();
-		commandList->SetGraphicsRootDescriptorTable(4, 
-			lockedTexture ? 
-			lockedTexture->get_gpu_handle() : 
+		commandList->SetGraphicsRootDescriptorTable(4,
+			lockedTexture ?
+			lockedTexture->get_gpu_handle() :
 			TextureManager::GetTexture("Error.png").lock()->get_gpu_handle()
 		);
 		commandList->DrawIndexedInstanced(meshLocked->index_size(i), 1, 0, 0, 0); // 描画コマンド
@@ -88,6 +89,7 @@ void GameObject::default_material() {
 	for (int i = 0; i < meshMaterials.size(); ++i) {
 		// 色情報のリセット
 		meshMaterials[i].color = Color{ 1.0f,1.0f,1.0f,1.0f };
+		meshMaterials[i].lightingType = LighingType::HalfLambert;
 		if (meshLocked->has_mtl(i)) {
 			// テクスチャ情報の取得
 			meshMaterials[i].texture = TextureManager::GetTexture(meshLocked->texture_name(i));
@@ -106,7 +108,7 @@ void GameObject::default_material() {
 #endif // _DEBUG
 			Console("[GameObject] Mtl file used Object file \'{}\' is not found.\n", meshName);
 		}
-		materialData.emplace_back(meshMaterials[i].color, meshMaterials[i].uvTransform);
+		materialData.emplace_back(meshMaterials[i].color, meshMaterials[i].uvTransform, meshMaterials[i].lightingType);
 	}
 }
 
@@ -163,13 +165,15 @@ void GameObject::debug_gui() {
 GameObject::PolygonMeshMaterial::PolygonMeshMaterial() :
 	material(std::make_unique<Material>()),
 	color(material->get_color_reference()) {
+	lightingType = LighingType::HalfLambert;
 	material->get_data()->color = Color{ 1.0f, 1.0f, 1.0f, 1.0f };
-	material->get_data()->lighting = static_cast<std::uint32_t>(LighingType::HalfLambert);
+	material->get_data()->lighting = static_cast<std::uint32_t>(lightingType);
 	material->get_data()->padding = std::array<std::int32_t, 3>();
 	material->get_data()->uvTransform = CMatrix4x4::IDENTITY;
 }
 
-GameObject::MaterialDataRef::MaterialDataRef(Color& color_, Transform2D& uvTransform_) :
+GameObject::MaterialDataRef::MaterialDataRef(Color& color_, Transform2D& uvTransform_, LighingType& lighingType_) :
 	color(color_),
-	uvTransform(uvTransform_) {
+	uvTransform(uvTransform_),
+	lighingType(lighingType_) {
 }

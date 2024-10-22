@@ -2,9 +2,6 @@
 
 #include <Engine/Module/GameObject/GameObject.h>
 
-#include <variant>
-
-#include <Engine/Utility/TimedCall/TimedCall.h>
 #include <Engine/Module/Collision/Collider/SphereCollider.h>
 #include <Engine/Module/Behavior/Behavior.h>
 #include <Engine/DirectX/DirectXResourceObject/ConstantBuffer/ConstantBuffer.h>
@@ -28,10 +25,16 @@ class PlayerHPManager;
 class BeatManager;
 
 class BaseEnemy : public WorldInstance {
+public:
+	enum class Type {
+		Normal,
+		Strong,
+	};
+
 public: // Contsructor/Destructor
 
 public: // Member function
-	void initialize(const Vector3& transform, const Vector3& forward);
+	void initialize(const Vector3& transform, const Vector3& forward, Type type_);
 	void begin();
 	void update();
 	void begin_rendering();
@@ -39,9 +42,14 @@ public: // Member function
 	void draw_marker() const;
 
 	void normal_animation();
+	void attack_animation();
 	void beating_animation();
 	void down_animetion();
 	void revive_animation();
+	void enemy_resetObject();
+
+	float easeInBack(float t);
+	float CustomEase(float t);
 
 private:
 	void damaged_callback(const BaseCollider* const other);
@@ -50,6 +58,7 @@ private:
 public: // Getter/Setter
 	int get_hp() const { return hitpoint; };
 	int get_state() const { return static_cast<int>(behavior.state()); };
+	bool get_isBeatUI()const { return isBeatUI_; }
 	// ビート状態にする
 	void start_beat();
 	void beating();
@@ -81,6 +90,9 @@ private: // BehaviorFunctions
 
 private: // Member values
 	bool isDead;
+
+	Type type;
+
 	int hitpoint; // HP
 	int maxHitpoint; // HP
 	Vector3 velocity;
@@ -99,6 +111,7 @@ private: // Member values
 	float waveFrameCount;
 	float initialY;
 	bool isBeatingAnima;
+	bool isBeatUI_ = false;
 
 	std::shared_ptr<SphereCollider> hitCollider;
 

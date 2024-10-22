@@ -28,6 +28,12 @@ private:
 
 public:
 	const Transform2D& get_transform() noexcept;
+
+	void set_scale(const Vector2& scale);
+	void set_rotate(const float& rotate);
+	void set_translate(const Vector2& translate);
+	void set_alpha(const float& alpha);
+	void set_texture(const std::string& textureName);
 	//void update();
 	void begin_rendering() noexcept;
 	void draw() const;

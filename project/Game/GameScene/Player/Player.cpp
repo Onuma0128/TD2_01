@@ -11,6 +11,8 @@
 #include <Game/GameOverScene/GameOverScene.h>
 #include "Game/GameScene/Player/PlayerHPManager.h"
 #include "Game/GameScene/BeatManager/BeatManager.h"
+#include "Game/GameScene/GameUI/Wave/WaveSprite.h"
+#include "Game/GameScene/PostEffectManager/PostEffectManager.h"
 
 #ifdef _DEBUG
 #include "imgui.h"
@@ -33,18 +35,18 @@ void Player::initialize() {
 
 	// 汗
 	globalValues.add_value<int>("Sweat", "NumSweat", 5);
-	globalValues.add_value<float>("Sweat", "velocityY", 0.1f);
+	globalValues.add_value<float>("Sweat", "velocityY", 3.0f);
 	globalValues.add_value<int>("Sweat", "Radius", 240);
-	globalValues.add_value<float>("Sweat", "AccelerationY", 0.4f);
+	globalValues.add_value<float>("Sweat", "AccelerationY", 8.0f);
 	globalValues.add_value<float>("Sweat", "SmallerScale", 0.25f);
 
 	// 死ぬ時のアニメーション
 	globalValues.add_value<float>("DeadAnimation", "BeatScale", 0.5f);
-	globalValues.add_value<float>("DeadAnimation", "DownCount", 1.0f);
+	globalValues.add_value<float>("DeadAnimation", "DownCount", 2.0f);
 
 
 	// 描画オブジェクトを設定
-	playerMesh = std::make_unique<GameObject>("player_model.obj");
+	playerMesh = std::make_unique<GameObject>("player.obj");
 	playerMesh->initialize();
 	playerMesh->set_parent(*this);
 
@@ -61,7 +63,9 @@ void Player::begin() {
 	// 再代入
 	releaseButton = false;
 	input = CVector2::ZERO;
-	InputPad();
+	if (waveSprite_->get_clearWaveFrame() >= 1.5f && waveSprite_->get_state() != WaveSprite::WaveState::Return) {
+		InputPad();
+	}
 }
 
 void Player::update() {
@@ -224,6 +228,8 @@ void Player::Beating() {
 	if (beatingTimer >= beatAttackInterval) {
 		beatingTimer = std::fmod(beatingTimer, beatAttackInterval);
 		beatManager->beating();
+		postEffectManager->beat_cycle(beatAttackInterval);
+		postEffectManager->set_reaction(PostEffectState::BEATING);
 	}
 	bool killAll = beatManager->empty_pair();
 	// ボタンが離れたらor敵が全員倒れたらMoveに戻す
@@ -341,9 +347,6 @@ void Player::Dead()
 		downFrame_ = std::clamp(downFrame_, 0.0f, 1.0f);
 
 		transform.set_quaternion(Quaternion::Slerp(axisOfQuaternion_, combinedRotation, downFrame_));
-
-		// 死んだらシーン切り替え
-		SceneManager::SetSceneChange(std::make_unique<GameOverScene>(), 2, false);
 	}
 }
 
@@ -387,6 +390,7 @@ void Player::OnCollisionCallBack(const BaseCollider* const other) {
 				state_ = State::NockBack;
 				isInvincible_ = true;
 				invincibleFrame_ = 0.0f;
+				postEffectManager->set_reaction(PostEffectState::DAMANGE);
 				break;
 			}
 		}

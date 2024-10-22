@@ -13,7 +13,7 @@ void EnemyManager::update() {
 		enemy.update();
 	}
 
-	enemies.remove_if([](const BaseEnemy& enemy) {return !enemy.is_active(); });
+	enemies.remove_if([&](const BaseEnemy& enemy) {return !enemy.is_active(); });
 }
 
 void EnemyManager::begin_rendering() {
@@ -42,9 +42,9 @@ void EnemyManager::set_collision_manager(CollisionManager* collisionManager_) {
 	collisionManager = collisionManager_;
 }
 
-void EnemyManager::create_enemy(const Vector3& position, const Vector3& forward) {
+void EnemyManager::create_enemy(const Vector3& position, const Vector3& forward, BaseEnemy::Type type) {
 	auto& newEnemy = enemies.emplace_back();
-	newEnemy.initialize(position, forward);
+	newEnemy.initialize(position, forward, type);
 	collisionManager->register_collider("EnemyHit", newEnemy.get_hit_collider());
 	collisionManager->register_collider("Beat", newEnemy.get_beat_collider());
 	collisionManager->register_collider("EnemyMelee", newEnemy.get_melee_collider());
