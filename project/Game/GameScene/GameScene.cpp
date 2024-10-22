@@ -133,7 +133,9 @@ void GameScene::initialize() {
 	PlayerBullet::playerHpManager = playerHpManager_.get();
 	Player::playerHpManager_ = playerHpManager_.get();
 
-	std::shared_ptr<SingleRenderTarget> renderTarget{ eps::CreateShared<SingleRenderTarget>() };
+	postEffectManager = eps::CreateUnique<PostEffectManager>();
+
+	renderTarget = eps::CreateShared<SingleRenderTarget>();
 	renderTarget->initialize();
 
 	object3dNode_ = std::make_unique<Object3DNode>();
@@ -168,12 +170,20 @@ void GameScene::initialize() {
 
 	bloomNode = eps::CreateShared<BloomNode>();
 	bloomNode->initialize();
-	bloomNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	bloomNode->set_render_target();
 	bloomNode->set_base_texture(spriteNode_->result_stv_handle());
 	bloomNode->set_blur_texture(gaussianBlurNode->result_stv_handle());
 
+	chromaticAberrationNode = eps::CreateShared<ChromaticAberrationNode>();
+	chromaticAberrationNode->initialize();
+	chromaticAberrationNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	chromaticAberrationNode->set_texture_resource(bloomNode->result_stv_handle());
+
 	RenderPath path{};
-	path.initialize({ object3dNode_,particleMeshNode,circleGaugeNode,spriteNode_, luminanceExtractionNode, gaussianBlurNode, bloomNode });
+	path.initialize({ object3dNode_,particleMeshNode,circleGaugeNode,spriteNode_, luminanceExtractionNode, gaussianBlurNode, bloomNode,chromaticAberrationNode });
+
+	postEffectManager->initialize(chromaticAberrationNode);
+	//postEffectManager->(player_.get());
 
 	// 背景色の設定
 	GlobalValues::GetInstance().add_value<Vector3>("GameConfig", "BackgroundColor", { 0.015f, 0.015f, 0.015f });
@@ -190,6 +200,7 @@ void GameScene::initialize() {
 	PlayerBullet::player = player_.get();
 	PlayerSweat::player = player_.get();
 	timeline->SetPlayer(player_.get());
+	player_->set_posteffect_manager(postEffectManager.get());
 
 	collisionManager->register_collider("Player", player_->get_hit_collider());
 
@@ -228,7 +239,10 @@ void GameScene::finalize() {
 	particleMeshNode->finalize();
 	circleGaugeNode->finalize();
 	spriteNode_->finalize();
-	object3dNode_->finalize();
+	luminanceExtractionNode->finalize();
+	gaussianBlurNode->finalize();
+	bloomNode->finalize();
+	chromaticAberrationNode->finalize();
 }
 
 void GameScene::begin() {
@@ -238,7 +252,7 @@ void GameScene::begin() {
 #ifdef _DEBUG
 	Vector3 clearColor = GlobalValues::GetInstance().get_value<Vector3>("GameConfig", "BackgroundColor");
 
-	DirectXSwapChain::SetClearColor({ clearColor.x, clearColor.y, clearColor.z, 1.0f });
+	renderTarget->offscreen_render().set_claer_color({ clearColor.x, clearColor.y, clearColor.z, 1.0f });
 #endif // _DEBUG
 
 }
@@ -255,6 +269,7 @@ void GameScene::update() {
 
 	gameOverCamera_->update();
 	fadeSprite_->update();
+	postEffectManager->update();
 }
 
 void GameScene::begin_rendering() {
@@ -319,6 +334,9 @@ void GameScene::draw() const {
 	bloomNode->draw();
 	RenderPathManager::Next();
 	// ここまでBloom
+	RenderPathManager::Next();
+	// 色収差
+	chromaticAberrationNode->draw();
 }
 
 #ifdef _DEBUG
@@ -350,7 +368,8 @@ void GameScene::debug_update() {
 
 	enemyManager->debug_gui();
 
-	ImGui::Begin("PostEffetc");
+	postEffectManager->debug_gui();
+	ImGui::Begin("BloomEffect");
 	if (ImGui::CollapsingHeader("Bloom")) {
 		if (ImGui::TreeNode("Luminiance")) {
 			luminanceExtractionNode->debug_gui();
