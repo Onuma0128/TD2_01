@@ -283,7 +283,29 @@ float BaseEnemy::easeInBack(float t) {
 	const float c3 = c1 + 2.0f;
 
 	return c3 * t * t * t - c1 * t * t;
-};
+}
+float BaseEnemy::CustomEase(float t) {
+	float scale = 1.0f;
+
+	if (t <= 0.5f) {
+		// 最初の50%で1.0から1.2に広がる
+		float startScale = 1.0f;
+		float peakScale = 1.2f;
+
+		// イージング（例えば Ease Out）
+		scale = startScale + (peakScale - startScale) * (1 - std::powf(1 - t * 2.0f, 3.0f));
+	}
+	else {
+		// 残りの50%で1.2から0に縮小
+		float peakScale = 1.2f;
+		float endScale = 0.0f;
+
+		// イージング（例えば Cubic Ease In）
+		scale = peakScale + (endScale - peakScale) * std::powf((t - 0.5f) * 2.0f, 3.0f);
+	}
+
+	return scale;
+}
 
 // 被ダメ時コールバック
 void BaseEnemy::damaged_callback(const BaseCollider* const other) {
@@ -578,6 +600,11 @@ void BaseEnemy::erase_initialize() {
 
 void BaseEnemy::erase_update() {
 	behaviorTimer += WorldClock::DeltaSeconds();
+	if (behaviorTimer >= 2.5f) {
+		float t = CustomEase((behaviorTimer - 2.5f) * 2.0f);
+		t = std::clamp(t, 0.0f, 1.5f);
+		ghostMesh->get_transform().set_scale({ t,t,t });
+	}
 	if (behaviorTimer >= 3.0f) {
 		isActive = false;
 	}

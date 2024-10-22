@@ -48,6 +48,7 @@ public: // Member function
 	void revive_animation();
 
 	float easeInBack(float t);
+	float CustomEase(float t);
 
 private:
 	void damaged_callback(const BaseCollider* const other);
