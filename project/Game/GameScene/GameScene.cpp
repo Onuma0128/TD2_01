@@ -77,6 +77,9 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_8.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_9.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_10.png");
+	// GameSprite
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "fade.png");
+
 }
 
 void GameScene::initialize() {
@@ -183,6 +186,10 @@ void GameScene::initialize() {
 	gameOverCamera_->player_ = player_.get();
 	gameOverCamera_->initialize();
 
+	fadeSprite_ = std::make_unique<Fade>();
+	fadeSprite_->initialize();
+	GameOverCamera::fadeSprite_ = fadeSprite_.get();
+
 #ifdef _DEBUG
 	editor = eps::CreateUnique<TimelineEditor>();
 	editor->initialize(timeline.get(), camera3D_.get());
@@ -220,6 +227,7 @@ void GameScene::update() {
 	uiManager_->update();
 
 	gameOverCamera_->update();
+	fadeSprite_->update();
 }
 
 void GameScene::begin_rendering() {
@@ -233,6 +241,7 @@ void GameScene::begin_rendering() {
 
 	ground_->begin_rendering();
 	gameOverCamera_->begin_rendering();
+	fadeSprite_->begin_rendering();
 }
 
 void GameScene::late_update() {
@@ -271,6 +280,7 @@ void GameScene::draw() const {
 	uiManager_->draw();
 
 	gameOverCamera_->draw();
+	fadeSprite_->draw();
 	RenderPathManager::Next();
 }
 

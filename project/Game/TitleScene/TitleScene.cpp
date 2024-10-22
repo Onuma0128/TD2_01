@@ -54,6 +54,9 @@ void TitleScene::initialize() {
 	RenderPathManager::SetPath("GameScene" + std::to_string(reinterpret_cast<std::uint64_t>(this)));
 
 	GameState::getInstance().setCurrentWave(0);
+
+	fadeSprite_ = std::make_unique<Fade>();
+	fadeSprite_->initialize();
 }
 
 void TitleScene::poped() {
@@ -68,13 +71,18 @@ void TitleScene::begin() {
 
 void TitleScene::update() {
 	//camera3D_->update();
+	fadeSprite_->update();
+
 	if (Input::IsReleaseKey(KeyID::Space) || Input::IsReleasePad(PadID::A)) {
 		SceneManager::SetSceneChange(std::make_unique<GameScene>(), 1, false);
+		fadeSprite_->set_state(Fade::FadeState::FadeIN);
 	}
 }
 
 void TitleScene::begin_rendering() {
 	camera3D_->update_matrix();
+
+	fadeSprite_->begin_rendering();
 }
 
 void TitleScene::late_update() {
@@ -91,6 +99,8 @@ void TitleScene::draw() const {
 	DirectXCore::ShowGrid();
 
 	RenderPathManager::Next();
+
+	fadeSprite_->draw();
 	RenderPathManager::Next();
 }
 

@@ -6,6 +6,7 @@
 #include "Engine/Application/Scene/BaseScene.h"
 
 #include "Engine/Module/Camera/Camera3D.h"
+#include "Game/GameScene/GameUI/Fade/Fade.h"
 
 class TitleScene : public BaseScene
 {
@@ -36,5 +37,7 @@ private:
 
 	std::shared_ptr<Object3DNode> object3dNode_ = nullptr;
 	std::shared_ptr<SpriteNode> spriteNode_ = nullptr;
+
+	std::unique_ptr<Fade> fadeSprite_ = nullptr;
 };
 

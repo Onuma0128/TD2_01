@@ -55,6 +55,11 @@ void SpriteObject::set_translate(const Vector2& translate)
 	transform->set_translate(translate);
 }
 
+void SpriteObject::set_alpha(const float& alpha)
+{
+	color.alpha = alpha;
+}
+
 void SpriteObject::set_texture(const std::string& textureName)
 {
 	texture = TextureManager::GetTexture(textureName);

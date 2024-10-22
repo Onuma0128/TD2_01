@@ -120,6 +120,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Math\Easing.cpp" />
+    <ClCompile Include="Game\GameScene\GameUI\Fade\Fade.cpp" />
     <ClCompile Include="Game\GameScene\Timeline\GameState.cpp" />
     <ClCompile Include="Game\GameScene\BeatManager\BeatParticleSystem\BeatEmitter.cpp" />
     <ClCompile Include="Game\GameScene\BeatManager\BeatParticleSystem\BeatParticleMvements.cpp" />
@@ -229,6 +230,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Math\Easing.h" />
+    <ClInclude Include="Game\GameScene\GameUI\Fade\Fade.h" />
     <ClInclude Include="Game\GameScene\Timeline\GameState.h" />
     <ClInclude Include="Game\GameScene\BeatManager\BeatParticleSystem\BeatEmitter.h" />
     <ClInclude Include="Game\GameScene\BeatManager\BeatParticleSystem\BeatParticleMvements.h" />

@@ -20,6 +20,7 @@
 #include "Game/GameScene/EnemyManager/EnemyManager.h"
 #include "Game/GameScene/RenderNode/CircleGauge/CircleGaugeNode.h"
 #include "Game/GameScene/GameOverCamera/GameOverCamera.h"
+#include "Game/GameScene/GameUI/Fade/Fade.h"
 
 #ifdef _DEBUG
 #include "Game/GameScene/Timeline/TimelineEditor/TimelineEditor.h"
@@ -63,6 +64,7 @@ private:
 	std::unique_ptr<Player> player_ = nullptr;
 	std::unique_ptr<PlayerHPManager> playerHpManager_ = nullptr;
 	std::unique_ptr<UIManager> uiManager_ = nullptr;
+	std::unique_ptr<Fade> fadeSprite_ = nullptr;
 
 	std::shared_ptr<Object3DNode> object3dNode_ = nullptr;
 	std::shared_ptr<ParticleMeshNode> particleMeshNode;
