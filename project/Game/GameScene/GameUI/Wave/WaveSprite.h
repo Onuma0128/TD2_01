@@ -11,6 +11,7 @@
 
 class Timeline;
 class EnemyManager;
+class Fade;
 
 class WaveSprite : public SpriteObject
 {
@@ -73,10 +74,11 @@ private:
 	std::unique_ptr<NumberSprite> numberSprite_ = nullptr;
 	std::unique_ptr<SpriteObject> clearSprite_ = nullptr;
 	std::unique_ptr<SpriteObject> clearBackSprite_ = nullptr;
+	std::unique_ptr<SpriteObject> allclearSprite_ = nullptr;
 
 public:
     inline static Timeline* timeline_;
 	inline static EnemyManager* enemyManager_;
-
+	inline static Fade* fadeSprite_ = nullptr;
 
 };

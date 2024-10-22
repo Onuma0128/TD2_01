@@ -67,6 +67,7 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "7.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "8.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "9.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "10.png");
 	// HP用
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_0.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_1.png");
@@ -83,6 +84,7 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "fade.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "title.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "titleBack.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "allclear.png");
 }
 
 void GameScene::initialize() {
@@ -222,6 +224,7 @@ void GameScene::initialize() {
 	fadeSprite_ = std::make_unique<Fade>();
 	fadeSprite_->initialize();
 	GameOverCamera::fadeSprite_ = fadeSprite_.get();
+	WaveSprite::fadeSprite_ = fadeSprite_.get();
 
 #ifdef _DEBUG
 	editor = eps::CreateUnique<TimelineEditor>();

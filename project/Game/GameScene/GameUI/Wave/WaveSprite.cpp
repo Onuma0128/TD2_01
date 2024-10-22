@@ -4,11 +4,16 @@
 #include <format>
 
 #include <Engine/Application/WorldClock/WorldClock.h>
+#include <Engine/Application/Input/Input.h>
+#include <Engine/Application/Input/InputEnum.h>
+#include <Engine/Application/Scene/SceneManager.h>
 
 #include "Game/GameScene/Timeline/Timeline.h"
 #include "Game/GameScene/Enemy/BaseEnemy.h"
 #include "Game/GameScene/EnemyManager/EnemyManager.h"
 #include "Game/GameScene/Timeline/GameState.h"
+#include "Game/GameScene/GameUI/Fade/Fade.h"
+#include "Game/TitleScene/TitleScene.h"
 
 WaveSprite::WaveSprite(const std::string& textureName, const Vector2& pivot) noexcept(false)
 : SpriteObject(textureName, pivot) 
@@ -38,6 +43,9 @@ void WaveSprite::reset()
 	clearBackSprite_ = std::make_unique<SpriteObject>("clearback.png", Vector2{ 0.5f,0.5f });
 	clearBackSprite_->set_translate({ 2000.0f,360.0f });
 
+	allclearSprite_ = std::make_unique<SpriteObject>("allclear.png", Vector2{ 0.5f,0.5f });
+	allclearSprite_->set_translate({ 2000.0f,360.0f });
+
 	isClearSpriteMove_ = false;
 }
 
@@ -50,6 +58,9 @@ void WaveSprite::clear_animation_reset()
 	transform->set_scale(Vector2{ 1.5f,1.5f });
 	transform->set_translate(Vector2{ 1500.0f,360.0f });
 	returnPosition_ = transform->get_translate();
+	if (waveNumber_ > 10) {
+		returnPosition_ = { 2000,360 };
+	}
 
 	clearSprite_->set_translate({ -700.0f,360.0f });
 	clearBackSprite_->set_translate({ -700.0f,360.0f });
@@ -58,9 +69,11 @@ void WaveSprite::clear_animation_reset()
 
 void WaveSprite::update()
 {
+#ifdef _DEBUG
 	if (timeline_->GetIsActiveEditor() && !timeline_->GetisDemoPlay()) {
 		return;
 	}
+#endif // DEBUG
 
 	switch (state_)
 	{
@@ -89,15 +102,19 @@ void WaveSprite::begin_rendering() noexcept
 
 	clearBackSprite_->begin_rendering();
 	clearSprite_->begin_rendering();
+	allclearSprite_->begin_rendering();
 }
 
 void WaveSprite::draw() const
 {
+#ifdef _DEBUG
 	if (timeline_->GetIsActiveEditor() && !timeline_->GetisDemoPlay()) {
 		return;
 	}
+#endif // DEBUG
 	clearBackSprite_->draw();
 	clearSprite_->draw();
+	allclearSprite_->draw();
 	SpriteObject::draw();
 	numberSprite_->draw();
 }
@@ -179,23 +196,47 @@ void WaveSprite::Return()
 void WaveSprite::Reappear()
 {
 	clearWaveFrame_ += WorldClock::DeltaSeconds();
-	if (clearWaveFrame_ <= 1.0f) {
-		float duration = 1.0f;
-		float t = clearWaveFrame_ / duration;
-		t = std::clamp(t, 0.0f, 1.0f);
+	if (waveNumber_ <= 10) {
+		if (clearWaveFrame_ <= 1.0f) {
+			float duration = 1.0f;
+			float t = clearWaveFrame_ / duration;
+			t = std::clamp(t, 0.0f, 1.0f);
 
-		float easedT = easeOutBack(t);
-		transform->set_translate(Vector2::Lerp(returnPosition_, Vector2{ 600.0f, 360.0f }, easedT));
+			float easedT = easeOutBack(t);
+			transform->set_translate(Vector2::Lerp(returnPosition_, Vector2{ 600.0f, 360.0f }, easedT));
+		}
+		else if (clearWaveFrame_ >= 1.5f) {
+			float t = easeInBack(clearWaveFrame_ - 1.5f);
+			t = std::clamp(t, -1.0f, 1.0f);
+			transform->set_scale(Vector2::Lerp(Vector2{ 1.5f,1.5f }, Vector2{ 1.0f,1.0f }, t));
+			transform->set_translate(Vector2::Lerp(Vector2{ 600.0f, 360.0f }, Vector2{ 128.0f,64.0f }, t));
+			if (clearWaveFrame_ >= 2.5f) {
+				state_ = WaveState::Normal;
+				transform->set_scale(Vector2{ 1.0f,1.0f });
+				transform->set_translate(Vector2{ 128.0f,64.0f });
+			}
+		}
 	}
-	else if (clearWaveFrame_ >= 1.5f) {
-		float t = easeInBack(clearWaveFrame_ - 1.5f);
-		t = std::clamp(t, -1.0f, 1.0f);
-		transform->set_scale(Vector2::Lerp(Vector2{ 1.5f,1.5f }, Vector2{ 1.0f,1.0f }, t));
-		transform->set_translate(Vector2::Lerp(Vector2{ 600.0f, 360.0f }, Vector2{ 128.0f,64.0f }, t));
-		if (clearWaveFrame_ >= 2.5f) {
-			state_ = WaveState::Normal;
-			transform->set_scale(Vector2{ 1.0f,1.0f });
-			transform->set_translate(Vector2{ 128.0f,64.0f });
+	else {
+		if (clearWaveFrame_ >= 0.0f) {
+			// AllClearSpriteが画面に出てくる処理
+			if (clearWaveFrame_ > 0.0f && clearWaveFrame_ <= 2.0f) {
+				float t = (clearWaveFrame_ - 0.3f) / 1.0f;
+				t = std::clamp(t, 0.0f, 1.0f);
+
+				float easedT = easeOutBack(t);
+				allclearSprite_->set_translate(Vector2::Lerp(returnPosition_, { 640.0f,360.0f }, easedT));
+
+				t = easeOutQuint(clearWaveFrame_);
+				t = std::clamp(t, 0.0f, 1.0f);
+				clearBackSprite_->set_translate(Vector2::Lerp(returnPosition_, { 640.0f,360.0f }, t));
+			}
+			else {
+				if (Input::IsReleaseKey(KeyID::Space) || Input::IsReleasePad(PadID::A)) {
+					SceneManager::SetSceneChange(std::make_unique<TitleScene>(), 1, false);
+					fadeSprite_->set_state(Fade::FadeState::FadeIN);
+				}
+			}
 		}
 	}
 }
