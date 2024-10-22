@@ -10,6 +10,9 @@
 #include "Engine/Render/RenderNode/Object3DNode/Object3DNode.h"
 #include "Engine/Render/RenderNode/Sprite/SpriteNode.h"
 #include "Engine/Render/RenderNode/Particle/ParticleMeshNode/ParticleMeshNode.h"
+#include "Game/GameScene/RenderNode/PostEffects/Bloom/BloomNode.h"
+#include "Game/GameScene/RenderNode/PostEffects/GaussianBlur/GaussianBlurNode.h"
+#include "Game/GameScene/RenderNode/PostEffects/LuminanceExtraction/LuminanceExtractionNode.h"
 
 #include "Game/GameScene/Player/Player.h"
 #include "Game/GameScene/Player/PlayerHPManager.h"
@@ -70,6 +73,9 @@ private:
 	std::shared_ptr<ParticleMeshNode> particleMeshNode;
 	std::shared_ptr<CircleGaugeNode> circleGaugeNode = nullptr;
 	std::shared_ptr<SpriteNode> spriteNode_ = nullptr;
+	std::shared_ptr<LuminanceExtractionNode> luminanceExtractionNode = nullptr;
+	std::shared_ptr<GaussianBlurNode> gaussianBlurNode = nullptr;
+	std::shared_ptr<BloomNode> bloomNode = nullptr;
 
 #ifdef _DEBUG
 	std::unique_ptr<TimelineEditor> editor = nullptr;

@@ -114,7 +114,7 @@ void Timeline::Load(const std::filesystem::path& directoryPath) {
 		popData.forward = { popJson["Forward"].at(0),popJson["Forward"].at(1),popJson["Forward"].at(2) };
 	}
 
-	Console("[Timeline] Successed open wave data. \'{}\'", directoryPath.string());
+	Console("[Timeline] Successed open wave data. \'{}\'\n", directoryPath.string());
 }
 
 void Timeline::LoadAll() {
@@ -124,7 +124,7 @@ void Timeline::LoadAll() {
 
 	// 開けなかったらログを出す
 	if (ifstream.fail()) {
-		std::string message = std::format("[Timeline] Failed open Timeline file. \'{}\'", settingFile.string());
+		std::string message = std::format("[Timeline] Failed open Timeline file. \'{}\'\n", settingFile.string());
 		ConsoleA(message);
 		MessageBoxA(nullptr, message.c_str(), "Timeline", MB_OK | MB_ICONEXCLAMATION);
 		return;

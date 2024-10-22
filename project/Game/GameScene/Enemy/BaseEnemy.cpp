@@ -4,6 +4,7 @@
 #include <Engine/Utility/SmartPointer.h>
 #include "Engine/DirectX/DirectXCommand/DirectXCommand.h"
 #include <Engine/Math/Definition.h>
+#include <Engine/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h>
 
 #include "Game/GameScene/Player/PlayerBullet.h"
 #include "Game/GameScene/Player/PlayerHPManager.h"
@@ -140,6 +141,8 @@ void BaseEnemy::begin() {
 }
 
 void BaseEnemy::update() {
+	auto& materials = ghostMesh->get_materials();
+
 	// 行動の更新
 	behavior.update();
 
@@ -188,6 +191,9 @@ void BaseEnemy::update() {
 		else {
 			ghostMesh->reset_object("bigEnemy.obj");
 		}
+	}
+	for (auto& material : materials) {
+		material.lighingType = LighingType::None;
 	}
 }
 

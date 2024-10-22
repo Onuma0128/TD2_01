@@ -9,16 +9,16 @@ SingleRenderTarget::SingleRenderTarget() = default;
 SingleRenderTarget::~SingleRenderTarget() noexcept = default;
 
 void SingleRenderTarget::initialize() {
-	initialize(WinApp::GetClientWidth(), WinApp::GetClientHight());
+	initialize(WinApp::GetClientWidth(), WinApp::GetClientHight(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 }
 
 void SingleRenderTarget::finalize() {
 	renderTarget->release_index();
 }
 
-void SingleRenderTarget::initialize(std::uint32_t width, std::uint32_t hight) {
+void SingleRenderTarget::initialize(std::uint32_t width, std::uint32_t hight, DXGI_FORMAT format) {
 	renderTarget = std::make_unique<OffscreenRender>();
-	renderTarget->initialize(width, hight);
+	renderTarget->initialize(width, hight, format);
 	create_view_port(width, hight);
 }
 

@@ -10,6 +10,8 @@
 #include <Engine/Utility/SmartPointer.h>
 #include <Engine/Application/Input/Input.h>
 #include <Engine/Render/RenderTargetGroup/SwapChainRenderTargetGroup.h>
+#include <Engine/Render/RenderTargetGroup/SingleRenderTarget.h>
+#include <Engine/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
 
 #include "Game/GlobalValues/GlobalValues.h"
 #include "Game/TitleScene/TitleScene.h"
@@ -131,33 +133,52 @@ void GameScene::initialize() {
 	PlayerBullet::playerHpManager = playerHpManager_.get();
 	Player::playerHpManager_ = playerHpManager_.get();
 
-	GlobalValues::GetInstance().add_value<Vector3>("GameConfig", "BackgroundColor", { 0.015f, 0.015f, 0.015f });
-	Vector3 clearColor = GlobalValues::GetInstance().get_value<Vector3>("GameConfig", "BackgroundColor");
-
-	DirectXSwapChain::SetClearColor({ clearColor.x, clearColor.y, clearColor.z, 1.0f });
+	std::shared_ptr<SingleRenderTarget> renderTarget{ eps::CreateShared<SingleRenderTarget>() };
+	renderTarget->initialize();
 
 	object3dNode_ = std::make_unique<Object3DNode>();
 	object3dNode_->initialize();
 	object3dNode_->set_config(eps::to_bitflag(RenderNodeConfig::ContinueDrawBefore) | RenderNodeConfig::ContinueUseDpehtBefore);
-	object3dNode_->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	object3dNode_->set_render_target(renderTarget);
 
 	particleMeshNode = std::make_unique<ParticleMeshNode>();
 	particleMeshNode->initialize();
 	particleMeshNode->set_config(eps::to_bitflag(RenderNodeConfig::ContinueDrawBefore) | RenderNodeConfig::ContinueUseDpehtBefore | RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueUseDpehtAfter);
-	particleMeshNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	particleMeshNode->set_render_target(renderTarget);
 
 	circleGaugeNode = std::make_unique<CircleGaugeNode>();
 	circleGaugeNode->initialize();
 	circleGaugeNode->set_config(eps::to_bitflag(RenderNodeConfig::ContinueDrawBefore) | RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueUseDpehtAfter);
-	circleGaugeNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	circleGaugeNode->set_render_target(renderTarget);
 
 	spriteNode_ = std::make_unique<SpriteNode>();
 	spriteNode_->initialize();
-	spriteNode_->set_config(eps::to_bitflag(RenderNodeConfig::ContinueDrawAfter) | RenderNodeConfig::ContinueDrawBefore);
-	spriteNode_->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	spriteNode_->set_config(RenderNodeConfig::ContinueDrawAfter);
+	spriteNode_->set_render_target(renderTarget);
+
+	luminanceExtractionNode = eps::CreateShared<LuminanceExtractionNode>();
+	luminanceExtractionNode->initialize();
+	luminanceExtractionNode->set_render_target();
+	luminanceExtractionNode->set_texture_resource(spriteNode_->result_stv_handle());
+
+	gaussianBlurNode = eps::CreateShared<GaussianBlurNode>();
+	gaussianBlurNode->initialize();
+	gaussianBlurNode->set_render_target();
+	gaussianBlurNode->set_texture_resource(luminanceExtractionNode->result_stv_handle());
+
+	bloomNode = eps::CreateShared<BloomNode>();
+	bloomNode->initialize();
+	bloomNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	bloomNode->set_base_texture(spriteNode_->result_stv_handle());
+	bloomNode->set_blur_texture(gaussianBlurNode->result_stv_handle());
 
 	RenderPath path{};
-	path.initialize({ object3dNode_,particleMeshNode,circleGaugeNode,spriteNode_ });
+	path.initialize({ object3dNode_,particleMeshNode,circleGaugeNode,spriteNode_, luminanceExtractionNode, gaussianBlurNode, bloomNode });
+
+	// 背景色の設定
+	GlobalValues::GetInstance().add_value<Vector3>("GameConfig", "BackgroundColor", { 0.015f, 0.015f, 0.015f });
+	Vector3 clearColor = GlobalValues::GetInstance().get_value<Vector3>("GameConfig", "BackgroundColor");
+	renderTarget->offscreen_render().set_claer_color({ clearColor.x, clearColor.y, clearColor.z, 1.0f });
 
 	RenderPathManager::RegisterPath("GameScene" + std::to_string(reinterpret_cast<std::uint64_t>(this)), std::move(path));
 	RenderPathManager::SetPath("GameScene" + std::to_string(reinterpret_cast<std::uint64_t>(this)));
@@ -203,6 +224,11 @@ void GameScene::poped() {
 }
 
 void GameScene::finalize() {
+	object3dNode_->finalize();
+	particleMeshNode->finalize();
+	circleGaugeNode->finalize();
+	spriteNode_->finalize();
+	object3dNode_->finalize();
 }
 
 void GameScene::begin() {
@@ -282,7 +308,17 @@ void GameScene::draw() const {
 
 	gameOverCamera_->draw();
 	fadeSprite_->draw();
+
+	// PE開始
+	// Bloom
 	RenderPathManager::Next();
+	luminanceExtractionNode->draw();
+	RenderPathManager::Next();
+	gaussianBlurNode->draw();
+	RenderPathManager::Next();
+	bloomNode->draw();
+	RenderPathManager::Next();
+	// ここまでBloom
 }
 
 #ifdef _DEBUG
@@ -313,6 +349,20 @@ void GameScene::debug_update() {
 	editor->editor_gui();
 
 	enemyManager->debug_gui();
+
+	ImGui::Begin("PostEffetc");
+	if (ImGui::CollapsingHeader("Bloom")) {
+		if (ImGui::TreeNode("Luminiance")) {
+			luminanceExtractionNode->debug_gui();
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("GaussianBlur")) {
+			gaussianBlurNode->debug_gui();
+			ImGui::TreePop();
+		}
+		bloomNode->debug_gui();
+	}
+	ImGui::End();
 }
 #endif // _DEBUG
 
