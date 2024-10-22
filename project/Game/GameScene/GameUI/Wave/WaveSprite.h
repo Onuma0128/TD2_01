@@ -24,6 +24,10 @@ public:
 
 	WaveSprite(const std::string& textureName, const Vector2& pivot = Vector2{ 0.5f,0.5f }) noexcept(false);
 
+	void reset();
+
+	void clear_animation_reset();
+
 	void update();
 
 	void begin_rendering() noexcept;
