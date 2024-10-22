@@ -5,8 +5,7 @@
 #include "Engine/DirectX/PipelineState/PSOBuilder/PSOBuilder.h"
 
 #ifdef _DEBUG
-#include <imgui.h>
-#include "Engine/WinApp.h"
+#include "externals/imgui/imgui.h"
 #endif // _DEBUG
 
 ChromaticAberrationNode::ChromaticAberrationNode() = default;
@@ -16,12 +15,13 @@ ChromaticAberrationNode::~ChromaticAberrationNode() noexcept = default;
 void ChromaticAberrationNode::initialize() {
 	create_pipeline_state();
 	primitiveTopology = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	*aberrationLevel.get_data() = CVector2::ZERO;
+	aberrationInfo.get_data()->center = Vector2{ 0.5f, 0.5f };
+	aberrationInfo.get_data()->length = 0;
 }
 
 void ChromaticAberrationNode::draw() {
 	auto&& command = DirectXCommand::GetCommandList();
-	command->SetGraphicsRootConstantBufferView(0, aberrationLevel.get_resource()->GetGPUVirtualAddress());
+	command->SetGraphicsRootConstantBufferView(0, aberrationInfo.get_resource()->GetGPUVirtualAddress());
 	command->SetGraphicsRootDescriptorTable(1, textureGPUHandle);
 	command->DrawInstanced(3, 1, 0, 0);
 }
@@ -33,7 +33,7 @@ void ChromaticAberrationNode::set_texture_resource(const D3D12_GPU_DESCRIPTOR_HA
 void ChromaticAberrationNode::create_pipeline_state() {
 	RootSignatureBuilder rootSignatureBuilder;
 	rootSignatureBuilder.add_cbv(D3D12_SHADER_VISIBILITY_PIXEL, 0);
-	rootSignatureBuilder.add_texture(D3D12_SHADER_VISIBILITY_PIXEL, 0, 1);
+	rootSignatureBuilder.add_texture(D3D12_SHADER_VISIBILITY_PIXEL);
 	rootSignatureBuilder.sampler(
 		D3D12_SHADER_VISIBILITY_PIXEL,
 		0
@@ -55,12 +55,21 @@ void ChromaticAberrationNode::create_pipeline_state() {
 
 	pipelineState = std::make_unique<PipelineState>();
 	pipelineState->initialize(psoBuilder->get_rootsignature(), psoBuilder->build());
+}
 
+void ChromaticAberrationNode::set_length(float length) {
+	aberrationInfo.get_data()->length = length;
+}
+
+void ChromaticAberrationNode::set_center(const Vector2& center) {
+	aberrationInfo.get_data()->center = center;
 }
 
 #ifdef _DEBUG
 void ChromaticAberrationNode::debug_gui() {
-	ImGui::DragFloat("AberrationLevelX", &aberrationLevel.get_data()->x, 0.1f / WinApp::GetClientWidth(), -0.5f, 0.5f, "%.4f");
-	ImGui::DragFloat("AberrationLevelY", &aberrationLevel.get_data()->y, 0.1f / WinApp::GetClientHight(), -0.5f, 0.5f, "%.4f");
+	if (ImGui::CollapsingHeader("ChromaticAberrationNode", ImGuiTreeNodeFlags_DefaultOpen)) {
+		ImGui::DragFloat2("Center", &aberrationInfo.get_data()->center.x, 0.01f, -1.0f, 1.0f, "%.4f");
+		ImGui::DragFloat("Length", &aberrationInfo.get_data()->length, 0.001f, 0.0f, 2.0f, "%.4f");
+	}
 }
 #endif // _DEBUG

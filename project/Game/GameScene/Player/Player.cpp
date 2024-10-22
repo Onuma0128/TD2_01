@@ -12,6 +12,7 @@
 #include "Game/GameScene/Player/PlayerHPManager.h"
 #include "Game/GameScene/BeatManager/BeatManager.h"
 #include "Game/GameScene/GameUI/Wave/WaveSprite.h"
+#include "Game/GameScene/PostEffectManager/PostEffectManager.h"
 
 #ifdef _DEBUG
 #include "imgui.h"
@@ -227,6 +228,8 @@ void Player::Beating() {
 	if (beatingTimer >= beatAttackInterval) {
 		beatingTimer = std::fmod(beatingTimer, beatAttackInterval);
 		beatManager->beating();
+		postEffectManager->beat_cycle(beatAttackInterval);
+		postEffectManager->set_reaction(PostEffectState::BEATING);
 	}
 	bool killAll = beatManager->empty_pair();
 	// ボタンが離れたらor敵が全員倒れたらMoveに戻す
@@ -387,6 +390,7 @@ void Player::OnCollisionCallBack(const BaseCollider* const other) {
 				state_ = State::NockBack;
 				isInvincible_ = true;
 				invincibleFrame_ = 0.0f;
+				postEffectManager->set_reaction(PostEffectState::DAMANGE);
 				break;
 			}
 		}

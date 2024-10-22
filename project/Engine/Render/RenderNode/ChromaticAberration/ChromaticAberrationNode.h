@@ -35,6 +35,10 @@ private:
 	/// </summary>
 	void create_pipeline_state();
 
+public:
+	void set_length(float length);
+	void set_center(const Vector2& center);
+
 #ifdef _DEBUG
 public:
 	void debug_gui();
@@ -42,5 +46,11 @@ public:
 
 private:
 	D3D12_GPU_DESCRIPTOR_HANDLE textureGPUHandle{};
-	ConstantBuffer<Vector2> aberrationLevel{};
+
+	struct ChromaticAberrationInfo {
+		Vector2 center;
+		float length;
+	};
+
+	ConstantBuffer<ChromaticAberrationInfo> aberrationInfo{};
 };

@@ -4,6 +4,7 @@
 #include <Engine/Utility/SmartPointer.h>
 #include "Engine/DirectX/DirectXCommand/DirectXCommand.h"
 #include <Engine/Math/Definition.h>
+#include <Engine/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h>
 
 #include "Game/GameScene/Player/PlayerBullet.h"
 #include "Game/GameScene/Player/PlayerHPManager.h"
@@ -132,6 +133,10 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Typ
 	default:
 		break;
 	}
+
+	for (auto& material : materials) {
+		material.lighingType = LighingType::None;
+	}
 	hitpoint = maxHitpoint;
 }
 
@@ -140,6 +145,8 @@ void BaseEnemy::begin() {
 }
 
 void BaseEnemy::update() {
+	auto& materials = ghostMesh->get_materials();
+
 	// 行動の更新
 	behavior.update();
 
@@ -279,6 +286,10 @@ void BaseEnemy::enemy_resetObject()
 		else {
 			ghostMesh->reset_object("bigEnemy.obj");
 		}
+	}
+
+	for (auto& material : materials) {
+		material.lighingType = LighingType::None;
 	}
 }
 

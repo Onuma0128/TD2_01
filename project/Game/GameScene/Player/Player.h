@@ -15,6 +15,7 @@ class BeatManager;
 class PlayerHPManager;
 class CollisionManager;
 class WaveSprite;
+class PostEffectManager;
 
 class Player : public WorldInstance 
 {
@@ -70,6 +71,7 @@ public:
 	const std::vector<std::unique_ptr<PlayerBullet>>& get_bullets() const {
 		return bullets_;
 	}
+	void set_posteffect_manager(PostEffectManager* peManager) { postEffectManager = peManager; };
 
 private:
 	void OnCollisionCallBack(const BaseCollider* const other);
@@ -105,6 +107,8 @@ private:
 	bool lastBeat_ = false;
 
 	State state_;
+
+	PostEffectManager* postEffectManager;
 
 public:
 	inline static GlobalValues& globalValues = GlobalValues::GetInstance();

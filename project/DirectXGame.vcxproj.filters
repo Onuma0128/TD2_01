@@ -16,6 +16,11 @@
     <FxCompile Include="EngineResources\HLSL\Sprite\Sprite.VS.hlsl" />
     <FxCompile Include="EngineResources\HLSL\Wireframe\Wireframe3d.PS.hlsl" />
     <FxCompile Include="EngineResources\HLSL\Wireframe\Wireframe3d.VS.hlsl" />
+    <FxCompile Include="Resources\GameScene\HLSL\PostEffetct\LuminanceExtraction.PS.hlsl" />
+    <FxCompile Include="Resources\GameScene\HLSL\CircleGauge\CircleGauge3D.PS.hlsl" />
+    <FxCompile Include="Resources\GameScene\HLSL\CircleGauge\CircleGauge3D.VS.hlsl" />
+    <FxCompile Include="Resources\GameScene\HLSL\PostEffetct\Bloom.PS.hlsl" />
+    <FxCompile Include="Resources\GameScene\HLSL\PostEffetct\GaussianBlur.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Math\Easing.cpp" />
@@ -126,6 +131,10 @@
     <ClCompile Include="Game\GameScene\GameUI\Wave\WaveSprite.cpp" />
     <ClCompile Include="Game\GameScene\Timeline\GameState.cpp" />
     <ClCompile Include="Game\GameScene\GameUI\Fade\Fade.cpp" />
+    <ClCompile Include="Game\GameScene\RenderNode\PostEffects\Bloom\BloomNode.cpp" />
+    <ClCompile Include="Game\GameScene\RenderNode\PostEffects\GaussianBlur\GaussianBlurNode.cpp" />
+    <ClCompile Include="Game\GameScene\RenderNode\PostEffects\LuminanceExtraction\LuminanceExtractionNode.cpp" />
+    <ClCompile Include="Game\GameScene\PostEffectManager\PostEffectManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Math\Easing.h" />
@@ -248,14 +257,18 @@
     <ClInclude Include="Game\GameScene\GameUI\Wave\WaveSprite.h" />
     <ClInclude Include="Game\GameScene\Timeline\GameState.h" />
     <ClInclude Include="Game\GameScene\GameUI\Fade\Fade.h" />
+    <ClInclude Include="Game\GameScene\RenderNode\PostEffects\Bloom\BloomNode.h" />
+    <ClInclude Include="Game\GameScene\RenderNode\PostEffects\GaussianBlur\GaussianBlurNode.h" />
+    <ClInclude Include="Game\GameScene\RenderNode\PostEffects\LuminanceExtraction\LuminanceExtractionNode.h" />
+    <ClInclude Include="Game\GameScene\PostEffectManager\PostEffectManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="EngineResources\HLSL\3DObject\Object3d.hlsli" />
-    <None Include="EngineResources\HLSL\ChromaticAberration\ChromaticAberration.hlsli" />
     <None Include="EngineResources\HLSL\Grayscale\Grayscale.hlsli" />
     <None Include="EngineResources\HLSL\NormalColor\NormalColor.hlsli" />
     <None Include="EngineResources\HLSL\Particle\ParticleMesh\ParticleMesh.hlsli" />
     <None Include="EngineResources\HLSL\RadialBlur\RadialBlur.hlsli" />
     <None Include="EngineResources\HLSL\Sprite\Sprite.hlsli" />
+    <None Include="Resources\GameScene\HLSL\CircleGauge\CircleGauge3D.hlsli" />
   </ItemGroup>
 </Project>

@@ -6,7 +6,7 @@
 
 void CircleGaugeNode::initialize() {
 	create_pipeline_state();
-	pipelineState->set_name("Object3DNode");
+	pipelineState->set_name("CircleGaugeNode");
 	primitiveTopology = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	depthStencil = DirectXSwapChain::GetDepthStencil();
 }

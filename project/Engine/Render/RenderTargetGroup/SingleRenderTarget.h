@@ -3,6 +3,7 @@
 #include "Engine/Render/RenderTargetGroup/BaseRenderTargetGroup.h"
 
 class OffscreenRender;
+enum DXGI_FORMAT;
 
 class SingleRenderTarget : public BaseRenderTargetGroup {
 public:
@@ -25,7 +26,7 @@ public:
 	/// </summary>
 	/// <param name="width">幅</param>
 	/// <param name="hight">高さ</param>
-	void initialize(std::uint32_t width, std::uint32_t hight);
+	void initialize(std::uint32_t width, std::uint32_t hight, DXGI_FORMAT format);
 
 public:
 	/// <summary>

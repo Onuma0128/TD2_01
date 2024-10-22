@@ -121,6 +121,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClCompile Include="Engine\Math\Easing.cpp" />
     <ClCompile Include="Game\GameScene\GameUI\Fade\Fade.cpp" />
+    <ClCompile Include="Game\GameScene\PostEffectManager\PostEffectManager.cpp" />
+    <ClCompile Include="Game\GameScene\RenderNode\PostEffects\Bloom\BloomNode.cpp" />
+    <ClCompile Include="Game\GameScene\RenderNode\PostEffects\GaussianBlur\GaussianBlurNode.cpp" />
+    <ClCompile Include="Game\GameScene\RenderNode\PostEffects\LuminanceExtraction\LuminanceExtractionNode.cpp" />
     <ClCompile Include="Game\GameScene\Timeline\GameState.cpp" />
     <ClCompile Include="Game\GameScene\BeatManager\BeatParticleSystem\BeatEmitter.cpp" />
     <ClCompile Include="Game\GameScene\BeatManager\BeatParticleSystem\BeatParticleMvements.cpp" />
@@ -231,6 +235,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="Engine\Math\Easing.h" />
     <ClInclude Include="Game\GameScene\GameUI\Fade\Fade.h" />
+    <ClInclude Include="Game\GameScene\PostEffectManager\PostEffectManager.h" />
+    <ClInclude Include="Game\GameScene\RenderNode\PostEffects\Bloom\BloomNode.h" />
+    <ClInclude Include="Game\GameScene\RenderNode\PostEffects\GaussianBlur\GaussianBlurNode.h" />
+    <ClInclude Include="Game\GameScene\RenderNode\PostEffects\LuminanceExtraction\LuminanceExtractionNode.h" />
     <ClInclude Include="Game\GameScene\Timeline\GameState.h" />
     <ClInclude Include="Game\GameScene\BeatManager\BeatParticleSystem\BeatEmitter.h" />
     <ClInclude Include="Game\GameScene\BeatManager\BeatParticleSystem\BeatParticleMvements.h" />
@@ -411,6 +419,26 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="Resources\GameScene\HLSL\CircleGauge\CircleGauge3D.PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\GameScene\HLSL\CircleGauge\CircleGauge3D.VS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\GameScene\HLSL\PostEffetct\Bloom.PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\GameScene\HLSL\PostEffetct\GaussianBlur.PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\GameScene\HLSL\PostEffetct\LuminanceExtraction.PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
@@ -422,10 +450,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <None Include="EngineResources\HLSL\3DObject\Object3d.hlsli">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="EngineResources\HLSL\ChromaticAberration\ChromaticAberration.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
@@ -446,6 +470,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
     <None Include="EngineResources\HLSL\Sprite\Sprite.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Resources\GameScene\HLSL\CircleGauge\CircleGauge3D.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
