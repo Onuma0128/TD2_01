@@ -14,6 +14,7 @@
 #include "Game/GameScene/RenderNode/PostEffects/GaussianBlur/GaussianBlurNode.h"
 #include "Game/GameScene/RenderNode/PostEffects/LuminanceExtraction/LuminanceExtractionNode.h"
 #include "Engine/Render/RenderNode/ChromaticAberration/ChromaticAberrationNode.h"
+#include "Engine/Application/Audio/AudioPlayer.h"
 
 #include "Game/GameScene/Player/Player.h"
 #include "Game/GameScene/Player/PlayerHPManager.h"
@@ -73,6 +74,7 @@ private:
 	std::unique_ptr<PlayerHPManager> playerHpManager_ = nullptr;
 	std::unique_ptr<UIManager> uiManager_ = nullptr;
 	std::unique_ptr<Fade> fadeSprite_ = nullptr;
+	std::unique_ptr<AudioPlayer> gameBGM_ = nullptr;
 
 	std::shared_ptr<SingleRenderTarget> renderTarget;
 
