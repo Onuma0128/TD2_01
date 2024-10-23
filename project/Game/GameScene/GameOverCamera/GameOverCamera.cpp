@@ -22,6 +22,9 @@ void GameOverCamera::initialize()
 	gameOverSprite_->set_translate({ 1920,360 });
 
 	state_ = CameraState::Stop;
+
+	clickAudio_ = std::make_unique<AudioPlayer>();
+	clickAudio_->initialize("click.wav");
 }
 
 void GameOverCamera::update()
@@ -38,12 +41,16 @@ void GameOverCamera::update()
 		SpriteMove();
 		if (cameraFrame_ > 3.0f) {
 			if (Input::IsReleaseKey(KeyID::Space) || Input::IsReleasePad(PadID::A)) {
-				SceneManager::SetSceneChange(std::make_unique<GameScene>(), 1, false);
+				SceneManager::SetSceneChange(std::make_unique<GameScene>(), 2, false);
 				fadeSprite_->set_state(Fade::FadeState::FadeIN);
+				clickAudio_->restart();
+				clickAudio_->play();
 			}
 			if (Input::IsTriggerKey(KeyID::Escape)) {
-				SceneManager::SetSceneChange(std::make_unique<TitleScene>(), 1, false);
+				SceneManager::SetSceneChange(std::make_unique<TitleScene>(), 2, false);
 				fadeSprite_->set_state(Fade::FadeState::FadeIN);
+				clickAudio_->restart();
+				clickAudio_->play();
 			}
 		}
 		break;

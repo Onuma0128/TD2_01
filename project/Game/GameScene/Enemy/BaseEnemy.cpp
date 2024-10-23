@@ -346,6 +346,7 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 		if (behavior.state() == EnemyBehavior::Down) {
 			return;
 		}
+		damageAudio();
 		hitpoint -= globalValues.get_value<int>("Heart", "AttackDamage");
 		enemy_resetObject();
 		// マークされたのを記録

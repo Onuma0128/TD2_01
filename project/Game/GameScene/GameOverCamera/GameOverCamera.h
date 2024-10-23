@@ -5,6 +5,7 @@
 #include "Engine/Math/Vector3.h"
 #include "Engine/Module/Transform2D/Transform2D.h"
 #include "Engine/Module/GameObject/SpriteObject.h"
+#include "Engine/Application/Audio/AudioPlayer.h"
 
 #include "Game/GlobalValues/GlobalValues.h"
 
@@ -52,6 +53,8 @@ private:
 	bool isMoveCamera_ = false;
 
 	std::unique_ptr<SpriteObject> gameOverSprite_ = nullptr;
+
+	std::unique_ptr<AudioPlayer> clickAudio_ = nullptr;
 
 public:
 

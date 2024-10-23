@@ -87,10 +87,10 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "allclear.png");
 	// Audio
 	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "BGM.wav");
-	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "click.wav");
 	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "enemydamage.wav");
 	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "playerdamage.wav");
 	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "throw.wav");
+	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "click.wav");
 
 }
 
