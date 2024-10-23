@@ -8,6 +8,7 @@
 
 #include <Game/GlobalValues/GlobalValues.h>
 
+class GameObject;
 class BaseEnemy;
 class PlayerBullet;
 class BaseCollider;
@@ -29,11 +30,20 @@ private:
 		BeatParticleMvements* movements;
 	};
 
+	struct BeatEffect {
+		std::unique_ptr<GameObject> mesh;
+		float timer;
+		float baseUV = 0;
+		int useFrame;
+		int frameCount;
+	};
+
 public:
 	void initalize();
 	void update();
 	void begin_rendering();
 	void draw() const;
+	void draw_particle() const;
 
 public:
 	void set_next_enemy(BaseEnemy* enemy);
@@ -69,6 +79,8 @@ private:
 	std::unordered_map<PlayerBullet*, BaseEnemy*> heartBeatPair;
 
 	std::list<ParticleSystemModel> particleSystems;
+
+	std::list<BeatEffect> beatEffects;
 
 	std::unordered_map<const Particle*, std::shared_ptr<SphereCollider>> beatCollider;
 	std::unordered_map<const BaseCollider*, BeatColliderInvolved> involeder;

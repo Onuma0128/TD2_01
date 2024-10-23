@@ -584,7 +584,7 @@ void BaseEnemy::down_update() {
 	if (behaviorTimer <= 1.0f) {
 		down_animetion();
 	}
-	if (behaviorTimer >= 3.0f) {
+	if (behaviorTimer >= globalValues.get_value<float>("Enemy", "ToDeadDuration")) {
 		behavior.request(EnemyBehavior::Erase);
 	}
 }
