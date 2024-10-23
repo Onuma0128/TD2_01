@@ -25,7 +25,7 @@ void ReviveParticleMvements::move(Particle* const particle) {
 	velocity += accel * WorldClock::DeltaSeconds();
 	particle->get_transform().plus_translate(velocity * WorldClock::DeltaSeconds());
 	particle->get_transform().set_scale(
-		Vector3::Lerp(CVector3::BASIS * 2, Vector3{0,2,2}, Easing::In::Expo(parametric))
+		Vector3::Lerp(CVector3::BASIS * 2, Vector3{0,2,2}, Easing::In::Cubic(parametric))
 	);
 
 	if (timer >= lifeTime) {

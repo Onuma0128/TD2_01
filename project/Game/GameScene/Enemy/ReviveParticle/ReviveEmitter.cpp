@@ -31,7 +31,7 @@ void ReviveEmitter::on_emit(Particle* const particle) {
 	float theta = RandomEngine::RandomPIClosed();
 	Vector3 offset = {
 		distance * std::cos(theta),
-		RandomEngine::Random01Closed() + 0.5f ,
+		RandomEngine::Random01Closed() * 0.2f + 0.2f ,
 		distance * std::sin(theta)
 	};
 	particle->get_transform().set_translate(this->world_position() + offset);
