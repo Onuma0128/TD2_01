@@ -142,7 +142,7 @@ void WaveSprite::Normal()
 {
 	isAddWave_ = true;
 	for (auto& enemy : enemyManager_->get_enemies()) {
-		if (enemy.get_hp() > 0 || enemy.get_now_behavior() == EnemyBehavior::Revive) {
+		if (enemy.get_hp() > 0 || enemy.get_now_behavior() == EnemyBehavior::Revive || enemy.get_now_behavior() == EnemyBehavior::Beating) {
 			isAddWave_ = false;
 			break;
 		}

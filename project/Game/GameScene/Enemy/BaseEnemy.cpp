@@ -228,7 +228,7 @@ void BaseEnemy::normal_animation() {
 
 void BaseEnemy::attack_animation() {
 	// プレイヤー攻撃する
-	float t = easeInBack(behaviorTimer - 0.5f);
+	float t = easeInBack(behaviorTimer);
 	t = std::clamp(t, -1.0f, 3.0f);
 	float angle = 120 * ToRadian;
 	Quaternion rotationX = Quaternion::AngleAxis(CVector3::BASIS_X, angle);
@@ -519,14 +519,17 @@ void BaseEnemy::attack_initialize() {
 
 void BaseEnemy::attack_update() {
 	behaviorTimer += WorldClock::DeltaSeconds();
-	if (behaviorTimer >= 0.5f && behaviorTimer <= 3.0f) {
+	if (behaviorTimer >= 0.0f && behaviorTimer <= 2.5f) {
 		attack_animation();
 	}
-	if (behaviorTimer < 1.0f) {
+	if (behaviorTimer < 0.5f) {
 		meleeCollider->set_active(false);
 	}
 	else if (behaviorTimer < 1.5f) {
 		meleeCollider->set_active(true);
+	}
+	else if (behaviorTimer < 2.0f) {
+		meleeCollider->set_active(false);
 	}
 	else if (behaviorTimer > 3.0f) {
 		meleeCollider->set_active(false);
