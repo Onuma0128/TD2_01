@@ -17,7 +17,8 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Typ
 	globalValues.add_value<int>("Enemy", "HPStrong", 200);
 	globalValues.add_value<int>("Enemy", "BeatingDamage", 20);
 	globalValues.add_value<int>("Enemy", "BeatHitDamage", 5);
-	globalValues.add_value<int>("Enemy", "RevivedHitpoint", 30);
+	globalValues.add_value<int>("Enemy", "RevivedHitpointNormal", 30);
+	globalValues.add_value<int>("Enemy", "RevivedHitpointStrong", 70);
 
 	globalValues.add_value<float>("Enemy", "NockbackMag", 3.0f);
 	globalValues.add_value<float>("Enemy", "NockbackFriction", 0.8f);
@@ -611,7 +612,14 @@ void BaseEnemy::revive_initialize() {
 	hitCollider->set_active(false);
 	behaviorTimer = 0;
 	// HP強制回復
-	hitpoint = globalValues.get_value<int>("Enemy", "RevivedHitpoint");
+	switch (type) {
+	case BaseEnemy::Type::Normal:
+		hitpoint = globalValues.get_value<int>("Enemy", "RevivedHitpointNormal");
+		break;
+	case BaseEnemy::Type::Strong:
+		hitpoint = globalValues.get_value<int>("Enemy", "RevivedHitpointStrong");
+		break;
+	}
 	// 復活時の回転を取得
 	axisOfQuaternion = ghostMesh->get_transform().get_quaternion();
 }
