@@ -5,6 +5,7 @@
 #include <Engine/Module/Collision/Collider/SphereCollider.h>
 #include <Engine/Module/Behavior/Behavior.h>
 #include <Engine/DirectX/DirectXResourceObject/ConstantBuffer/ConstantBuffer.h>
+#include "Engine/Application/Audio/AudioPlayer.h"
 
 #include "Game/GlobalValues/GlobalValues.h"
 
@@ -23,6 +24,7 @@ enum class EnemyBehavior {
 class Player;
 class PlayerHPManager;
 class BeatManager;
+class EnemyManager;
 
 class BaseEnemy : public WorldInstance {
 public:
@@ -34,6 +36,9 @@ public:
 public: // Contsructor/Destructor
 
 public: // Member function
+	BaseEnemy();
+	~BaseEnemy();
+
 	void initialize(const Vector3& transform, const Vector3& forward, Type type_);
 	void begin();
 	void update();
@@ -47,6 +52,7 @@ public: // Member function
 	void down_animetion();
 	void revive_animation();
 	void enemy_resetObject();
+	void damageAudio();
 
 	float easeInBack(float t);
 	float CustomEase(float t);
@@ -101,6 +107,8 @@ private: // Member values
 	std::unique_ptr<GameObject> ghostMesh;
 	std::unique_ptr<GameObject> hitMarkerMesh;
 
+	bool isChangedModel = false;
+
 	Behavior<EnemyBehavior> behavior;
 
 	int markedCount;
@@ -108,7 +116,7 @@ private: // Member values
 	bool isAttakced;
 	float behaviorTimer;
 
-	float waveFrameCount;
+	float waveFrameCount = 0;
 	float initialY;
 	bool isBeatingAnima;
 	bool isBeatUI_ = false;
@@ -120,6 +128,10 @@ private: // Member values
 
 	ConstantBuffer<float> percentage;
 
+	// Audio
+	std::vector<std::unique_ptr<AudioPlayer>> damageAudios_;
+	int damageAudioCount = 0;
+
 public:
 	static void SetApproachSpeed(float speed) { approachSpeed = speed; };
 
@@ -128,6 +140,7 @@ public: // Static value
 	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
 	inline static BeatManager* beatManager = nullptr;
 	inline static PlayerHPManager* playerHpManager_ = nullptr;
+	inline static EnemyManager* enemyManager = nullptr;
 
 private:
 	inline static float approachSpeed = 0.0f;

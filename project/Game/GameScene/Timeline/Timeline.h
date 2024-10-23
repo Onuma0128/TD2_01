@@ -47,17 +47,18 @@ private:
 	void ResetNowWave();
 
 public:
+	bool is_all_enemy_poped() const;
 	bool IsEndWaveAll() { return nowWave == waveData.end(); };
 	void SetEnemyManager(EnemyManager* enemyManager_) { enemyManager = enemyManager_; };
-	void SetPlayer(Player* player_) { player = player_; };
-	bool GetIsActiveEditor()const { return isActiveEditor; }
-	bool GetisDemoPlay()const { return isDemoPlay; }
+	void SetPlayer(Player* player_) { player = player_; }
 
 	const std::vector<WaveData>& GetWaveData() { return waveData; }
 	std::vector<WaveData>::const_iterator GetNowWave() const { return nowWave; }
 
 #ifdef _DEBUG
 public:
+	bool GetIsActiveEditor()const { return isActiveEditor; }
+	bool GetisDemoPlay()const { return isDemoPlay; }
 	void debug_gui();
 
 private:

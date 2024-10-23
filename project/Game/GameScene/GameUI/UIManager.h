@@ -13,6 +13,7 @@
 
 class EnemyManager;
 class PlayerHPManager;
+class GameOverCamera;
 
 class UIManager
 {
@@ -28,6 +29,12 @@ public:
 
 	void input_update();
 
+	void input_action();
+
+	void gameOver();
+
+	void allGameClear();
+
 	WaveSprite* get_waveSprite()const { return waveSprite_.get(); }
 
 private:
@@ -42,10 +49,17 @@ private:
 	bool isBeatComment_ = false;
 	float beatCommentFrame_ = 0;
 	std::unique_ptr<SpriteObject> beatCommentSprite_ = nullptr;
+	std::unique_ptr<SpriteObject> retrySprite_ = nullptr;
+	std::unique_ptr<SpriteObject> titleSprite_ = nullptr;
+
+	float gameOverFrame_ = 1;
+	float gameClearFrame_ = 1;
+	float gameAllClearFrame_ = 1;
 
 public:
 
 	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
 	inline static EnemyManager* enemyManager_ = nullptr;
+	inline static GameOverCamera* gameOverCamera_ = nullptr;
 
 };

@@ -42,9 +42,9 @@ void GameObject::begin_rendering() noexcept {
 	// Transformに転送
 	transformMatrix->set_transformation_matrix_data(world_matrix());
 	// Materialに転送
-	for (int i = 0; i < meshMaterials.size(); ++i) {
-		meshMaterials[i].material->set_uv_transform(meshMaterials[i].uvTransform.get_matrix4x4_transform());
-		meshMaterials[i].material->get_data()->lighting = static_cast<int>(meshMaterials[i].lightingType);
+	for (auto& material : meshMaterials) {
+		material.material->set_uv_transform(material.uvTransform.get_matrix4x4_transform());
+		material.material->get_data()->lighting = static_cast<int>(material.lightingType);
 	}
 }
 

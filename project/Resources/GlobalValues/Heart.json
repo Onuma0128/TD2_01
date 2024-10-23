@@ -3,7 +3,7 @@
         "AttackDamage": 50,
         "AttackSpeed": 10.0,
         "CamebackSpeed": 8.0,
-        "CamebackTime": 1.0,
+        "CamebackTime": 1.5,
         "ColliderRadius": 1.0,
         "HeightOffset": 1.0,
         "StartOffset": 1.5,

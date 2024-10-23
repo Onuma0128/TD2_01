@@ -154,6 +154,10 @@ void Timeline::ResetNowWave() {
 	timer = 0;
 }
 
+bool Timeline::is_all_enemy_poped() const {
+	return nextPopData == nowWave->popData.end();
+}
+
 #ifdef _DEBUG
 
 #include <imgui.h>

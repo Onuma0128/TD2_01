@@ -14,6 +14,7 @@
 #include "Game/GameScene/RenderNode/PostEffects/GaussianBlur/GaussianBlurNode.h"
 #include "Game/GameScene/RenderNode/PostEffects/LuminanceExtraction/LuminanceExtractionNode.h"
 #include "Engine/Render/RenderNode/ChromaticAberration/ChromaticAberrationNode.h"
+#include "Engine/Application/Audio/AudioPlayer.h"
 
 #include "Game/GameScene/Player/Player.h"
 #include "Game/GameScene/Player/PlayerHPManager.h"
@@ -26,6 +27,7 @@
 #include "Game/GameScene/GameOverCamera/GameOverCamera.h"
 #include "Game/GameScene/GameUI/Fade/Fade.h"
 #include "Game/GameScene/PostEffectManager/PostEffectManager.h"
+#include "Game/GameScene/Speaker/Speaker.h"
 
 #ifdef _DEBUG
 #include "Game/GameScene/Timeline/TimelineEditor/TimelineEditor.h"
@@ -57,9 +59,6 @@ public:
 #endif 
 
 private:
-	void create_enemy();
-
-private:
 	std::unique_ptr<CollisionManager> collisionManager = nullptr;
 	std::unique_ptr<BeatManager> beatManager = nullptr;
 	std::unique_ptr<Timeline> timeline = nullptr;
@@ -73,6 +72,8 @@ private:
 	std::unique_ptr<PlayerHPManager> playerHpManager_ = nullptr;
 	std::unique_ptr<UIManager> uiManager_ = nullptr;
 	std::unique_ptr<Fade> fadeSprite_ = nullptr;
+	std::unique_ptr<AudioPlayer> gameBGM_ = nullptr;
+	std::unique_ptr<Speaker> speaker_ = nullptr;
 
 	std::shared_ptr<SingleRenderTarget> renderTarget;
 

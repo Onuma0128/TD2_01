@@ -5,10 +5,21 @@
 #include "Engine/DirectX/DirectXCommand/DirectXCommand.h"
 #include <Engine/Math/Definition.h>
 #include <Engine/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h>
+#include <Engine/Math/Easing.h>
 
 #include "Game/GameScene/Player/PlayerBullet.h"
 #include "Game/GameScene/Player/PlayerHPManager.h"
 #include "Game/GameScene/BeatManager/BeatManager.h"
+#include "Game/GameScene/EnemyManager/EnemyManager.h"
+
+BaseEnemy::BaseEnemy() = default;
+
+BaseEnemy::~BaseEnemy()
+{
+	for (const std::unique_ptr<AudioPlayer>& audio : damageAudios_) {
+		audio->finalize();
+	}
+}
 
 void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Type type_) {
 	globalValues.add_value<int>("Heart", "AttackDamage", 30);
@@ -17,7 +28,8 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Typ
 	globalValues.add_value<int>("Enemy", "HPStrong", 200);
 	globalValues.add_value<int>("Enemy", "BeatingDamage", 20);
 	globalValues.add_value<int>("Enemy", "BeatHitDamage", 5);
-	globalValues.add_value<int>("Enemy", "RevivedHitpoint", 30);
+	globalValues.add_value<int>("Enemy", "RevivedHitpointNormal", 30);
+	globalValues.add_value<int>("Enemy", "RevivedHitpointStrong", 70);
 
 	globalValues.add_value<float>("Enemy", "NockbackMag", 3.0f);
 	globalValues.add_value<float>("Enemy", "NockbackFriction", 0.8f);
@@ -139,6 +151,12 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Typ
 		material.lighingType = LighingType::None;
 	}
 	hitpoint = maxHitpoint;
+	for (int i = 0; i < 2; ++i) {
+		std::unique_ptr<AudioPlayer> audio = std::make_unique<AudioPlayer>();
+		audio->initialize("enemydamage.wav");
+		audio->set_volume(0.3f);
+		damageAudios_.push_back(std::move(audio));
+	}
 }
 
 void BaseEnemy::begin() {
@@ -164,8 +182,10 @@ void BaseEnemy::update() {
 	if (markingTimer >= markingTime) {
 		markingTimer = 0;
 		beatManager->recovery(this);
+		enemyManager->create_revive_effect(this);
 		// 回復
 		hitpoint += globalValues.get_value<int>("Enemy", "AbsorptionAmount") * markedCount;
+		enemy_resetObject();
 		// 上限を超えないようにする
 		hitpoint = std::min(maxHitpoint, hitpoint);
 		markedCount = 0;
@@ -212,7 +232,7 @@ void BaseEnemy::normal_animation() {
 
 void BaseEnemy::attack_animation() {
 	// プレイヤー攻撃する
-	float t = easeInBack(behaviorTimer - 0.5f);
+	float t = easeInBack(behaviorTimer);
 	t = std::clamp(t, -1.0f, 3.0f);
 	float angle = 120 * ToRadian;
 	Quaternion rotationX = Quaternion::AngleAxis(CVector3::BASIS_X, angle);
@@ -270,26 +290,38 @@ void BaseEnemy::revive_animation() {
 void BaseEnemy::enemy_resetObject()
 {
 	// HPが50以下ならモデルを差し替え
-	if (hitpoint <= 50) {
+	if (hitpoint <= maxHitpoint / 2 && !isChangedModel) {
 		if (type == Type::Normal) {
 			ghostMesh->reset_object("enemyDamage.obj");
 		}
 		else {
 			ghostMesh->reset_object("bigEnemyDamage.obj");
 		}
+		isChangedModel = true;
 	}
-	else {
+	else if(hitpoint > maxHitpoint / 2 && isChangedModel){
 		if (type == Type::Normal) {
 			ghostMesh->reset_object("enemy.obj");
 		}
 		else {
 			ghostMesh->reset_object("bigEnemy.obj");
 		}
+		isChangedModel = false;
 	}
 
 	auto& materials = ghostMesh->get_materials();
 	for (auto& material : materials) {
 		material.lighingType = LighingType::None;
+	}
+}
+
+void BaseEnemy::damageAudio()
+{
+	damageAudios_[damageAudioCount]->restart();
+	damageAudios_[damageAudioCount]->play();
+	++damageAudioCount;
+	if (damageAudios_.size() == damageAudioCount) {
+		damageAudioCount = 0;
 	}
 }
 
@@ -331,6 +363,7 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 		if (behavior.state() == EnemyBehavior::Down) {
 			return;
 		}
+		damageAudio();
 		hitpoint -= globalValues.get_value<int>("Heart", "AttackDamage");
 		enemy_resetObject();
 		// マークされたのを記録
@@ -438,12 +471,19 @@ std::weak_ptr<SphereCollider> BaseEnemy::get_melee_collider() {
 // ---------- スポーン処理 ----------
 void BaseEnemy::spawn_initialize() {
 	behaviorTimer = 0;
+	ghostMesh->get_transform().set_scale({ 0,0,0 });
 }
 
 void BaseEnemy::spawn_update() {
 	behaviorTimer += WorldClock::DeltaSeconds();
+	if (behaviorTimer < 1.0f) {
+		float t = Easing::Out::Back(behaviorTimer);
+		t = std::clamp(t, 0.0f, 1.5f);
+		ghostMesh->get_transform().set_scale({ t,t,t });
+	}
 	if (behaviorTimer >= 3) {
 		behavior.request(EnemyBehavior::Approach);
+		ghostMesh->get_transform().set_scale({ 1,1,1 });
 	}
 }
 
@@ -471,7 +511,11 @@ void BaseEnemy::approach_update() {
 	velocity = distance.normalize_safe() * approachSpeed;
 	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
 	// player方向を向く
-	look_at(*targetPlayer);
+	const Quaternion& internal = transform.get_quaternion();
+	const Quaternion terminal = Quaternion::LookForward(distance.normalize_safe());
+	transform.set_quaternion(
+		Quaternion::Slerp(internal, terminal, 0.5f)
+	);
 	axisOfQuaternion = ghostMesh->get_transform().get_quaternion();
 }
 
@@ -485,14 +529,17 @@ void BaseEnemy::attack_initialize() {
 
 void BaseEnemy::attack_update() {
 	behaviorTimer += WorldClock::DeltaSeconds();
-	if (behaviorTimer >= 0.5f && behaviorTimer <= 3.0f) {
+	if (behaviorTimer >= 0.0f && behaviorTimer <= 2.5f) {
 		attack_animation();
 	}
-	if (behaviorTimer < 1.0f) {
+	if (behaviorTimer < 0.5f) {
 		meleeCollider->set_active(false);
 	}
 	else if (behaviorTimer < 1.5f) {
 		meleeCollider->set_active(true);
+	}
+	else if (behaviorTimer < 2.0f) {
+		meleeCollider->set_active(false);
 	}
 	else if (behaviorTimer > 3.0f) {
 		meleeCollider->set_active(false);
@@ -584,7 +631,7 @@ void BaseEnemy::down_update() {
 	if (behaviorTimer <= 1.0f) {
 		down_animetion();
 	}
-	if (behaviorTimer >= 3.0f) {
+	if (behaviorTimer >= globalValues.get_value<float>("Enemy", "ToDeadDuration")) {
 		behavior.request(EnemyBehavior::Erase);
 	}
 }
@@ -594,9 +641,19 @@ void BaseEnemy::revive_initialize() {
 	hitCollider->set_active(false);
 	behaviorTimer = 0;
 	// HP強制回復
-	hitpoint = globalValues.get_value<int>("Enemy", "RevivedHitpoint");
+	switch (type) {
+	case BaseEnemy::Type::Normal:
+		hitpoint = globalValues.get_value<int>("Enemy", "RevivedHitpointNormal");
+		break;
+	case BaseEnemy::Type::Strong:
+		hitpoint = globalValues.get_value<int>("Enemy", "RevivedHitpointStrong");
+		break;
+	}
 	// 復活時の回転を取得
 	axisOfQuaternion = ghostMesh->get_transform().get_quaternion();
+	if (enemyManager) {
+		enemyManager->create_revive_effect(this);
+	}
 }
 
 void BaseEnemy::revive_update() {

@@ -1,17 +1,19 @@
 #include "GameScene.h"
 
 #include <Engine/DirectX/DirectXSwapChain/DirectXSwapChain.h>
-#include <Engine/Application/Scene/SceneManager.h>
 #include <Engine/Render/RenderPath/RenderPath.h>
-#include <Engine/Render/RenderPathManager/RenderPathManager.h>
 #include <Engine/DirectX/DirectXCore.h>
-#include <Engine/Module/PolygonMesh/PolygonMeshManager.h>
-#include <Engine/Module/TextureManager/TextureManager.h>
 #include <Engine/Utility/SmartPointer.h>
 #include <Engine/Application/Input/Input.h>
 #include <Engine/Render/RenderTargetGroup/SwapChainRenderTargetGroup.h>
 #include <Engine/Render/RenderTargetGroup/SingleRenderTarget.h>
 #include <Engine/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
+
+#include <Engine/Application/Scene/SceneManager.h>
+#include <Engine/Render/RenderPathManager/RenderPathManager.h>
+#include <Engine/Module/PolygonMesh/PolygonMeshManager.h>
+#include <Engine/Module/TextureManager/TextureManager.h>
+#include "Engine/Application/Audio/AudioManager.h"
 
 #include "Game/GlobalValues/GlobalValues.h"
 #include "Game/TitleScene/TitleScene.h"
@@ -27,7 +29,9 @@
 
 GameScene::GameScene() = default;
 
-GameScene::~GameScene() = default;
+GameScene::~GameScene() {
+	gameBGM_->finalize();
+}
 
 void GameScene::load() {
 	std::string ResourceDirectory = "./Resources/GameScene/";
@@ -42,6 +46,9 @@ void GameScene::load() {
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/playerSweat", "playerSweat.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/ground", "ground.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/Particle", "beat-particle.obj");
+	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/Effects/Beat", "beating.obj");
+	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/Effects/EnemyRevive", "EnemyRevive.obj");
+	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/speaker", "speaker.obj");
 
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "wave.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "hp.png");
@@ -56,6 +63,9 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "clear.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "clearback.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "beatComment.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "gameover_comment.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "cleartext_title.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "cleartext_retry.png");
 	// Wave用
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "0.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "1.png");
@@ -67,6 +77,7 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "7.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "8.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "9.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "10.png");
 	// HP用
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_0.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_1.png");
@@ -81,8 +92,15 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_10.png");
 	// GameSprite
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "fade.png");
-	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "title.png");
-	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "titleBack.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "allclear.png");
+	// Audio
+	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "BGM.wav");
+	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "enemydamage.wav");
+	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "playerdamage.wav");
+	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "throw.wav");
+	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "click.wav");
+	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "clear.wav");
+	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "allclear.wav");
 }
 
 void GameScene::initialize() {
@@ -106,6 +124,7 @@ void GameScene::initialize() {
 
 	enemyManager = eps::CreateUnique<EnemyManager>();
 	enemyManager->set_collision_manager(collisionManager.get());
+	enemyManager->initialize();
 
 	beatManager = eps::CreateUnique<BeatManager>();
 	beatManager->initalize();
@@ -204,9 +223,6 @@ void GameScene::initialize() {
 
 	collisionManager->register_collider("Player", player_->get_hit_collider());
 
-	create_enemy();
-	create_enemy();
-
 	BaseEnemy::targetPlayer = player_.get();
 
 	timeline->Start();
@@ -218,10 +234,23 @@ void GameScene::initialize() {
 	gameOverCamera_->camera3d_ = camera3D_.get();
 	gameOverCamera_->player_ = player_.get();
 	gameOverCamera_->initialize();
+	UIManager::gameOverCamera_ = gameOverCamera_.get();
 
 	fadeSprite_ = std::make_unique<Fade>();
 	fadeSprite_->initialize();
 	GameOverCamera::fadeSprite_ = fadeSprite_.get();
+	WaveSprite::fadeSprite_ = fadeSprite_.get();
+
+	// Audio
+	gameBGM_ = std::make_unique<AudioPlayer>();
+	gameBGM_->initialize("BGM.wav");
+	gameBGM_->set_loop(true);
+	gameBGM_->set_volume(0.3f);
+	gameBGM_->play();
+
+	speaker_ = std::make_unique<Speaker>();
+	speaker_->initialize();
+
 
 #ifdef _DEBUG
 	editor = eps::CreateUnique<TimelineEditor>();
@@ -245,6 +274,7 @@ void GameScene::finalize() {
 	gaussianBlurNode->finalize();
 	bloomNode->finalize();
 	chromaticAberrationNode->finalize();
+	gameBGM_->finalize();
 	RenderPathManager::UnregisterPath("GameScene" + std::to_string(reinterpret_cast<std::uint64_t>(this)));
 }
 
@@ -265,6 +295,7 @@ void GameScene::update() {
 
 	player_->update();
 	enemyManager->update();
+	speaker_->update();
 
 	beatManager->update();
 
@@ -281,6 +312,7 @@ void GameScene::begin_rendering() {
 	enemyManager->begin_rendering();
 	beatManager->begin_rendering();
 	uiManager_->begin_rendering();
+	speaker_->begin_rendering();
 
 	collisionManager->update();
 
@@ -306,15 +338,18 @@ void GameScene::draw() const {
 	camera3D_->debug_draw();
 	collisionManager->debug_draw3d();
 	editor->draw_preview();
+	//DirectXCore::ShowGrid();
 #endif // _DEBUG
 
-	//DirectXCore::ShowGrid();
 	ground_->draw();
+	speaker_->draw();
+	beatManager->draw();
 
 	RenderPathManager::Next();
 	// 3Dパーティクル
 	camera3D_->set_command(1);
-	beatManager->draw();
+	beatManager->draw_particle();
+	enemyManager->draw_particle();
 
 	RenderPathManager::Next();
 	// マーカー
@@ -361,6 +396,8 @@ void GameScene::debug_update() {
 
 	player_->debug_gui();
 
+	speaker_->debug_gui();
+
 	timeline->debug_gui();
 
 	ImGui::Begin("HP");
@@ -387,11 +424,3 @@ void GameScene::debug_update() {
 	ImGui::End();
 }
 #endif // _DEBUG
-
-void GameScene::create_enemy() {
-	//auto& newEnemy = enemies.emplace_back();
-	//newEnemy.initialize();
-	//collisionManager->register_collider("EnemyHit", newEnemy.get_hit_collider());
-	//collisionManager->register_collider("Beat", newEnemy.get_beat_collider());
-	//collisionManager->register_collider("EnemyMelee", newEnemy.get_melee_collider());
-}

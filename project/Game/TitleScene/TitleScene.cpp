@@ -8,6 +8,7 @@
 #include <Engine/Module/PolygonMesh/PolygonMeshManager.h>
 #include <Engine/Utility/SmartPointer.h>
 #include <Engine/Application/Input/Input.h>
+#include <Engine/Module/TextureManager/TextureManager.h>
 
 #include "Game/GlobalValues/GlobalValues.h"
 #include "Game/GameScene/GameScene.h"
@@ -19,9 +20,16 @@
 
 TitleScene::TitleScene() = default;
 
-TitleScene::~TitleScene() = default;
+TitleScene::~TitleScene() {
+	clickAudio_->finalize();
+}
 
 void TitleScene::load() {
+	std::string ResourceDirectory = "./Resources/GameScene/";
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "fade.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "title.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "titleBack.png");
+	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "click.wav");
 }
 
 void TitleScene::initialize() {
@@ -35,6 +43,8 @@ void TitleScene::initialize() {
 		Quaternion::EulerDegree(49,0,0),
 		{0,23,-21}
 		});
+
+	Camera2D::Initialize();
 
 	/*==================== シーン ====================*/
 
@@ -62,6 +72,10 @@ void TitleScene::initialize() {
 	titleBackSprite_ = std::make_unique<SpriteObject>("titleBack.png", Vector2{ 0.5f,0.5f });
 	titleSprite_->set_translate({ 640,360 });
 	titleBackSprite_->set_translate({ 640,360 });
+
+	clickAudio_ = std::make_unique<AudioPlayer>();
+	clickAudio_->initialize("click.wav");
+	clickAudio_->set_volume(0.2f);
 }
 
 void TitleScene::poped() {
@@ -78,9 +92,12 @@ void TitleScene::update() {
 	//camera3D_->update();
 	fadeSprite_->update();
 
-	if (Input::IsReleaseKey(KeyID::Space) || Input::IsReleasePad(PadID::A)) {
-		SceneManager::SetSceneChange(std::make_unique<GameScene>(), 1, false);
+	if ((Input::IsReleaseKey(KeyID::Space) || Input::IsReleasePad(PadID::A)) && !isGameScene_) {
+		SceneManager::SetSceneChange(std::make_unique<GameScene>(), 1.5f, false);
 		fadeSprite_->set_state(Fade::FadeState::FadeIN);
+		clickAudio_->restart();
+		clickAudio_->play();
+		isGameScene_ = true;
 	}
 }
 
