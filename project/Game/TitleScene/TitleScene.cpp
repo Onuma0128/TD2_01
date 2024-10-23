@@ -91,7 +91,7 @@ void TitleScene::update() {
 	//camera3D_->update();
 	fadeSprite_->update();
 
-	if (Input::IsReleaseKey(KeyID::Space) || Input::IsReleasePad(PadID::A) && !isGameScene_) {
+	if ((Input::IsReleaseKey(KeyID::Space) || Input::IsReleasePad(PadID::A)) && !isGameScene_) {
 		SceneManager::SetSceneChange(std::make_unique<GameScene>(), 1, false);
 		fadeSprite_->set_state(Fade::FadeState::FadeIN);
 		clickAudio_->restart();
