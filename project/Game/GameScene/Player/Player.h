@@ -30,6 +30,9 @@ public:
 	};
 
 public:
+	Player();
+	~Player();
+
 	void initialize();
 
 	void begin();

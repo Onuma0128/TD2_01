@@ -25,6 +25,7 @@ public:
 	};
 
 	WaveSprite(const std::string& textureName, const Vector2& pivot = Vector2{ 0.5f,0.5f }) noexcept(false);
+	~WaveSprite();
 
 	void reset();
 

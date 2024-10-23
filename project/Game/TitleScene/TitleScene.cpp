@@ -20,7 +20,9 @@
 
 TitleScene::TitleScene() = default;
 
-TitleScene::~TitleScene() = default;
+TitleScene::~TitleScene() {
+	clickAudio_->finalize();
+}
 
 void TitleScene::load() {
 	std::string ResourceDirectory = "./Resources/GameScene/";

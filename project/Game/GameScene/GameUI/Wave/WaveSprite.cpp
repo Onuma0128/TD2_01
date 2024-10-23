@@ -21,6 +21,12 @@ WaveSprite::WaveSprite(const std::string& textureName, const Vector2& pivot) noe
 	reset();
 }
 
+WaveSprite::~WaveSprite()
+{
+	clearAudio_->finalize();
+	allClearAudio_->finalize();
+}
+
 void WaveSprite::reset()
 {
 	state_ = WaveState::Reappear;
@@ -69,7 +75,9 @@ void WaveSprite::clear_animation_reset()
 	}
 
 	clearSprite_->set_translate({ -700.0f,360.0f });
-	clearBackSprite_->set_translate({ -700.0f,360.0f });
+	if (waveNumber_ <= 10) {
+		clearBackSprite_->set_translate({ -700.0f,360.0f });
+	}
 	isClearSpriteMove_ = false;
 }
 
@@ -193,9 +201,11 @@ void WaveSprite::Return()
 			clearSprite_->set_translate(Vector2::Lerp({ 640.0f,360.0f }, { -700.0f,360.0f }, t));
 			transform->set_translate({ clearSprite_->get_transform().get_translate().x - 240.0f,100.0f });
 
-			t = easeInExpo(clearWaveFrame_ - 3.8f);
-			t = std::clamp(t, 0.0f, 1.0f);
-			clearBackSprite_->set_translate(Vector2::Lerp({ 640.0f,360.0f }, { -700.0f,360.0f }, t));
+			if (waveNumber_ < 10) {
+				t = easeInExpo(clearWaveFrame_ - 3.8f);
+				t = std::clamp(t, 0.0f, 1.0f);
+				clearBackSprite_->set_translate(Vector2::Lerp({ 640.0f,360.0f }, { -700.0f,360.0f }, t));
+			}
 		}
 		// 全部のSpriteが画面から出たらStateを更新
 		else {
@@ -242,9 +252,6 @@ void WaveSprite::Reappear()
 				float easedT = easeOutBack(t);
 				allclearSprite_->set_translate(Vector2::Lerp(returnPosition_, { 640.0f,360.0f }, easedT));
 
-				t = easeOutQuint(clearWaveFrame_);
-				t = std::clamp(t, 0.0f, 1.0f);
-				clearBackSprite_->set_translate(Vector2::Lerp(returnPosition_, { 640.0f,360.0f }, t));
 			}
 			else {
 				if (Input::IsReleaseKey(KeyID::Space) || Input::IsReleasePad(PadID::A)) {

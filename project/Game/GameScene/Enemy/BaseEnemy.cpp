@@ -10,6 +10,15 @@
 #include "Game/GameScene/Player/PlayerHPManager.h"
 #include "Game/GameScene/BeatManager/BeatManager.h"
 
+BaseEnemy::BaseEnemy() = default;
+
+BaseEnemy::~BaseEnemy()
+{
+	for (const std::unique_ptr<AudioPlayer>& audio : damageAudios_) {
+		audio->finalize();
+	}
+}
+
 void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Type type_) {
 	globalValues.add_value<int>("Heart", "AttackDamage", 30);
 
