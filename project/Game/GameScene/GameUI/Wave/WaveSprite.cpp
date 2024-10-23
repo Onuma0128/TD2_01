@@ -163,13 +163,14 @@ void WaveSprite::Return()
 			float t = easeInBack(clearWaveFrame_);
 			t = std::clamp(t, -1.0f, 1.0f);
 			transform->set_translate(Vector2::Lerp(returnPosition_, Vector2{ returnPosition_.x - 360,returnPosition_.y }, t));
-		}
-		if (clearWaveFrame_ >= 1.0f) {
-			isClearSpriteMove_ = true;
-			returnPosition_ = { 2000.0f,360.0f };
+			if (clearWaveFrame_ >= 1.0f) {
+				isClearSpriteMove_ = true;
+				returnPosition_ = { 2000.0f,360.0f };
+			}
 		}
 		// ClearSpriteが画面に出てくる処理
-		if (clearWaveFrame_ > 1.0f && clearWaveFrame_ <= 2.5f) {
+		else if (clearWaveFrame_ <= 3.5f) {
+			// 1.0f, 2.5f
 			float t = (clearWaveFrame_ - 1.3f) / 1.0f;
 			t = std::clamp(t, 0.0f, 1.0f);
 			if (t == 0.0f) {
@@ -186,18 +187,18 @@ void WaveSprite::Return()
 			clearBackSprite_->set_translate(Vector2::Lerp(returnPosition_, { 640.0f,360.0f }, t));
 		}
 		// ClearSpriteが画面からフェードアウトする処理
-		else if(clearWaveFrame_ > 2.5f && clearWaveFrame_ <= 3.8f) {
-			float t = easeInBack(clearWaveFrame_ - 2.5f);
+		else if(clearWaveFrame_ <= 4.8f) {
+			float t = easeInBack(clearWaveFrame_ - 3.5f);
 			t = std::clamp(t, -1.0f, 1.0f);
 			clearSprite_->set_translate(Vector2::Lerp({ 640.0f,360.0f }, { -700.0f,360.0f }, t));
 			transform->set_translate({ clearSprite_->get_transform().get_translate().x - 240.0f,100.0f });
 
-			t = easeInExpo(clearWaveFrame_ - 2.8f);
+			t = easeInExpo(clearWaveFrame_ - 3.8f);
 			t = std::clamp(t, 0.0f, 1.0f);
 			clearBackSprite_->set_translate(Vector2::Lerp({ 640.0f,360.0f }, { -700.0f,360.0f }, t));
 		}
 		// 全部のSpriteが画面から出たらStateを更新
-		if (clearWaveFrame_ >= 3.8f) {
+		else {
 			clear_animation_reset();
 		}
 	}
