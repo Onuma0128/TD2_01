@@ -48,13 +48,13 @@ void GameOverCamera::update()
 		break;
 	case GameOverCamera::CameraState::Stop:
 		Stop();
-		if (Input::IsReleaseKey(KeyID::Escape) && !isEsc_ && WaveSprite::WaveState::Normal == waveSprite_->get_state()) {
+		/*if (Input::IsReleaseKey(KeyID::Escape) && !isEsc_ && WaveSprite::WaveState::Normal == waveSprite_->get_state()) {
 			SceneManager::SetSceneChange(std::make_unique<TitleScene>(), 1, false);
 			fadeSprite_->set_state(Fade::FadeState::FadeIN);
 			clickAudio_->restart();
 			clickAudio_->play();
 			isEsc_ = true;
-		}
+		}*/
 		break;
 	case GameOverCamera::CameraState::GameOverSprite:
 		SpriteMove();
@@ -66,7 +66,7 @@ void GameOverCamera::update()
 				clickAudio_->play();
 				cameraFrame_ = 0;
 			}
-			if (Input::IsTriggerKey(KeyID::Escape)) {
+			if (cameraFrame_ > 8.0f) {
 				SceneManager::SetSceneChange(std::make_unique<TitleScene>(), 1, false);
 				fadeSprite_->set_state(Fade::FadeState::FadeIN);
 				clickAudio_->restart();

@@ -277,7 +277,7 @@ void WaveSprite::Reappear()
 						clickAudio_->play();
 						isSceneChenge_ = true;
 					}
-					if (Input::IsReleaseKey(KeyID::Escape)) {
+					if (clearWaveFrame_ > 7.0f) {
 						SceneManager::SetSceneChange(std::make_unique<TitleScene>(), 1, false);
 						fadeSprite_->set_state(Fade::FadeState::FadeIN);
 						clickAudio_->restart();
