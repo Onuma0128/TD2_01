@@ -92,7 +92,8 @@ void GameScene::load() {
 	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "playerdamage.wav");
 	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "throw.wav");
 	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "click.wav");
-
+	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "clear.wav");
+	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "allclear.wav");
 }
 
 void GameScene::initialize() {
