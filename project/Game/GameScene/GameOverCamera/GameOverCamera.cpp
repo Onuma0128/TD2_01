@@ -28,7 +28,7 @@ void GameOverCamera::initialize()
 	gameOverSprite_ = std::make_unique<SpriteObject>("gameOver.png", Vector2{ 0.5f,0.5f });
 	gameOverSprite_->set_translate({ 1920,300 });
 	gameOverCommentSprite_ = std::make_unique<SpriteObject>("gameover_comment.png", Vector2{ 0.5f,0.5f });
-	gameOverCommentSprite_->set_translate({ 1920,200 });
+	gameOverCommentSprite_->set_translate({ 1920,160 });
 
 	state_ = CameraState::Stop;
 
@@ -116,7 +116,7 @@ void GameOverCamera::SpriteMove()
 	float t = easeOutQuint(cameraFrame_ - 1.0f);
 	t = std::clamp(t, 0.0f, 1.0f);
 	if (cameraFrame_ >= 1.0f && !isMoveCamera_) {
-		gameOverCommentSprite_->set_translate(Vector2::Lerp(oldSpritePos_, Vector2{ 640,160 }, t));
+		gameOverCommentSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,160 }, Vector2{ 640,160 }, t));
 	}
 	t = easeOutQuint(cameraFrame_ - 2.0f);
 	t = std::clamp(t, 0.0f, 1.0f);
