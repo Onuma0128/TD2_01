@@ -14,8 +14,8 @@ const std::int32_t kClientHight = 720;
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	WinApp::Initialize("2103_ハートビート", kClientWidth, kClientHight);
 
-#ifdef _DEBUG
 	WorldClock::IsFixDeltaTime(true);
+#ifdef _DEBUG
 #endif // _DEBUG
 
 #ifdef _DEBUG
