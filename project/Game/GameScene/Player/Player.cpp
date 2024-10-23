@@ -72,9 +72,11 @@ void Player::initialize() {
 
 	damageAudio_ = std::make_unique<AudioPlayer>();
 	damageAudio_->initialize("playerdamage.wav");
+	damageAudio_->set_volume(0.5f);
 	for (int i = 0; i < 2; ++i) {
 		std::unique_ptr<AudioPlayer> throwAudio = std::make_unique<AudioPlayer>();
 		throwAudio->initialize("throw.wav");
+		throwAudio->set_volume(0.2f);
 		throwAudios_.push_back(std::move(throwAudio));
 	}
 	throwCount = 0;

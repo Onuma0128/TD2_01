@@ -15,6 +15,11 @@
 
 #include <ranges>
 
+BeatManager::~BeatManager()
+{
+	damageAudio_->finalize();
+}
+
 void BeatManager::initalize() {
 	// ParticleMovementsに登録
 	BeatParticleMvements::beatManager = this;
@@ -30,6 +35,10 @@ void BeatManager::initalize() {
 	globalValues.add_value<int>("BeatParticle", "EmitsNum", 1);
 	globalValues.add_value<float>("BeatEffect", "FrameInterval", 0.05f);
 	globalValues.add_value<float>("BeatEffect", "AnimationTime", 0.5f);
+
+	damageAudio_ = std::make_unique<AudioPlayer>();
+	damageAudio_->initialize("enemydamage.wav");
+	damageAudio_->set_volume(0.4f);
 }
 
 void BeatManager::update() {
@@ -156,6 +165,8 @@ void BeatManager::beating() {
 		effect.mesh->initialize();
 		effect.mesh->get_transform().set_translate(deadTranslate);
 	}
+	damageAudio_->restart();
+	damageAudio_->play();
 }
 
 // ビート攻撃止める

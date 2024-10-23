@@ -56,9 +56,11 @@ void WaveSprite::reset()
 
 	clearAudio_ = std::make_unique<AudioPlayer>();
 	clearAudio_->initialize("clear.wav");
+	clearAudio_->set_volume(0.3f);
 
 	allClearAudio_ = std::make_unique<AudioPlayer>();
 	allClearAudio_->initialize("allclear.wav");
+	allClearAudio_->set_volume(0.3f);
 }
 
 void WaveSprite::clear_animation_reset()

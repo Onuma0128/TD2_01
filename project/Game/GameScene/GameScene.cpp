@@ -243,7 +243,7 @@ void GameScene::initialize() {
 	gameBGM_ = std::make_unique<AudioPlayer>();
 	gameBGM_->initialize("BGM.wav");
 	gameBGM_->set_loop(true);
-	gameBGM_->set_volume(0.5f);
+	gameBGM_->set_volume(0.3f);
 	gameBGM_->play();
 
 #ifdef _DEBUG

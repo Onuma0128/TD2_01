@@ -153,6 +153,7 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Typ
 	for (int i = 0; i < 2; ++i) {
 		std::unique_ptr<AudioPlayer> audio = std::make_unique<AudioPlayer>();
 		audio->initialize("enemydamage.wav");
+		audio->set_volume(0.3f);
 		damageAudios_.push_back(std::move(audio));
 	}
 }
@@ -558,7 +559,6 @@ void BaseEnemy::beating_update() {
 		if (behaviorTimer >= beatAttackInterval) {
 			behaviorTimer = std::fmod(behaviorTimer, beatAttackInterval);
 			isBeatingAnima = true;
-			damageAudio();
 		}
 	}
 }
@@ -566,7 +566,6 @@ void BaseEnemy::beating_update() {
 // ---------- 被ハート時処理 ----------
 void BaseEnemy::damaged_heart_initialize() {
 	behaviorTimer = 0;
-	damageAudio();
 }
 
 void BaseEnemy::damaged_heart_update() {
