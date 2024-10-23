@@ -185,6 +185,7 @@ void BaseEnemy::update() {
 		enemyManager->create_revive_effect(this);
 		// 回復
 		hitpoint += globalValues.get_value<int>("Enemy", "AbsorptionAmount") * markedCount;
+		enemy_resetObject();
 		// 上限を超えないようにする
 		hitpoint = std::min(maxHitpoint, hitpoint);
 		markedCount = 0;
@@ -289,21 +290,23 @@ void BaseEnemy::revive_animation() {
 void BaseEnemy::enemy_resetObject()
 {
 	// HPが50以下ならモデルを差し替え
-	if (hitpoint <= 50) {
+	if (hitpoint <= maxHitpoint / 2 && !isChangedModel) {
 		if (type == Type::Normal) {
 			ghostMesh->reset_object("enemyDamage.obj");
 		}
 		else {
 			ghostMesh->reset_object("bigEnemyDamage.obj");
 		}
+		isChangedModel = true;
 	}
-	else {
+	else if(hitpoint > maxHitpoint / 2 && isChangedModel){
 		if (type == Type::Normal) {
 			ghostMesh->reset_object("enemy.obj");
 		}
 		else {
 			ghostMesh->reset_object("bigEnemy.obj");
 		}
+		isChangedModel = false;
 	}
 
 	auto& materials = ghostMesh->get_materials();
@@ -508,7 +511,11 @@ void BaseEnemy::approach_update() {
 	velocity = distance.normalize_safe() * approachSpeed;
 	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
 	// player方向を向く
-	look_at(*targetPlayer);
+	const Quaternion& internal = transform.get_quaternion();
+	const Quaternion terminal = Quaternion::LookForward(distance.normalize_safe());
+	transform.set_quaternion(
+		Quaternion::Slerp(internal, terminal, 0.5f)
+	);
 	axisOfQuaternion = ghostMesh->get_transform().get_quaternion();
 }
 

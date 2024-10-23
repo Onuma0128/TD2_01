@@ -107,6 +107,8 @@ private: // Member values
 	std::unique_ptr<GameObject> ghostMesh;
 	std::unique_ptr<GameObject> hitMarkerMesh;
 
+	bool isChangedModel = false;
+
 	Behavior<EnemyBehavior> behavior;
 
 	int markedCount;
