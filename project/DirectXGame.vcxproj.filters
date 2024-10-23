@@ -135,6 +135,7 @@
     <ClCompile Include="Game\GameScene\RenderNode\PostEffects\GaussianBlur\GaussianBlurNode.cpp" />
     <ClCompile Include="Game\GameScene\RenderNode\PostEffects\LuminanceExtraction\LuminanceExtractionNode.cpp" />
     <ClCompile Include="Game\GameScene\PostEffectManager\PostEffectManager.cpp" />
+    <ClCompile Include="Game\GameScene\Speaker\Speaker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Math\Easing.h" />
@@ -261,6 +262,7 @@
     <ClInclude Include="Game\GameScene\RenderNode\PostEffects\GaussianBlur\GaussianBlurNode.h" />
     <ClInclude Include="Game\GameScene\RenderNode\PostEffects\LuminanceExtraction\LuminanceExtractionNode.h" />
     <ClInclude Include="Game\GameScene\PostEffectManager\PostEffectManager.h" />
+    <ClInclude Include="Game\GameScene\Speaker\Speaker.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="EngineResources\HLSL\3DObject\Object3d.hlsli" />

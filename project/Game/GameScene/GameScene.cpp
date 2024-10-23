@@ -47,6 +47,7 @@ void GameScene::load() {
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/ground", "ground.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/Particle", "beat-particle.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/Effects/Beat", "beating.obj");
+	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/speaker", "speaker.obj");
 
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "wave.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "hp.png");
@@ -246,6 +247,10 @@ void GameScene::initialize() {
 	gameBGM_->set_volume(0.3f);
 	gameBGM_->play();
 
+	speaker_ = std::make_unique<Speaker>();
+	speaker_->initialize();
+
+
 #ifdef _DEBUG
 	editor = eps::CreateUnique<TimelineEditor>();
 	editor->initialize(timeline.get(), camera3D_.get());
@@ -289,6 +294,7 @@ void GameScene::update() {
 
 	player_->update();
 	enemyManager->update();
+	speaker_->update();
 
 	beatManager->update();
 
@@ -305,6 +311,7 @@ void GameScene::begin_rendering() {
 	enemyManager->begin_rendering();
 	beatManager->begin_rendering();
 	uiManager_->begin_rendering();
+	speaker_->begin_rendering();
 
 	collisionManager->update();
 
@@ -334,6 +341,7 @@ void GameScene::draw() const {
 #endif // _DEBUG
 
 	ground_->draw();
+	speaker_->draw();
 	beatManager->draw();
 
 	RenderPathManager::Next();
@@ -385,6 +393,8 @@ void GameScene::debug_update() {
 	GlobalValues::GetInstance().debug_gui();
 
 	player_->debug_gui();
+
+	speaker_->debug_gui();
 
 	timeline->debug_gui();
 
