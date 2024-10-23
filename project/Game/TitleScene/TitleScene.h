@@ -45,5 +45,7 @@ private:
 
 	std::unique_ptr<Fade> fadeSprite_ = nullptr;
 	std::unique_ptr<AudioPlayer> clickAudio_ = nullptr;
+
+	bool isGameScene_ = false;
 };
 

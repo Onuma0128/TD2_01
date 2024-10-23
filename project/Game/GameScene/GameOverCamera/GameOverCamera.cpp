@@ -41,16 +41,18 @@ void GameOverCamera::update()
 		SpriteMove();
 		if (cameraFrame_ > 3.0f) {
 			if (Input::IsReleaseKey(KeyID::Space) || Input::IsReleasePad(PadID::A)) {
-				SceneManager::SetSceneChange(std::make_unique<GameScene>(), 2, false);
+				SceneManager::SetSceneChange(std::make_unique<GameScene>(), 1, false);
 				fadeSprite_->set_state(Fade::FadeState::FadeIN);
 				clickAudio_->restart();
 				clickAudio_->play();
+				cameraFrame_ = 0;
 			}
 			if (Input::IsTriggerKey(KeyID::Escape)) {
-				SceneManager::SetSceneChange(std::make_unique<TitleScene>(), 2, false);
+				SceneManager::SetSceneChange(std::make_unique<TitleScene>(), 1, false);
 				fadeSprite_->set_state(Fade::FadeState::FadeIN);
 				clickAudio_->restart();
 				clickAudio_->play();
+				cameraFrame_ = 0;
 			}
 		}
 		break;
