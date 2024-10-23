@@ -44,6 +44,7 @@ void GameScene::load() {
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/playerSweat", "playerSweat.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/ground", "ground.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/Particle", "beat-particle.obj");
+	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/Effects/Beat", "beating.obj");
 
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "wave.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "hp.png");
@@ -324,15 +325,16 @@ void GameScene::draw() const {
 	camera3D_->debug_draw();
 	collisionManager->debug_draw3d();
 	editor->draw_preview();
+	//DirectXCore::ShowGrid();
 #endif // _DEBUG
 
-	//DirectXCore::ShowGrid();
 	ground_->draw();
+	beatManager->draw();
 
 	RenderPathManager::Next();
 	// 3Dパーティクル
 	camera3D_->set_command(1);
-	beatManager->draw();
+	beatManager->draw_particle();
 
 	RenderPathManager::Next();
 	// マーカー

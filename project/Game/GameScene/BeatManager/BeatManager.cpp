@@ -7,6 +7,8 @@
 #include <Engine/Module/Collision/Collider/SphereCollider.h>
 #include <Engine/Module/ParticleSystem/Particle/Particle.h>
 #include <Engine/Module/Collision/CollisionManager.h>
+#include <Engine/Application/WorldClock/WorldClock.h>
+#include <Engine/Module/GameObject/GameObject.h>
 
 #include "BeatParticleSystem/BeatEmitter.h"
 #include "BeatParticleSystem/BeatParticleMvements.h"
@@ -26,6 +28,8 @@ void BeatManager::initalize() {
 	globalValues.add_value<float>("BeatParticle", "ColliderRadius", 0.24f);
 	globalValues.add_value<float>("BeatParticle", "EmitterDuration", 0.1f);
 	globalValues.add_value<int>("BeatParticle", "EmitsNum", 1);
+	globalValues.add_value<float>("BeatEffect", "FrameInterval", 0.05f);
+	globalValues.add_value<float>("BeatEffect", "AnimationTime", 0.5f);
 }
 
 void BeatManager::update() {
@@ -44,6 +48,26 @@ void BeatManager::update() {
 		}
 		return false;
 	});
+
+	constexpr int NumFrame = 2;
+	float FrameInterval = globalValues.get_value<float>("BeatEffect", "FrameInterval");
+	float AnimationTime = globalValues.get_value<float>("BeatEffect", "AnimationTime");
+	for (BeatEffect& beatEffect : beatEffects) {
+		beatEffect.timer += WorldClock::DeltaSeconds();
+
+		float offsetUV = 0.25f * beatEffect.useFrame;
+		beatEffect.mesh->get_materials()[0].uvTransform.set_translate_y(
+			static_cast<float>(beatEffect.baseUV) + offsetUV
+		);
+
+		if (beatEffect.timer - beatEffect.frameCount * FrameInterval > FrameInterval) {
+			beatEffect.useFrame ^= 1;
+			++beatEffect.frameCount;
+		}
+	}
+	std::erase_if(beatEffects, [AnimationTime](const BeatEffect& beatEffect) {
+		return beatEffect.timer >= AnimationTime;
+	});
 }
 
 void BeatManager::begin_rendering() {
@@ -51,9 +75,18 @@ void BeatManager::begin_rendering() {
 	for (ParticleSystemModel& particleSystem : particleSystems) {
 		particleSystem.begin_rendering();
 	}
+	for (BeatEffect& beatEffect : beatEffects) {
+		beatEffect.mesh->begin_rendering();
+	}
 }
 
 void BeatManager::draw() const {
+	for (const BeatEffect& beatEffect : beatEffects) {
+		beatEffect.mesh->draw();
+	}
+}
+
+void BeatManager::draw_particle() const {
 	// パーティクル描画
 	for (const ParticleSystemModel& particleSystem : particleSystems) {
 		particleSystem.draw();
@@ -97,11 +130,13 @@ void BeatManager::beating() {
 		enemy->beating();
 		prev = enemy;
 
+		Vector3 deadTranslate = enemy->world_position();
+
 		// 攻撃パーティクルの初期化
 		// エミッター初期化
 		auto&& emitter = eps::CreateUnique<BeatEmitter>();
 		Vector3 emitoffset = globalValues.get_value<Vector3>("BeatParticle", "EmitOffset");
-		emitter->get_transform().set_translate(enemy->world_position() + emitoffset);
+		emitter->get_transform().set_translate(deadTranslate + emitoffset);
 		emitter->update_matrix();
 		// Mvements初期化
 		auto&& movement = eps::CreateUnique<BeatParticleMvements>();
@@ -112,6 +147,14 @@ void BeatManager::beating() {
 		newParticleSystem.set_mesh("beat-particle.obj");
 		newParticleSystem.set_emitter(std::move(emitter));
 		newParticleSystem.set_particle_movements(std::move(movement));
+
+		// ビートエフェクトの追加
+		auto& effect = beatEffects.emplace_back(
+			eps::CreateUnique<GameObject>("beating.obj"),
+			0.0f, 0.0f, 0, 0
+		);
+		effect.mesh->initialize();
+		effect.mesh->get_transform().set_translate(deadTranslate);
 	}
 }
 
@@ -172,13 +215,6 @@ bool BeatManager::is_self_particle(BaseEnemy* const enemy, const BaseCollider* c
 // パーティクルシステムごと削除
 void BeatManager::unregister_particle(const ParticleSystemModel& particleSystem) {
 	auto& particles = particleSystem.get_particles();
-	for (auto& particle : particles) {
-		// 削除するColliderを取得
-		auto& collider = beatCollider.at(&particle);
-		// どっちも削除
-		involeder.erase(collider.get());
-		beatCollider.erase(&particle);
-	}
 }
 
 // ParticleにParentするColliderの生成
