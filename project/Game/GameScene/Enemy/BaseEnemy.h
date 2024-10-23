@@ -113,7 +113,7 @@ private: // Member values
 	bool isAttakced;
 	float behaviorTimer;
 
-	float waveFrameCount;
+	float waveFrameCount = 0;
 	float initialY;
 	bool isBeatingAnima;
 	bool isBeatUI_ = false;
