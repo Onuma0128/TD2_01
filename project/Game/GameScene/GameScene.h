@@ -59,9 +59,6 @@ public:
 #endif 
 
 private:
-	void create_enemy();
-
-private:
 	std::unique_ptr<CollisionManager> collisionManager = nullptr;
 	std::unique_ptr<BeatManager> beatManager = nullptr;
 	std::unique_ptr<Timeline> timeline = nullptr;

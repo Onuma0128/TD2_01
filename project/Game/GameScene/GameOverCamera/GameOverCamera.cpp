@@ -66,13 +66,13 @@ void GameOverCamera::update()
 				clickAudio_->play();
 				cameraFrame_ = 0;
 			}
-			if (Input::IsTriggerKey(KeyID::Escape)) {
-				SceneManager::SetSceneChange(std::make_unique<TitleScene>(), 1, false);
-				fadeSprite_->set_state(Fade::FadeState::FadeIN);
-				clickAudio_->restart();
-				clickAudio_->play();
-				cameraFrame_ = 0;
-			}
+			//if (Input::IsTriggerKey(KeyID::Escape)) {
+			//	SceneManager::SetSceneChange(std::make_unique<TitleScene>(), 1, false);
+			//	fadeSprite_->set_state(Fade::FadeState::FadeIN);
+			//	clickAudio_->restart();
+			//	clickAudio_->play();
+			//	cameraFrame_ = 0;
+			//}
 		}
 		break;
 	default:

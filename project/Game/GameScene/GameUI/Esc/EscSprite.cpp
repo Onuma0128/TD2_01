@@ -29,5 +29,5 @@ void EscSprite::begin_rendering() noexcept
 
 void EscSprite::draw() const
 {
-	SpriteObject::draw();
+	//SpriteObject::draw();
 }

@@ -223,9 +223,6 @@ void GameScene::initialize() {
 
 	collisionManager->register_collider("Player", player_->get_hit_collider());
 
-	create_enemy();
-	create_enemy();
-
 	BaseEnemy::targetPlayer = player_.get();
 
 	timeline->Start();
@@ -427,11 +424,3 @@ void GameScene::debug_update() {
 	ImGui::End();
 }
 #endif // _DEBUG
-
-void GameScene::create_enemy() {
-	//auto& newEnemy = enemies.emplace_back();
-	//newEnemy.initialize();
-	//collisionManager->register_collider("EnemyHit", newEnemy.get_hit_collider());
-	//collisionManager->register_collider("Beat", newEnemy.get_beat_collider());
-	//collisionManager->register_collider("EnemyMelee", newEnemy.get_melee_collider());
-}

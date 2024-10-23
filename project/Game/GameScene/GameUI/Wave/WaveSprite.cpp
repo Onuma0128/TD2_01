@@ -270,20 +270,20 @@ void WaveSprite::Reappear()
 			else {
 				if (!isSceneChenge_) {
 					if (Input::IsReleaseKey(KeyID::Space) || Input::IsReleasePad(PadID::A)) {
-						SceneManager::SetSceneChange(std::make_unique<GameScene>(), 1, false);
+						SceneManager::SetSceneChange(std::make_unique<TitleScene>(), 1, false);
 						fadeSprite_->set_state(Fade::FadeState::FadeIN);
 						GameState::getInstance().setCurrentWave(0);
 						clickAudio_->restart();
 						clickAudio_->play();
 						isSceneChenge_ = true;
 					}
-					if (Input::IsReleaseKey(KeyID::Escape)) {
-						SceneManager::SetSceneChange(std::make_unique<TitleScene>(), 1, false);
-						fadeSprite_->set_state(Fade::FadeState::FadeIN);
-						clickAudio_->restart();
-						clickAudio_->play();
-						isSceneChenge_ = true;
-					}
+					//if (Input::IsReleaseKey(KeyID::Escape)) {
+					//	SceneManager::SetSceneChange(std::make_unique<TitleScene>(), 1, false);
+					//	fadeSprite_->set_state(Fade::FadeState::FadeIN);
+					//	clickAudio_->restart();
+					//	clickAudio_->play();
+					//	isSceneChenge_ = true;
+					//}
 				}
 			}
 		}
