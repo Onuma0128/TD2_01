@@ -1,17 +1,19 @@
 #include "GameScene.h"
 
 #include <Engine/DirectX/DirectXSwapChain/DirectXSwapChain.h>
-#include <Engine/Application/Scene/SceneManager.h>
 #include <Engine/Render/RenderPath/RenderPath.h>
-#include <Engine/Render/RenderPathManager/RenderPathManager.h>
 #include <Engine/DirectX/DirectXCore.h>
-#include <Engine/Module/PolygonMesh/PolygonMeshManager.h>
-#include <Engine/Module/TextureManager/TextureManager.h>
 #include <Engine/Utility/SmartPointer.h>
 #include <Engine/Application/Input/Input.h>
 #include <Engine/Render/RenderTargetGroup/SwapChainRenderTargetGroup.h>
 #include <Engine/Render/RenderTargetGroup/SingleRenderTarget.h>
 #include <Engine/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
+
+#include <Engine/Application/Scene/SceneManager.h>
+#include <Engine/Render/RenderPathManager/RenderPathManager.h>
+#include <Engine/Module/PolygonMesh/PolygonMeshManager.h>
+#include <Engine/Module/TextureManager/TextureManager.h>
+#include "Engine/Application/Audio/AudioManager.h"
 
 #include "Game/GlobalValues/GlobalValues.h"
 #include "Game/TitleScene/TitleScene.h"
@@ -83,6 +85,13 @@ void GameScene::load() {
 	// GameSprite
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "fade.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "allclear.png");
+	// Audio
+	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "BGM.wav");
+	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "click.wav");
+	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "enemydamage.wav");
+	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "playerdamage.wav");
+	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "throw.wav");
+
 }
 
 void GameScene::initialize() {
@@ -224,6 +233,13 @@ void GameScene::initialize() {
 	GameOverCamera::fadeSprite_ = fadeSprite_.get();
 	WaveSprite::fadeSprite_ = fadeSprite_.get();
 
+	// Audio
+	gameBGM_ = std::make_unique<AudioPlayer>();
+	gameBGM_->initialize("BGM.wav");
+	gameBGM_->set_loop(true);
+	gameBGM_->set_volume(0.5f);
+	gameBGM_->play();
+
 #ifdef _DEBUG
 	editor = eps::CreateUnique<TimelineEditor>();
 	editor->initialize(timeline.get(), camera3D_.get());
@@ -246,6 +262,7 @@ void GameScene::finalize() {
 	gaussianBlurNode->finalize();
 	bloomNode->finalize();
 	chromaticAberrationNode->finalize();
+	gameBGM_->finalize();
 	RenderPathManager::UnregisterPath("GameScene" + std::to_string(reinterpret_cast<std::uint64_t>(this)));
 }
 

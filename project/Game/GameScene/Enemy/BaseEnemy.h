@@ -5,6 +5,7 @@
 #include <Engine/Module/Collision/Collider/SphereCollider.h>
 #include <Engine/Module/Behavior/Behavior.h>
 #include <Engine/DirectX/DirectXResourceObject/ConstantBuffer/ConstantBuffer.h>
+#include "Engine/Application/Audio/AudioPlayer.h"
 
 #include "Game/GlobalValues/GlobalValues.h"
 
@@ -47,6 +48,7 @@ public: // Member function
 	void down_animetion();
 	void revive_animation();
 	void enemy_resetObject();
+	void damageAudio();
 
 	float easeInBack(float t);
 	float CustomEase(float t);
@@ -119,6 +121,10 @@ private: // Member values
 	std::shared_ptr<SphereCollider> beatCollider;
 
 	ConstantBuffer<float> percentage;
+
+	// Audio
+	std::vector<std::unique_ptr<AudioPlayer>> damageAudios_;
+	int damageAudioCount = 0;
 
 public:
 	static void SetApproachSpeed(float speed) { approachSpeed = speed; };

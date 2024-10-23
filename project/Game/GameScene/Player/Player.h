@@ -2,6 +2,7 @@
 
 #include "Engine/Module/GameObject/GameObject.h"
 #include <Engine/Module/Collision/Collider/SphereCollider.h>
+#include "Engine/Application/Audio/AudioPlayer.h"
 
 #include <memory>
 
@@ -109,6 +110,12 @@ private:
 	State state_;
 
 	PostEffectManager* postEffectManager;
+
+	// Audio
+	std::unique_ptr<AudioPlayer> damageAudio_ = nullptr;
+
+	std::vector<std::unique_ptr<AudioPlayer>> throwAudios_;
+	int throwCount = 0;
 
 public:
 	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
