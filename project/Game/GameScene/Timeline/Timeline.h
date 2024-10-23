@@ -49,17 +49,15 @@ private:
 public:
 	bool IsEndWaveAll() { return nowWave == waveData.end(); };
 	void SetEnemyManager(EnemyManager* enemyManager_) { enemyManager = enemyManager_; };
-	void SetPlayer(Player* player_) { player = player_; };
-#ifdef _DEBUG
-	bool GetIsActiveEditor()const { return isActiveEditor; }
-	bool GetisDemoPlay()const { return isDemoPlay; }
-#endif // DEBUG
+	void SetPlayer(Player* player_) { player = player_; }
 
 	const std::vector<WaveData>& GetWaveData() { return waveData; }
 	std::vector<WaveData>::const_iterator GetNowWave() const { return nowWave; }
 
 #ifdef _DEBUG
 public:
+	bool GetIsActiveEditor()const { return isActiveEditor; }
+	bool GetisDemoPlay()const { return isDemoPlay; }
 	void debug_gui();
 
 private:

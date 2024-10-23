@@ -5,6 +5,7 @@
 #include "Engine/Application/Scene/SceneManager.h"
 #include "TestCode/SceneDemo.h"
 #include "Game/GameScene/GameScene.h"
+#include "Game/TitleScene/TitleScene.h"
 
 // クライアント領域サイズ
 const std::int32_t kClientWidth = 1280;
@@ -17,7 +18,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	WorldClock::IsFixDeltaTime(true);
 #endif // _DEBUG
 
-	SceneManager::Initialize(std::make_unique<GameScene>());
+#ifdef _DEBUG
+	SceneManager::Initialize(std::make_unique<TitleScene>());
+#else
+	SceneManager::Initialize(std::make_unique<TitleScene>());
+#endif // _DEBUG
+
 
 	WinApp::ShowAppWindow();
 
