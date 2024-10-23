@@ -6,6 +6,7 @@
 #include <Engine/Module/Behavior/Behavior.h>
 #include <Engine/DirectX/DirectXResourceObject/ConstantBuffer/ConstantBuffer.h>
 #include "Engine/Application/Audio/AudioPlayer.h"
+#include <Engine/Module/ParticleSystem/ParticleSystemModel.h>
 
 #include "Game/GlobalValues/GlobalValues.h"
 
@@ -102,6 +103,7 @@ private: // Member values
 
 	std::unique_ptr<GameObject> ghostMesh;
 	std::unique_ptr<GameObject> hitMarkerMesh;
+	std::unique_ptr<ParticleSystemModel> reviveParticle;
 
 	Behavior<EnemyBehavior> behavior;
 

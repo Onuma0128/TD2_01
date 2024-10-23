@@ -145,6 +145,12 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Typ
 		audio->initialize("enemydamage.wav");
 		damageAudios_.push_back(std::move(audio));
 	}
+
+	reviveParticle = eps::CreateUnique<ParticleSystemModel>();
+	reviveParticle->initialize(32);
+	//reviveParticle->set_emitter();
+	//reviveParticle->set_mesh();
+	//reviveParticle->set_particle_movements();
 }
 
 void BaseEnemy::begin() {
