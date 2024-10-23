@@ -139,6 +139,11 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Typ
 		material.lighingType = LighingType::None;
 	}
 	hitpoint = maxHitpoint;
+	for (int i = 0; i < 2; ++i) {
+		std::unique_ptr<AudioPlayer> audio = std::make_unique<AudioPlayer>();
+		audio->initialize("enemydamage.wav");
+		damageAudios_.push_back(std::move(audio));
+	}
 }
 
 void BaseEnemy::begin() {
@@ -290,6 +295,16 @@ void BaseEnemy::enemy_resetObject()
 	auto& materials = ghostMesh->get_materials();
 	for (auto& material : materials) {
 		material.lighingType = LighingType::None;
+	}
+}
+
+void BaseEnemy::damageAudio()
+{
+	damageAudios_[damageAudioCount]->restart();
+	damageAudios_[damageAudioCount]->play();
+	++damageAudioCount;
+	if (damageAudios_.size() == damageAudioCount) {
+		damageAudioCount = 0;
 	}
 }
 
@@ -521,6 +536,7 @@ void BaseEnemy::beating_update() {
 		if (behaviorTimer >= beatAttackInterval) {
 			behaviorTimer = std::fmod(behaviorTimer, beatAttackInterval);
 			isBeatingAnima = true;
+			damageAudio();
 		}
 	}
 }
@@ -528,6 +544,7 @@ void BaseEnemy::beating_update() {
 // ---------- 被ハート時処理 ----------
 void BaseEnemy::damaged_heart_initialize() {
 	behaviorTimer = 0;
+	damageAudio();
 }
 
 void BaseEnemy::damaged_heart_update() {

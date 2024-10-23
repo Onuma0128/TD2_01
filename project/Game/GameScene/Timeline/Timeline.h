@@ -49,7 +49,7 @@ private:
 public:
 	bool IsEndWaveAll() { return nowWave == waveData.end(); };
 	void SetEnemyManager(EnemyManager* enemyManager_) { enemyManager = enemyManager_; };
-	void SetPlayer(Player* player_) { player = player_; };
+	void SetPlayer(Player* player_) { player = player_; }
 
 	const std::vector<WaveData>& GetWaveData() { return waveData; }
 	std::vector<WaveData>::const_iterator GetNowWave() const { return nowWave; }

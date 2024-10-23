@@ -59,6 +59,15 @@ void Player::initialize() {
 	hitCollider->set_on_collision_enter(
 		std::bind(&Player::OnCollisionCallBack, this, std::placeholders::_1)
 	);
+
+	damageAudio_ = std::make_unique<AudioPlayer>();
+	damageAudio_->initialize("playerdamage.wav");
+	for (int i = 0; i < 2; ++i) {
+		std::unique_ptr<AudioPlayer> throwAudio = std::make_unique<AudioPlayer>();
+		throwAudio->initialize("throw.wav");
+		throwAudios_.push_back(std::move(throwAudio));
+	}
+	throwCount = 0;
 }
 
 void Player::begin() {
@@ -267,6 +276,12 @@ void Player::ThrowHeart() {
 			bullet->Throw(world_position(), CVector3::BASIS_Z * transform.get_quaternion());
 			playerHpManager_->set_state(HP_State::Damage);
 			AddSweat();
+			throwAudios_[throwCount]->restart();
+			throwAudios_[throwCount]->play();
+			++throwCount;
+			if (throwAudios_.size() == throwCount) {
+				throwCount = 0;
+			}
 			// 1回投げたら終わる
 			return;
 		}
@@ -401,6 +416,8 @@ void Player::OnCollisionCallBack(const BaseCollider* const other) {
 				isInvincible_ = true;
 				invincibleFrame_ = 0.0f;
 				postEffectManager->set_reaction(PostEffectState::DAMANGE);
+				damageAudio_->restart();
+				damageAudio_->play();
 				break;
 			}
 		}
