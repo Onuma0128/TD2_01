@@ -15,6 +15,7 @@ void HpSprite::update()
 {
 	hp_update();
 
+	numberSprite_->set_alpha(color.alpha);
 	numberSprite_->update();
 }
 

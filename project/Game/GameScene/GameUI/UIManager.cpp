@@ -3,10 +3,12 @@
 #include <Engine/Application/WorldClock/WorldClock.h>
 #include <Engine/Application/Input/Input.h>
 #include <Engine/Application/Input/InputEnum.h>
+#include <Engine/Math/Easing.h>
 
 #include "Game/GameScene/Timeline/Timeline.h"
 #include "Game/GameScene/EnemyManager/EnemyManager.h"
 #include "Game/GameScene/Player/PlayerHPManager.h"
+#include "Game/GameScene/GameOverCamera/GameOverCamera.h"
 
 
 void UIManager::initialize()
@@ -31,15 +33,23 @@ void UIManager::initialize()
 	globalValues.add_value<int>("GameUI", "SpaceX", 1160);
 	globalValues.add_value<int>("GameUI", "SpaceY", 672);
 	globalValues.add_value<float>("GameUI", "SpaceSize", 1.0f);
+
+	gameOverFrame_ = 1;
 }
 
 void UIManager::update()
 {
+	gameOver();
+
 	waveSprite_->update();
 	hpSprite_->update();
-	escSprite_->update();
 	// ボタン系のスプライトを更新
+	input_action();
+	if (gameOverCamera_->get_state() == GameOverCamera::CameraState::GameOverSprite) {
+		return;
+	}
 	input_update();
+	escSprite_->update();
 	buttonSprite_->update();
 	spaceSprite_->update();
 	actionSprite_->update();
@@ -72,13 +82,6 @@ void UIManager::draw()
 
 void UIManager::input_update()
 {
-	// Aボタンの処理
-	if (Input::IsPressPad(PadID::A)) {
-		buttonSprite_->set_texture("A_button_push.png");
-	}
-	else {
-		buttonSprite_->set_texture("A_button.png");
-	}
 	Vector2 translate = {
 		static_cast<float>(globalValues.get_value<int>("GameUI", "ButtonX")),
 		static_cast<float>(globalValues.get_value<int>("GameUI", "ButtonY"))
@@ -86,13 +89,6 @@ void UIManager::input_update()
 	buttonSprite_->set_size(globalValues.get_value<float>("GameUI", "ButtonSize"));
 	buttonSprite_->set_translate(translate);
 
-	// スペースの処理
-	if (Input::IsPressKey(KeyID::Space)) {
-		spaceSprite_->set_texture("Space_button_push.png");
-	}
-	else {
-		spaceSprite_->set_texture("Space_button.png");
-	}
 	translate = {
 		static_cast<float>(globalValues.get_value<int>("GameUI", "SpaceX")),
 		static_cast<float>(globalValues.get_value<int>("GameUI", "SpaceY"))
@@ -100,6 +96,41 @@ void UIManager::input_update()
 	spaceSprite_->set_size(globalValues.get_value<float>("GameUI", "SpaceSize"));
 	spaceSprite_->set_translate(translate);
 
+
+	translate = {
+		static_cast<float>(globalValues.get_value<int>("GameUI", "PlayerActionX")),
+		static_cast<float>(globalValues.get_value<int>("GameUI", "PlayerActionY"))
+	};
+	actionSprite_->set_size(globalValues.get_value<float>("GameUI", "PlayerActionSize"));
+	actionSprite_->set_translate(translate);
+
+	translate = {
+		static_cast<float>(globalValues.get_value<int>("GameUI", "BeatCommentX")),
+		static_cast<float>(globalValues.get_value<int>("GameUI", "BeatCommentY"))
+	};
+	beatCommentSprite_->set_scale({
+		globalValues.get_value<float>("GameUI", "BeatCommentSize"),
+		globalValues.get_value<float>("GameUI", "BeatCommentSize") 
+	});
+	beatCommentSprite_->set_translate(translate);
+}
+
+void UIManager::input_action()
+{
+	// Aボタンの処理
+	if (Input::IsPressPad(PadID::A)) {
+		buttonSprite_->set_texture("A_button_push.png");
+	}
+	else {
+		buttonSprite_->set_texture("A_button.png");
+	}
+	// スペースの処理
+	if (Input::IsPressKey(KeyID::Space)) {
+		spaceSprite_->set_texture("Space_button_push.png");
+	}
+	else {
+		spaceSprite_->set_texture("Space_button.png");
+	}
 	// プレイヤーのアクションスプライト処理
 	bool isBeatUI = false;
 	for (auto& enemy : enemyManager_->get_enemies()) {
@@ -122,20 +153,35 @@ void UIManager::input_update()
 		actionSprite_->set_texture("Attack.png");
 		isBeatComment_ = false;
 	}
-	translate = {
-		static_cast<float>(globalValues.get_value<int>("GameUI", "PlayerActionX")),
-		static_cast<float>(globalValues.get_value<int>("GameUI", "PlayerActionY"))
-	};
-	actionSprite_->set_size(globalValues.get_value<float>("GameUI", "PlayerActionSize"));
-	actionSprite_->set_translate(translate);
+}
 
-	translate = {
-		static_cast<float>(globalValues.get_value<int>("GameUI", "BeatCommentX")),
-		static_cast<float>(globalValues.get_value<int>("GameUI", "BeatCommentY"))
-	};
-	beatCommentSprite_->set_scale({
-		globalValues.get_value<float>("GameUI", "BeatCommentSize"),
-		globalValues.get_value<float>("GameUI", "BeatCommentSize") 
-	});
-	beatCommentSprite_->set_translate(translate);
+void UIManager::gameOver()
+{
+	if (gameOverCamera_->get_state() == GameOverCamera::CameraState::GameOverSprite && gameOverFrame_ > 0.0f) {
+		gameOverFrame_ -= WorldClock::DeltaSeconds();
+		float t = std::clamp(gameOverFrame_, 0.0f, 1.0f);
+		escSprite_->set_alpha(t);
+		spaceSprite_->set_alpha(t);
+		buttonSprite_->set_alpha(t);
+		actionSprite_->set_alpha(t);
+		beatCommentSprite_->set_alpha(t);
+		hpSprite_->set_alpha(t);
+		if (t == 0.0f) {
+			escSprite_->set_translate({ 1920,600 });
+			spaceSprite_->set_translate({ 1920,600 });
+			buttonSprite_->set_translate({ 1920,600 });
+			escSprite_->set_alpha(1);
+			spaceSprite_->set_alpha(1);
+			buttonSprite_->set_alpha(1);
+		}
+	}
+	else {
+		float t = Easing::Out::Quint(gameOverCamera_->get_frame() - 2.0f);
+		t = std::clamp(t, 0.0f, 1.0f);
+		if (gameOverCamera_->get_frame() >= 2.0f) {
+			escSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,600 }, Vector2{ 456,600 }, t));
+			buttonSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,600 }, Vector2{ 728,600 }, t));
+			spaceSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,600 }, Vector2{ 868,600 }, t));
+		}
+	}
 }
