@@ -47,6 +47,12 @@ void WaveSprite::reset()
 	allclearSprite_->set_translate({ 2000.0f,360.0f });
 
 	isClearSpriteMove_ = false;
+
+	clearAudio_ = std::make_unique<AudioPlayer>();
+	clearAudio_->initialize("clear.wav");
+
+	allClearAudio_ = std::make_unique<AudioPlayer>();
+	allClearAudio_->initialize("allclear.wav");
 }
 
 void WaveSprite::clear_animation_reset()
@@ -166,6 +172,10 @@ void WaveSprite::Return()
 		if (clearWaveFrame_ > 1.0f && clearWaveFrame_ <= 2.5f) {
 			float t = (clearWaveFrame_ - 1.3f) / 1.0f;
 			t = std::clamp(t, 0.0f, 1.0f);
+			if (t == 0.0f) {
+				clearAudio_->restart();
+				clearAudio_->play();
+			}
 
 			float easedT = easeOutBack(t);
 			clearSprite_->set_translate(Vector2::Lerp(returnPosition_, { 640.0f,360.0f }, easedT));
@@ -223,6 +233,10 @@ void WaveSprite::Reappear()
 			if (clearWaveFrame_ > 0.0f && clearWaveFrame_ <= 2.0f) {
 				float t = (clearWaveFrame_ - 0.3f) / 1.0f;
 				t = std::clamp(t, 0.0f, 1.0f);
+				if (t == 0.0f) {
+					allClearAudio_->restart();
+					allClearAudio_->play();
+				}
 
 				float easedT = easeOutBack(t);
 				allclearSprite_->set_translate(Vector2::Lerp(returnPosition_, { 640.0f,360.0f }, easedT));
