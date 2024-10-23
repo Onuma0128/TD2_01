@@ -10,6 +10,8 @@
 #include "Engine/Application/Scene/SceneManager.h"
 #include "Engine/Application/Input/Input.h"
 
+#include "Game/RandomEngine.h"
+
 #pragma comment(lib, "winmm.lib")
 
 #ifdef _DEBUG
@@ -68,6 +70,8 @@ void WinApp::Initialize(const std::string& programName, int32_t width, int32_t h
 	Input::Initialize();
 
 	WorldClock::Initialize();
+
+	RandomEngine::Initialize();
 
 	Console("Complite initialize application.\n");
 }

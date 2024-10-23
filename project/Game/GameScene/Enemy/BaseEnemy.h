@@ -6,7 +6,6 @@
 #include <Engine/Module/Behavior/Behavior.h>
 #include <Engine/DirectX/DirectXResourceObject/ConstantBuffer/ConstantBuffer.h>
 #include "Engine/Application/Audio/AudioPlayer.h"
-#include <Engine/Module/ParticleSystem/ParticleSystemModel.h>
 
 #include "Game/GlobalValues/GlobalValues.h"
 
@@ -25,6 +24,7 @@ enum class EnemyBehavior {
 class Player;
 class PlayerHPManager;
 class BeatManager;
+class EnemyManager;
 
 class BaseEnemy : public WorldInstance {
 public:
@@ -103,7 +103,6 @@ private: // Member values
 
 	std::unique_ptr<GameObject> ghostMesh;
 	std::unique_ptr<GameObject> hitMarkerMesh;
-	std::unique_ptr<ParticleSystemModel> reviveParticle;
 
 	Behavior<EnemyBehavior> behavior;
 
@@ -136,6 +135,7 @@ public: // Static value
 	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
 	inline static BeatManager* beatManager = nullptr;
 	inline static PlayerHPManager* playerHpManager_ = nullptr;
+	inline static EnemyManager* enemyManager = nullptr;
 
 private:
 	inline static float approachSpeed = 0.0f;

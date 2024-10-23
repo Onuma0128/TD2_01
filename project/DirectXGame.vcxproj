@@ -120,6 +120,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Math\Easing.cpp" />
+    <ClCompile Include="Game\GameScene\Enemy\ReviveParticle\ReviveEmitter.cpp" />
+    <ClCompile Include="Game\GameScene\Enemy\ReviveParticle\ReviveParticleMvements.cpp" />
     <ClCompile Include="Game\GameScene\GameUI\Fade\Fade.cpp" />
     <ClCompile Include="Game\GameScene\PostEffectManager\PostEffectManager.cpp" />
     <ClCompile Include="Game\GameScene\RenderNode\PostEffects\Bloom\BloomNode.cpp" />
@@ -221,6 +223,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameScene\Timeline\TimelineEditor\TimelineEditor.cpp" />
     <ClCompile Include="Game\GlobalValues\GlobalValues.cpp" />
     <ClCompile Include="Game\GameScene\GameUI\Hp\HpSprite.cpp" />
+    <ClCompile Include="Game\RandomEngine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TestCode\EmitterSample.cpp" />
     <ClCompile Include="TestCode\ParticleSample.cpp" />
@@ -234,6 +237,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Math\Easing.h" />
+    <ClInclude Include="Game\GameScene\Enemy\ReviveParticle\ReviveEmitter.h" />
+    <ClInclude Include="Game\GameScene\Enemy\ReviveParticle\ReviveParticleMvements.h" />
     <ClInclude Include="Game\GameScene\GameUI\Fade\Fade.h" />
     <ClInclude Include="Game\GameScene\PostEffectManager\PostEffectManager.h" />
     <ClInclude Include="Game\GameScene\RenderNode\PostEffects\Bloom\BloomNode.h" />
@@ -333,6 +338,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Utility\SmartPointer.h" />
     <ClInclude Include="Engine\Utility\TimedCall\TimedCall.h" />
     <ClInclude Include="Engine\WinApp.h" />
+    <ClInclude Include="Game\RandomEngine.h" />
     <ClInclude Include="TestCode\EmitterSample.h" />
     <ClInclude Include="TestCode\ParticleSample.h" />
     <ClInclude Include="Game\GameScene\GameUI\Esc\EscSprite.h" />

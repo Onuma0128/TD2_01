@@ -1,14 +1,9 @@
 #include "PostEffectManager.h"
 
-#include <random>
 #include <Engine/Application/WorldClock/WorldClock.h>
 #include <Engine/Math/Definition.h>
 
-static std::random_device device{};
-static std::mt19937 mt{ device() };
-static std::uniform_real_distribution<float> ufd10{ 0,10 };
-static std::uniform_real_distribution<float> ufd1010{ -10,10 };
-static std::uniform_real_distribution<float> ufd1{ 0,1 };
+#include <Game/RandomEngine.h>
 
 void PostEffectManager::initialize(const std::shared_ptr<ChromaticAberrationNode>& chromaticAberrationNode_) {
 	chromaticAberrationNode = chromaticAberrationNode_;
@@ -32,7 +27,7 @@ void PostEffectManager::update() {
 }
 
 void PostEffectManager::damange_update() {
-	chromaticAberrationNode->set_length(std::lerp(0.0f, 0.03f, ufd1(mt)));
+	chromaticAberrationNode->set_length(std::lerp(0.0f, 0.03f, RandomEngine::Random01MOD()));
 	if (animationTimer > 0.5f) {
 		state = PostEffectState::NANE;
 	}
@@ -43,7 +38,7 @@ void PostEffectManager::beating_update() {
 	float sinParametric = std::sin(parametric * PI);
 	chromaticAberrationNode->set_length(
 		std::lerp(0.0f, 0.02f, sinParametric) +
-		std::lerp(0.0f, 0.01f, ufd1(mt) * sinParametric)
+		std::lerp(0.0f, 0.01f, RandomEngine::Random01MOD() * sinParametric)
 	);
 	if (animationTimer > cycle) {
 		state = PostEffectState::NANE;

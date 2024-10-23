@@ -9,6 +9,7 @@
 #include "Game/GameScene/Player/PlayerBullet.h"
 #include "Game/GameScene/Player/PlayerHPManager.h"
 #include "Game/GameScene/BeatManager/BeatManager.h"
+#include "Game/GameScene/EnemyManager/EnemyManager.h"
 
 void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Type type_) {
 	globalValues.add_value<int>("Heart", "AttackDamage", 30);
@@ -145,12 +146,6 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Typ
 		audio->initialize("enemydamage.wav");
 		damageAudios_.push_back(std::move(audio));
 	}
-
-	reviveParticle = eps::CreateUnique<ParticleSystemModel>();
-	reviveParticle->initialize(32);
-	//reviveParticle->set_emitter();
-	//reviveParticle->set_mesh();
-	//reviveParticle->set_particle_movements();
 }
 
 void BaseEnemy::begin() {
@@ -628,6 +623,9 @@ void BaseEnemy::revive_initialize() {
 	}
 	// 復活時の回転を取得
 	axisOfQuaternion = ghostMesh->get_transform().get_quaternion();
+	if (enemyManager) {
+		enemyManager->create_revive_effect(this);
+	}
 }
 
 void BaseEnemy::revive_update() {
