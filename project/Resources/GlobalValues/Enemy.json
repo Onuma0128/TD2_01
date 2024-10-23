@@ -13,7 +13,9 @@
         "NockbackFriction": 0.800000011920929,
         "NockbackMag": 3.0,
         "RevivedHitpoint": 30,
-        "StartAttackDistance": 1.0,
+        "RevivedHitpointNormal": 30,
+        "RevivedHitpointStrong": 70,
+        "StartAttackDistance": 1.5,
         "ToDeadDuration": 5.0
     }
 }
