@@ -18,6 +18,16 @@
 #include "imgui.h"
 #endif // _DEBUG
 
+Player::Player() = default;
+
+Player::~Player()
+{
+	for (const std::unique_ptr<AudioPlayer>& audio : throwAudios_) {
+		audio->finalize();
+	}
+	damageAudio_->finalize();
+}
+
 void Player::initialize() {
 	globalValues.add_value<Vector3>("Player", "FieldSize", Vector3{ 6.6f,0,9.53f });
 
@@ -62,9 +72,11 @@ void Player::initialize() {
 
 	damageAudio_ = std::make_unique<AudioPlayer>();
 	damageAudio_->initialize("playerdamage.wav");
+	damageAudio_->set_volume(0.5f);
 	for (int i = 0; i < 2; ++i) {
 		std::unique_ptr<AudioPlayer> throwAudio = std::make_unique<AudioPlayer>();
 		throwAudio->initialize("throw.wav");
+		throwAudio->set_volume(0.2f);
 		throwAudios_.push_back(std::move(throwAudio));
 	}
 	throwCount = 0;

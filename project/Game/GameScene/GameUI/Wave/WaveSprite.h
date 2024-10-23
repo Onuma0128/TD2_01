@@ -4,6 +4,7 @@
 #include <Engine/Module/GameObject/SpriteObject.h>
 #include <Engine/Math/Vector2.h>
 #include <Engine/Module/Transform2D/Transform2D.h>
+#include <Engine/Application/Audio/AudioPlayer.h>
 
 #include "Game/GlobalValues/GlobalValues.h"
 
@@ -24,6 +25,7 @@ public:
 	};
 
 	WaveSprite(const std::string& textureName, const Vector2& pivot = Vector2{ 0.5f,0.5f }) noexcept(false);
+	~WaveSprite();
 
 	void reset();
 
@@ -75,6 +77,9 @@ private:
 	std::unique_ptr<SpriteObject> clearSprite_ = nullptr;
 	std::unique_ptr<SpriteObject> clearBackSprite_ = nullptr;
 	std::unique_ptr<SpriteObject> allclearSprite_ = nullptr;
+
+	std::unique_ptr<AudioPlayer> clearAudio_ = nullptr;
+	std::unique_ptr<AudioPlayer> allClearAudio_ = nullptr;
 
 public:
     inline static Timeline* timeline_;

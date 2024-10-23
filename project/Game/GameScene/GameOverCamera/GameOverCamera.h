@@ -5,6 +5,7 @@
 #include "Engine/Math/Vector3.h"
 #include "Engine/Module/Transform2D/Transform2D.h"
 #include "Engine/Module/GameObject/SpriteObject.h"
+#include "Engine/Application/Audio/AudioPlayer.h"
 
 #include "Game/GlobalValues/GlobalValues.h"
 
@@ -21,6 +22,8 @@ public:
 		Stop,
 		GameOverSprite,
 	};
+	GameOverCamera();
+	~GameOverCamera();
 
 	void initialize();
 
@@ -40,6 +43,10 @@ public:
 
 	void SpriteMove();
 
+	CameraState get_state()const { return state_; }
+
+	float get_frame()const { return cameraFrame_; }
+
 private:
 
 	CameraState state_;
@@ -52,6 +59,9 @@ private:
 	bool isMoveCamera_ = false;
 
 	std::unique_ptr<SpriteObject> gameOverSprite_ = nullptr;
+	std::unique_ptr<SpriteObject> gameOverCommentSprite_ = nullptr;
+
+	std::unique_ptr<AudioPlayer> clickAudio_ = nullptr;
 
 public:
 

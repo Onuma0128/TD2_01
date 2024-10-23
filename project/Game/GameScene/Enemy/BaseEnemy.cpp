@@ -5,11 +5,21 @@
 #include "Engine/DirectX/DirectXCommand/DirectXCommand.h"
 #include <Engine/Math/Definition.h>
 #include <Engine/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h>
+#include <Engine/Math/Easing.h>
 
 #include "Game/GameScene/Player/PlayerBullet.h"
 #include "Game/GameScene/Player/PlayerHPManager.h"
 #include "Game/GameScene/BeatManager/BeatManager.h"
 #include "Game/GameScene/EnemyManager/EnemyManager.h"
+
+BaseEnemy::BaseEnemy() = default;
+
+BaseEnemy::~BaseEnemy()
+{
+	for (const std::unique_ptr<AudioPlayer>& audio : damageAudios_) {
+		audio->finalize();
+	}
+}
 
 void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Type type_) {
 	globalValues.add_value<int>("Heart", "AttackDamage", 30);
@@ -144,6 +154,7 @@ void BaseEnemy::initialize(const Vector3& translate, const Vector3& forward, Typ
 	for (int i = 0; i < 2; ++i) {
 		std::unique_ptr<AudioPlayer> audio = std::make_unique<AudioPlayer>();
 		audio->initialize("enemydamage.wav");
+		audio->set_volume(0.3f);
 		damageAudios_.push_back(std::move(audio));
 	}
 }
@@ -220,7 +231,7 @@ void BaseEnemy::normal_animation() {
 
 void BaseEnemy::attack_animation() {
 	// プレイヤー攻撃する
-	float t = easeInBack(behaviorTimer - 0.5f);
+	float t = easeInBack(behaviorTimer);
 	t = std::clamp(t, -1.0f, 3.0f);
 	float angle = 120 * ToRadian;
 	Quaternion rotationX = Quaternion::AngleAxis(CVector3::BASIS_X, angle);
@@ -349,6 +360,7 @@ void BaseEnemy::damaged_callback(const BaseCollider* const other) {
 		if (behavior.state() == EnemyBehavior::Down) {
 			return;
 		}
+		damageAudio();
 		hitpoint -= globalValues.get_value<int>("Heart", "AttackDamage");
 		enemy_resetObject();
 		// マークされたのを記録
@@ -456,12 +468,19 @@ std::weak_ptr<SphereCollider> BaseEnemy::get_melee_collider() {
 // ---------- スポーン処理 ----------
 void BaseEnemy::spawn_initialize() {
 	behaviorTimer = 0;
+	ghostMesh->get_transform().set_scale({ 0,0,0 });
 }
 
 void BaseEnemy::spawn_update() {
 	behaviorTimer += WorldClock::DeltaSeconds();
+	if (behaviorTimer < 1.0f) {
+		float t = Easing::Out::Back(behaviorTimer);
+		t = std::clamp(t, 0.0f, 1.5f);
+		ghostMesh->get_transform().set_scale({ t,t,t });
+	}
 	if (behaviorTimer >= 3) {
 		behavior.request(EnemyBehavior::Approach);
+		ghostMesh->get_transform().set_scale({ 1,1,1 });
 	}
 }
 
@@ -503,14 +522,17 @@ void BaseEnemy::attack_initialize() {
 
 void BaseEnemy::attack_update() {
 	behaviorTimer += WorldClock::DeltaSeconds();
-	if (behaviorTimer >= 0.5f && behaviorTimer <= 3.0f) {
+	if (behaviorTimer >= 0.0f && behaviorTimer <= 2.5f) {
 		attack_animation();
 	}
-	if (behaviorTimer < 1.0f) {
+	if (behaviorTimer < 0.5f) {
 		meleeCollider->set_active(false);
 	}
 	else if (behaviorTimer < 1.5f) {
 		meleeCollider->set_active(true);
+	}
+	else if (behaviorTimer < 2.0f) {
+		meleeCollider->set_active(false);
 	}
 	else if (behaviorTimer > 3.0f) {
 		meleeCollider->set_active(false);
@@ -539,7 +561,6 @@ void BaseEnemy::beating_update() {
 		if (behaviorTimer >= beatAttackInterval) {
 			behaviorTimer = std::fmod(behaviorTimer, beatAttackInterval);
 			isBeatingAnima = true;
-			damageAudio();
 		}
 	}
 }
@@ -547,7 +568,6 @@ void BaseEnemy::beating_update() {
 // ---------- 被ハート時処理 ----------
 void BaseEnemy::damaged_heart_initialize() {
 	behaviorTimer = 0;
-	damageAudio();
 }
 
 void BaseEnemy::damaged_heart_update() {

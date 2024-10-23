@@ -5,6 +5,7 @@
 #include <list>
 
 #include <Engine/Module/ParticleSystem/ParticleSystemModel.h>
+#include <Engine/Application/Audio/AudioPlayer.h>
 
 #include <Game/GlobalValues/GlobalValues.h>
 
@@ -39,6 +40,7 @@ private:
 	};
 
 public:
+	~BeatManager();
 	void initalize();
 	void update();
 	void begin_rendering();
@@ -84,6 +86,8 @@ private:
 
 	std::unordered_map<const Particle*, std::shared_ptr<SphereCollider>> beatCollider;
 	std::unordered_map<const BaseCollider*, BeatColliderInvolved> involeder;
+
+	std::unique_ptr<AudioPlayer> damageAudio_;
 
 public:
 	inline static CollisionManager* collisionManager = nullptr;

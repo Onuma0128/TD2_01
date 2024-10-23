@@ -21,6 +21,12 @@ WaveSprite::WaveSprite(const std::string& textureName, const Vector2& pivot) noe
 	reset();
 }
 
+WaveSprite::~WaveSprite()
+{
+	clearAudio_->finalize();
+	allClearAudio_->finalize();
+}
+
 void WaveSprite::reset()
 {
 	state_ = WaveState::Reappear;
@@ -47,6 +53,14 @@ void WaveSprite::reset()
 	allclearSprite_->set_translate({ 2000.0f,360.0f });
 
 	isClearSpriteMove_ = false;
+
+	clearAudio_ = std::make_unique<AudioPlayer>();
+	clearAudio_->initialize("clear.wav");
+	clearAudio_->set_volume(0.3f);
+
+	allClearAudio_ = std::make_unique<AudioPlayer>();
+	allClearAudio_->initialize("allclear.wav");
+	allClearAudio_->set_volume(0.3f);
 }
 
 void WaveSprite::clear_animation_reset()
@@ -63,7 +77,9 @@ void WaveSprite::clear_animation_reset()
 	}
 
 	clearSprite_->set_translate({ -700.0f,360.0f });
-	clearBackSprite_->set_translate({ -700.0f,360.0f });
+	if (waveNumber_ <= 10) {
+		clearBackSprite_->set_translate({ -700.0f,360.0f });
+	}
 	isClearSpriteMove_ = false;
 }
 
@@ -128,7 +144,7 @@ void WaveSprite::Normal()
 {
 	isAddWave_ = true;
 	for (auto& enemy : enemyManager_->get_enemies()) {
-		if (enemy.get_hp() > 0 || enemy.get_now_behavior() == EnemyBehavior::Revive) {
+		if (enemy.get_hp() > 0 || enemy.get_now_behavior() == EnemyBehavior::Revive || enemy.get_now_behavior() == EnemyBehavior::Beating) {
 			isAddWave_ = false;
 			break;
 		}
@@ -157,15 +173,20 @@ void WaveSprite::Return()
 			float t = easeInBack(clearWaveFrame_);
 			t = std::clamp(t, -1.0f, 1.0f);
 			transform->set_translate(Vector2::Lerp(returnPosition_, Vector2{ returnPosition_.x - 360,returnPosition_.y }, t));
-		}
-		if (clearWaveFrame_ >= 1.0f) {
-			isClearSpriteMove_ = true;
-			returnPosition_ = { 2000.0f,360.0f };
+			if (clearWaveFrame_ >= 1.0f) {
+				isClearSpriteMove_ = true;
+				returnPosition_ = { 2000.0f,360.0f };
+			}
 		}
 		// ClearSpriteが画面に出てくる処理
-		if (clearWaveFrame_ > 1.0f && clearWaveFrame_ <= 2.5f) {
+		else if (clearWaveFrame_ <= 3.5f) {
+			// 1.0f, 2.5f
 			float t = (clearWaveFrame_ - 1.3f) / 1.0f;
 			t = std::clamp(t, 0.0f, 1.0f);
+			if (t == 0.0f) {
+				clearAudio_->restart();
+				clearAudio_->play();
+			}
 
 			float easedT = easeOutBack(t);
 			clearSprite_->set_translate(Vector2::Lerp(returnPosition_, { 640.0f,360.0f }, easedT));
@@ -176,18 +197,20 @@ void WaveSprite::Return()
 			clearBackSprite_->set_translate(Vector2::Lerp(returnPosition_, { 640.0f,360.0f }, t));
 		}
 		// ClearSpriteが画面からフェードアウトする処理
-		else if(clearWaveFrame_ > 2.5f && clearWaveFrame_ <= 3.8f) {
-			float t = easeInBack(clearWaveFrame_ - 2.5f);
+		else if(clearWaveFrame_ <= 4.8f) {
+			float t = easeInBack(clearWaveFrame_ - 3.5f);
 			t = std::clamp(t, -1.0f, 1.0f);
 			clearSprite_->set_translate(Vector2::Lerp({ 640.0f,360.0f }, { -700.0f,360.0f }, t));
 			transform->set_translate({ clearSprite_->get_transform().get_translate().x - 240.0f,100.0f });
 
-			t = easeInExpo(clearWaveFrame_ - 2.8f);
-			t = std::clamp(t, 0.0f, 1.0f);
-			clearBackSprite_->set_translate(Vector2::Lerp({ 640.0f,360.0f }, { -700.0f,360.0f }, t));
+			if (waveNumber_ < 10) {
+				t = easeInExpo(clearWaveFrame_ - 3.8f);
+				t = std::clamp(t, 0.0f, 1.0f);
+				clearBackSprite_->set_translate(Vector2::Lerp({ 640.0f,360.0f }, { -700.0f,360.0f }, t));
+			}
 		}
 		// 全部のSpriteが画面から出たらStateを更新
-		if (clearWaveFrame_ >= 3.8f) {
+		else {
 			clear_animation_reset();
 		}
 	}
@@ -223,13 +246,14 @@ void WaveSprite::Reappear()
 			if (clearWaveFrame_ > 0.0f && clearWaveFrame_ <= 2.0f) {
 				float t = (clearWaveFrame_ - 0.3f) / 1.0f;
 				t = std::clamp(t, 0.0f, 1.0f);
+				if (t == 0.0f) {
+					allClearAudio_->restart();
+					allClearAudio_->play();
+				}
 
 				float easedT = easeOutBack(t);
 				allclearSprite_->set_translate(Vector2::Lerp(returnPosition_, { 640.0f,360.0f }, easedT));
 
-				t = easeOutQuint(clearWaveFrame_);
-				t = std::clamp(t, 0.0f, 1.0f);
-				clearBackSprite_->set_translate(Vector2::Lerp(returnPosition_, { 640.0f,360.0f }, t));
 			}
 			else {
 				if (Input::IsReleaseKey(KeyID::Space) || Input::IsReleasePad(PadID::A)) {

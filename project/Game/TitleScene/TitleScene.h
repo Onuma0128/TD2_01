@@ -4,6 +4,8 @@
 #include "Engine/Render/RenderNode/Object3DNode/Object3DNode.h"
 #include "Engine/Render/RenderNode/Sprite/SpriteNode.h"
 #include "Engine/Application/Scene/BaseScene.h"
+#include "Engine/Application/Audio/AudioManager.h"
+#include "Engine/Application/Audio/AudioPlayer.h"
 
 #include "Engine/Module/Camera/Camera3D.h"
 #include "Game/GameScene/GameUI/Fade/Fade.h"
@@ -42,5 +44,8 @@ private:
 	std::shared_ptr<SpriteNode> spriteNode_ = nullptr;
 
 	std::unique_ptr<Fade> fadeSprite_ = nullptr;
+	std::unique_ptr<AudioPlayer> clickAudio_ = nullptr;
+
+	bool isGameScene_ = false;
 };
 

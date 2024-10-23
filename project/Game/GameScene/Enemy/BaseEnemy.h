@@ -36,6 +36,9 @@ public:
 public: // Contsructor/Destructor
 
 public: // Member function
+	BaseEnemy();
+	~BaseEnemy();
+
 	void initialize(const Vector3& transform, const Vector3& forward, Type type_);
 	void begin();
 	void update();
@@ -111,7 +114,7 @@ private: // Member values
 	bool isAttakced;
 	float behaviorTimer;
 
-	float waveFrameCount;
+	float waveFrameCount = 0;
 	float initialY;
 	bool isBeatingAnima;
 	bool isBeatUI_ = false;
