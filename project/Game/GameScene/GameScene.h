@@ -27,6 +27,7 @@
 #include "Game/GameScene/GameOverCamera/GameOverCamera.h"
 #include "Game/GameScene/GameUI/Fade/Fade.h"
 #include "Game/GameScene/PostEffectManager/PostEffectManager.h"
+#include "Game/GameScene/Speaker/Speaker.h"
 
 #ifdef _DEBUG
 #include "Game/GameScene/Timeline/TimelineEditor/TimelineEditor.h"
@@ -75,6 +76,7 @@ private:
 	std::unique_ptr<UIManager> uiManager_ = nullptr;
 	std::unique_ptr<Fade> fadeSprite_ = nullptr;
 	std::unique_ptr<AudioPlayer> gameBGM_ = nullptr;
+	std::unique_ptr<Speaker> speaker_ = nullptr;
 
 	std::shared_ptr<SingleRenderTarget> renderTarget;
 
