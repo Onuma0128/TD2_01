@@ -69,19 +69,19 @@ void UIManager::begin_rendering()
 {
 	waveSprite_->begin_rendering();
 	hpSprite_->begin_rendering();
-	escSprite_->begin_rendering();
+	//escSprite_->begin_rendering();
 	buttonSprite_->begin_rendering();
 	spaceSprite_->begin_rendering();
 	actionSprite_->begin_rendering();
 	beatCommentSprite_->begin_rendering();
 	retrySprite_->begin_rendering();
-	titleSprite_->begin_rendering();
+	//titleSprite_->begin_rendering();
 }
 
 void UIManager::draw()
 {
 	hpSprite_->draw();
-	escSprite_->draw();
+	//escSprite_->draw();
 	buttonSprite_->draw();
 	spaceSprite_->draw();
 	actionSprite_->draw();
@@ -91,7 +91,7 @@ void UIManager::draw()
 	}
 	waveSprite_->draw();
 	retrySprite_->draw();
-	titleSprite_->draw();
+	//titleSprite_->draw();
 }
 
 void UIManager::input_update()
@@ -197,9 +197,9 @@ void UIManager::gameOver()
 			t = std::clamp(t, 0.0f, 1.0f);
 			if (gameOverCamera_->get_frame() >= 2.0f) {
 				escSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,600 }, Vector2{ 456,600 }, t));
-				buttonSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,600 }, Vector2{ 728,600 }, t));
-				spaceSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,600 }, Vector2{ 868,600 }, t));
-				retrySprite_->set_translate(Vector2::Lerp(Vector2{ 1920,552 }, Vector2{ 868,552 }, t));
+				buttonSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,600 }, Vector2{ 560,600 }, t));
+				spaceSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,600 }, Vector2{ 700,600 }, t));
+				retrySprite_->set_translate(Vector2::Lerp(Vector2{ 1920,552 }, Vector2{ 700,552 }, t));
 				titleSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,552 }, Vector2{ 456,552 }, t));
 			}
 		}
@@ -235,9 +235,9 @@ void UIManager::allGameClear()
 			spaceSprite_->set_alpha(1);
 			buttonSprite_->set_alpha(1);
 			escSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,680 }, Vector2{ 456,680 }, t));
-			buttonSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,680 }, Vector2{ 728,680 }, t));
-			spaceSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,680 }, Vector2{ 868,680 }, t));
-			retrySprite_->set_translate(Vector2::Lerp(Vector2{ 1920,632 }, Vector2{ 868,632 }, t));
+			buttonSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,680 }, Vector2{ 560,680 }, t));
+			spaceSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,680 }, Vector2{ 700,680 }, t));
+			retrySprite_->set_translate(Vector2::Lerp(Vector2{ 1920,632 }, Vector2{ 700,632 }, t));
 			titleSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,632 }, Vector2{ 456,632 }, t));
 		}
 	}
