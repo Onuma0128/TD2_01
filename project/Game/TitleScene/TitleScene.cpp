@@ -27,6 +27,7 @@ void TitleScene::load() {
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "fade.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "title.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "titleBack.png");
+	AudioManager::RegisterLoadQue(ResourceDirectory + "Audio", "click.wav");
 }
 
 void TitleScene::initialize() {
@@ -69,6 +70,9 @@ void TitleScene::initialize() {
 	titleBackSprite_ = std::make_unique<SpriteObject>("titleBack.png", Vector2{ 0.5f,0.5f });
 	titleSprite_->set_translate({ 640,360 });
 	titleBackSprite_->set_translate({ 640,360 });
+
+	clickAudio_ = std::make_unique<AudioPlayer>();
+	clickAudio_->initialize("click.wav");
 }
 
 void TitleScene::poped() {
@@ -88,6 +92,8 @@ void TitleScene::update() {
 	if (Input::IsReleaseKey(KeyID::Space) || Input::IsReleasePad(PadID::A)) {
 		SceneManager::SetSceneChange(std::make_unique<GameScene>(), 1, false);
 		fadeSprite_->set_state(Fade::FadeState::FadeIN);
+		clickAudio_->restart();
+		clickAudio_->play();
 	}
 }
 

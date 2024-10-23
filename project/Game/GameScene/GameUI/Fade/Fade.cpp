@@ -41,6 +41,7 @@ void Fade::draw()
 void Fade::fade_in()
 {
 	fadeFrame_ += WorldClock::DeltaSeconds();
+	fadeFrame_ = std::clamp(fadeFrame_, 0.0f, 1.0f);
 	float t = std::clamp(fadeFrame_, 0.0f, 1.0f);
 	sprite_->set_alpha(t);
 	if (fadeFrame_ >= 1.0f) {
@@ -51,6 +52,7 @@ void Fade::fade_in()
 void Fade::fade_out()
 {
 	fadeFrame_ -= WorldClock::DeltaSeconds();
+	fadeFrame_ = std::clamp(fadeFrame_, 0.0f, 1.0f);
 	float t = std::clamp(fadeFrame_, 0.0f, 1.0f);
 	sprite_->set_alpha(t);
 	if (fadeFrame_ <= 0.0f) {
