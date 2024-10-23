@@ -43,6 +43,10 @@ public:
 
 	void SpriteMove();
 
+	CameraState get_state()const { return state_; }
+
+	float get_frame()const { return cameraFrame_; }
+
 private:
 
 	CameraState state_;
@@ -55,6 +59,7 @@ private:
 	bool isMoveCamera_ = false;
 
 	std::unique_ptr<SpriteObject> gameOverSprite_ = nullptr;
+	std::unique_ptr<SpriteObject> gameOverCommentSprite_ = nullptr;
 
 	std::unique_ptr<AudioPlayer> clickAudio_ = nullptr;
 

@@ -61,6 +61,7 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "clear.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "clearback.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "beatComment.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "gameover_comment.png");
 	// Wave用
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "0.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "1.png");
@@ -231,6 +232,7 @@ void GameScene::initialize() {
 	gameOverCamera_->camera3d_ = camera3D_.get();
 	gameOverCamera_->player_ = player_.get();
 	gameOverCamera_->initialize();
+	UIManager::gameOverCamera_ = gameOverCamera_.get();
 
 	fadeSprite_ = std::make_unique<Fade>();
 	fadeSprite_->initialize();
