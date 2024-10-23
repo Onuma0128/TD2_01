@@ -20,6 +20,11 @@ void UIManager::initialize()
 	spaceSprite_ = std::make_unique<ButtonSprite>("Space_button.png");
 	actionSprite_ = std::make_unique<ButtonSprite>("Attack.png");
 	beatCommentSprite_ = std::make_unique<SpriteObject>("beatComment.png", Vector2{ 0.5f,0.5f });
+	retrySprite_ = std::make_unique<SpriteObject>("cleartext_retry.png", Vector2{ 0.5f,0.5f });
+	retrySprite_->set_translate({ 1920,632 });
+	titleSprite_ = std::make_unique<SpriteObject>("cleartext_title.png", Vector2{ 0.5f,0.5f });
+	titleSprite_->set_translate({ 1920,632 });
+	GameOverCamera::waveSprite_ = waveSprite_.get();
 
 	globalValues.add_value<int>("GameUI", "BeatCommentX", 1160);
 	globalValues.add_value<int>("GameUI", "BeatCommentY", 380);
@@ -35,17 +40,22 @@ void UIManager::initialize()
 	globalValues.add_value<float>("GameUI", "SpaceSize", 1.0f);
 
 	gameOverFrame_ = 1;
+	gameClearFrame_ = 1;
+	gameAllClearFrame_ = 0;
 }
 
 void UIManager::update()
 {
-	gameOver();
-
 	waveSprite_->update();
 	hpSprite_->update();
+
+
+	allGameClear();
+	gameOver();
 	// ボタン系のスプライトを更新
 	input_action();
-	if (gameOverCamera_->get_state() == GameOverCamera::CameraState::GameOverSprite) {
+	if (gameOverCamera_->get_state() == GameOverCamera::CameraState::GameOverSprite ||
+		(waveSprite_->get_waveNumber() > 10 && gameClearFrame_ != 1.0f)) {
 		return;
 	}
 	input_update();
@@ -64,6 +74,8 @@ void UIManager::begin_rendering()
 	spaceSprite_->begin_rendering();
 	actionSprite_->begin_rendering();
 	beatCommentSprite_->begin_rendering();
+	retrySprite_->begin_rendering();
+	titleSprite_->begin_rendering();
 }
 
 void UIManager::draw()
@@ -78,6 +90,8 @@ void UIManager::draw()
 		beatCommentSprite_->draw();
 	}
 	waveSprite_->draw();
+	retrySprite_->draw();
+	titleSprite_->draw();
 }
 
 void UIManager::input_update()
@@ -170,18 +184,61 @@ void UIManager::gameOver()
 			escSprite_->set_translate({ 1920,600 });
 			spaceSprite_->set_translate({ 1920,600 });
 			buttonSprite_->set_translate({ 1920,600 });
+			retrySprite_->set_translate({ 1920,552 });
+			titleSprite_->set_translate({ 1920,552 });
 			escSprite_->set_alpha(1);
 			spaceSprite_->set_alpha(1);
 			buttonSprite_->set_alpha(1);
 		}
 	}
 	else {
-		float t = Easing::Out::Quint(gameOverCamera_->get_frame() - 2.0f);
-		t = std::clamp(t, 0.0f, 1.0f);
-		if (gameOverCamera_->get_frame() >= 2.0f) {
-			escSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,600 }, Vector2{ 456,600 }, t));
-			buttonSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,600 }, Vector2{ 728,600 }, t));
-			spaceSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,600 }, Vector2{ 868,600 }, t));
+		if (waveSprite_->get_waveNumber() <= 10 && gameClearFrame_ == 1.0f) {
+			float t = Easing::Out::Quint(gameOverCamera_->get_frame() - 2.0f);
+			t = std::clamp(t, 0.0f, 1.0f);
+			if (gameOverCamera_->get_frame() >= 2.0f) {
+				escSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,600 }, Vector2{ 456,600 }, t));
+				buttonSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,600 }, Vector2{ 728,600 }, t));
+				spaceSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,600 }, Vector2{ 868,600 }, t));
+				retrySprite_->set_translate(Vector2::Lerp(Vector2{ 1920,552 }, Vector2{ 868,552 }, t));
+				titleSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,552 }, Vector2{ 456,552 }, t));
+			}
+		}
+	}
+}
+
+void UIManager::allGameClear()
+{
+	if (waveSprite_->get_waveNumber() == 10 && waveSprite_->get_state() == WaveSprite::WaveState::Return) {
+		gameClearFrame_ -= WorldClock::DeltaSeconds();
+		float t = std::clamp(gameClearFrame_, 0.0f, 1.0f);
+		escSprite_->set_alpha(t);
+		spaceSprite_->set_alpha(t);
+		buttonSprite_->set_alpha(t);
+		actionSprite_->set_alpha(t);
+		beatCommentSprite_->set_alpha(t);
+		hpSprite_->set_alpha(t);
+		if (t == 0.0f) {
+			escSprite_->set_translate({ 1920,680 });
+			spaceSprite_->set_translate({ 1920,680 });
+			buttonSprite_->set_translate({ 1920,680 });
+			retrySprite_->set_translate({ 1920,632 });
+			titleSprite_->set_translate({ 1920,632 });
+			gameAllClearFrame_ = 0;
+		}
+	}
+	else if (waveSprite_->get_state() == WaveSprite::WaveState::Reappear) {
+		if (gameOverCamera_->get_state() != GameOverCamera::CameraState::GameOverSprite && gameClearFrame_ <= 0.0f) {
+			gameAllClearFrame_ += WorldClock::DeltaSeconds();
+			float t = Easing::Out::Quint(gameAllClearFrame_);
+			t = std::clamp(t, 0.0f, 1.0f);
+			escSprite_->set_alpha(1);
+			spaceSprite_->set_alpha(1);
+			buttonSprite_->set_alpha(1);
+			escSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,680 }, Vector2{ 456,680 }, t));
+			buttonSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,680 }, Vector2{ 728,680 }, t));
+			spaceSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,680 }, Vector2{ 868,680 }, t));
+			retrySprite_->set_translate(Vector2::Lerp(Vector2{ 1920,632 }, Vector2{ 868,632 }, t));
+			titleSprite_->set_translate(Vector2::Lerp(Vector2{ 1920,632 }, Vector2{ 456,632 }, t));
 		}
 	}
 }

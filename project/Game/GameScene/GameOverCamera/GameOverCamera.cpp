@@ -35,6 +35,8 @@ void GameOverCamera::initialize()
 	clickAudio_ = std::make_unique<AudioPlayer>();
 	clickAudio_->initialize("click.wav");
 	clickAudio_->set_volume(0.2f);
+
+	isEsc_ = false;
 }
 
 void GameOverCamera::update()
@@ -46,6 +48,13 @@ void GameOverCamera::update()
 		break;
 	case GameOverCamera::CameraState::Stop:
 		Stop();
+		if (Input::IsReleaseKey(KeyID::Escape) && !isEsc_ && WaveSprite::WaveState::Normal == waveSprite_->get_state()) {
+			SceneManager::SetSceneChange(std::make_unique<TitleScene>(), 1, false);
+			fadeSprite_->set_state(Fade::FadeState::FadeIN);
+			clickAudio_->restart();
+			clickAudio_->play();
+			isEsc_ = true;
+		}
 		break;
 	case GameOverCamera::CameraState::GameOverSprite:
 		SpriteMove();
