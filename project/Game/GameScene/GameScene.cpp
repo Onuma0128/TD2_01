@@ -47,6 +47,7 @@ void GameScene::load() {
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/ground", "ground.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/Particle", "beat-particle.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/Effects/Beat", "beating.obj");
+	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/Effects/EnemyRevive", "EnemyRevive.obj");
 	PolygonMeshManager::RegisterLoadQue(ResourceDirectory + "Models/speaker", "speaker.obj");
 
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "wave.png");
@@ -121,6 +122,7 @@ void GameScene::initialize() {
 
 	enemyManager = eps::CreateUnique<EnemyManager>();
 	enemyManager->set_collision_manager(collisionManager.get());
+	enemyManager->initialize();
 
 	beatManager = eps::CreateUnique<BeatManager>();
 	beatManager->initalize();
@@ -348,6 +350,7 @@ void GameScene::draw() const {
 	// 3Dパーティクル
 	camera3D_->set_command(1);
 	beatManager->draw_particle();
+	enemyManager->draw_particle();
 
 	RenderPathManager::Next();
 	// マーカー

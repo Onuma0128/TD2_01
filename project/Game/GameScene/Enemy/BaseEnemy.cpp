@@ -10,6 +10,7 @@
 #include "Game/GameScene/Player/PlayerBullet.h"
 #include "Game/GameScene/Player/PlayerHPManager.h"
 #include "Game/GameScene/BeatManager/BeatManager.h"
+#include "Game/GameScene/EnemyManager/EnemyManager.h"
 
 BaseEnemy::BaseEnemy() = default;
 
@@ -181,6 +182,7 @@ void BaseEnemy::update() {
 	if (markingTimer >= markingTime) {
 		markingTimer = 0;
 		beatManager->recovery(this);
+		enemyManager->create_revive_effect(this);
 		// 回復
 		hitpoint += globalValues.get_value<int>("Enemy", "AbsorptionAmount") * markedCount;
 		// 上限を超えないようにする
@@ -642,6 +644,9 @@ void BaseEnemy::revive_initialize() {
 	}
 	// 復活時の回転を取得
 	axisOfQuaternion = ghostMesh->get_transform().get_quaternion();
+	if (enemyManager) {
+		enemyManager->create_revive_effect(this);
+	}
 }
 
 void BaseEnemy::revive_update() {

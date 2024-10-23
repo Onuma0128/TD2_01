@@ -1,16 +1,6 @@
 #include "EmitterSample.h"
 
-#include <random>
-
-namespace EmitterRandomSample {
-
-static std::random_device device{};
-static std::mt19937 mt{ device() };
-static std::uniform_real_distribution<float> ufd10{ 0,10 };
-static std::uniform_real_distribution<float> ufd1010{ -10,10 };
-static std::uniform_real_distribution<float> ufd1{ 0,1 };
-
-}
+#include <Game/RandomEngine.h>
 
 void EmitterSample::initialize() {
 	isLoop = true;
@@ -33,7 +23,12 @@ void EmitterSample::restart() {
 }
 
 void EmitterSample::on_emit(Particle* const particle) {
+	Vector3 offset = {
+		std::lerp(-10.0f, 10.0f, RandomEngine::Random01Closed()),
+		0,
+		std::lerp(-10.0f, 10.0f, RandomEngine::Random01Closed())
+	};
 	particle->get_transform().set_translate(
-		this->world_position() + Vector3{ EmitterRandomSample::ufd1010(EmitterRandomSample::mt), 0, EmitterRandomSample::ufd1010(EmitterRandomSample::mt) }
-		);
+		this->world_position() + offset
+	);
 }

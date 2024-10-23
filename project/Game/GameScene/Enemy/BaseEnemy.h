@@ -24,6 +24,7 @@ enum class EnemyBehavior {
 class Player;
 class PlayerHPManager;
 class BeatManager;
+class EnemyManager;
 
 class BaseEnemy : public WorldInstance {
 public:
@@ -137,6 +138,7 @@ public: // Static value
 	inline static GlobalValues& globalValues = GlobalValues::GetInstance();
 	inline static BeatManager* beatManager = nullptr;
 	inline static PlayerHPManager* playerHpManager_ = nullptr;
+	inline static EnemyManager* enemyManager = nullptr;
 
 private:
 	inline static float approachSpeed = 0.0f;

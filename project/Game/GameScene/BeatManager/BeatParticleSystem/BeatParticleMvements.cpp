@@ -5,23 +5,15 @@
 #include <Engine/Math/Definition.h>
 #include <Engine/Math/Easing.h>
 
+#include <Game/RandomEngine.h>
+
 #include "Game/WorldSystemValue.h"
 #include "../BeatManager.h"
 
-#include <random>
-
-namespace BeatEmitterRandom {
-
-static std::random_device device{};
-static std::mt19937 mt{ device() };
-static std::uniform_real_distribution<float> PIRandom{ -PI,PI };
-static std::uniform_real_distribution<float> Random01{ 0.0f,1.0f };
-
-}
-
 Vector3 ConeRandomBias(float angle, const Vector3& baseDireciton) {
-	using namespace BeatEmitterRandom;
-	Vector3 direction = CVector3::BASIS_Y * Quaternion::EulerRadian(std::lerp(-angle, angle, Random01(mt)), PIRandom(mt), 0);
+	float xAngle = std::lerp(-angle, angle, RandomEngine::Random01MOD());
+	float yAngle = RandomEngine::RandomPIClosed();
+	Vector3 direction = CVector3::BASIS_Y * Quaternion::EulerRadian(xAngle, yAngle, 0);
 	Quaternion rotation = Quaternion::FromToRotation(CVector3::BASIS_Y, baseDireciton);
 	return direction * rotation;
 }
