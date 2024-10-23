@@ -19,7 +19,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #endif // _DEBUG
 
 #ifdef _DEBUG
-	SceneManager::Initialize(std::make_unique<TitleScene>());
+	SceneManager::Initialize(std::make_unique<GameScene>());
 #else
 	SceneManager::Initialize(std::make_unique<TitleScene>());
 #endif // _DEBUG

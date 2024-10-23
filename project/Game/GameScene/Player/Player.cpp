@@ -19,6 +19,8 @@
 #endif // _DEBUG
 
 void Player::initialize() {
+	globalValues.add_value<Vector3>("Player", "FieldSize", Vector3{ 6.6f,0,9.53f });
+
 	globalValues.add_value<float>("Player", "BeatIntervalBase", 1.0f);
 	globalValues.add_value<float>("Player", "BeatIntervalMin", 0.1f);
 
@@ -192,6 +194,19 @@ void Player::Move() {
 	velocity = moveDirection * globalValues.get_value<float>("Player", "Speed");
 	// 足す
 	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
+	Vector3 fieldSize = globalValues.get_value<Vector3>("Player", "FieldSize");
+	Vector3 translate = world_position();
+	Vector3 translateAbs = Vector3::Abs(translate);
+	if (translateAbs.x > fieldSize.x) {
+		float signe = translate.x >= 0 ? 1.0f : -1.0f;
+		translate.x = signe * fieldSize.x;
+		transform.set_translate_x(translate.x);
+	}
+	if (translateAbs.z > fieldSize.z) {
+		float signe = translate.z >= 0 ? 1.0f : -1.0f;
+		translate.z = signe * fieldSize.z;
+		transform.set_translate_z(translate.z);
+	}
 	// 移動があれば向きを更新
 	if (velocity != CVector3::ZERO) {
 		const Quaternion& quaternion = transform.get_quaternion();
@@ -258,8 +273,7 @@ void Player::ThrowHeart() {
 	}
 }
 
-void Player::KnockBack()
-{
+void Player::KnockBack() {
 	// ノックバックフレームを更新
 	nockBackFrame_ += WorldClock::DeltaSeconds();
 
@@ -288,10 +302,9 @@ void Player::KnockBack()
 	}
 }
 
-void Player::AddSweat()
-{
+void Player::AddSweat() {
 	if (playerHpManager_->get_hp() <= playerHpManager_->get_max_hitpoint() / 2) {
-		uint32_t numSweat = globalValues.get_value<int>("Sweat","NumSweat");
+		uint32_t numSweat = globalValues.get_value<int>("Sweat", "NumSweat");
 		for (uint32_t i = 0; i < numSweat; ++i) {
 			std::unique_ptr<PlayerSweat> sweat = std::make_unique<PlayerSweat>();
 			sweat->initialize(CVector3::BASIS_Z * transform.get_quaternion());
@@ -300,8 +313,7 @@ void Player::AddSweat()
 	}
 }
 
-void Player::InvincibleUpdate()
-{
+void Player::InvincibleUpdate() {
 	// 無敵時間の更新
 	invincibleFrame_ += WorldClock::DeltaSeconds();
 	if (invincibleFrame_ >= globalValues.get_value<float>("Player", "InvincibleTime")) {
@@ -310,8 +322,7 @@ void Player::InvincibleUpdate()
 	}
 }
 
-void Player::Dead()
-{
+void Player::Dead() {
 	invincibleFrame_ = 0.0f;
 
 	if (lastBeat_) {
@@ -326,7 +337,7 @@ void Player::Dead()
 		// プレイヤーのスケールを更新
 		transform.set_scale(Vector3(beatScale, beatScale, beatScale));
 
-		if (downFrame_ >= globalValues.get_value<float>("DeadAnimation","DownCount")) {
+		if (downFrame_ >= globalValues.get_value<float>("DeadAnimation", "DownCount")) {
 			lastBeat_ = false;
 			downFrame_ = 0.0f;
 			// スケールを完全に元に戻す
@@ -350,8 +361,7 @@ void Player::Dead()
 	}
 }
 
-float Player::EaseOutCubic(float t)
-{
+float Player::EaseOutCubic(float t) {
 	return 1.0f - powf(1.0f - t, 10.0f);
 }
 
