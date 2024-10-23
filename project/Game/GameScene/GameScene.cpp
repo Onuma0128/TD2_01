@@ -63,6 +63,8 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "clearback.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "beatComment.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "gameover_comment.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "cleartext_title.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/UI", "cleartext_retry.png");
 	// Wave用
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "0.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/numbers", "1.png");

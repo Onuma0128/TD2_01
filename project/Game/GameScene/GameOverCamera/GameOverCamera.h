@@ -12,6 +12,7 @@
 class Camera3D;
 class Player;
 class Fade;
+class WaveSprite;
 
 class GameOverCamera
 {
@@ -57,6 +58,7 @@ private:
 
 	float cameraFrame_ = 0;
 	bool isMoveCamera_ = false;
+	bool isEsc_ = false;
 
 	std::unique_ptr<SpriteObject> gameOverSprite_ = nullptr;
 	std::unique_ptr<SpriteObject> gameOverCommentSprite_ = nullptr;
@@ -69,5 +71,5 @@ public:
 	inline static Camera3D* camera3d_ = nullptr;
 	inline static Player* player_ = nullptr;
 	inline static Fade* fadeSprite_ = nullptr;
-
+	inline static WaveSprite* waveSprite_ = nullptr;
 };

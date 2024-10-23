@@ -14,6 +14,7 @@
 #include "Game/GameScene/Timeline/GameState.h"
 #include "Game/GameScene/GameUI/Fade/Fade.h"
 #include "Game/TitleScene/TitleScene.h"
+#include "Game/GameScene/GameScene.h"
 
 WaveSprite::WaveSprite(const std::string& textureName, const Vector2& pivot) noexcept(false)
 : SpriteObject(textureName, pivot) 
@@ -25,6 +26,7 @@ WaveSprite::~WaveSprite()
 {
 	clearAudio_->finalize();
 	allClearAudio_->finalize();
+	clickAudio_->finalize();
 }
 
 void WaveSprite::reset()
@@ -53,6 +55,7 @@ void WaveSprite::reset()
 	allclearSprite_->set_translate({ 2000.0f,360.0f });
 
 	isClearSpriteMove_ = false;
+	isSceneChenge_ = false;
 
 	clearAudio_ = std::make_unique<AudioPlayer>();
 	clearAudio_->initialize("clear.wav");
@@ -61,6 +64,10 @@ void WaveSprite::reset()
 	allClearAudio_ = std::make_unique<AudioPlayer>();
 	allClearAudio_->initialize("allclear.wav");
 	allClearAudio_->set_volume(0.3f);
+
+	clickAudio_ = std::make_unique<AudioPlayer>();
+	clickAudio_->initialize("click.wav");
+	clickAudio_->set_volume(0.2f);
 }
 
 void WaveSprite::clear_animation_reset()
@@ -256,9 +263,22 @@ void WaveSprite::Reappear()
 
 			}
 			else {
-				if (Input::IsReleaseKey(KeyID::Space) || Input::IsReleasePad(PadID::A)) {
-					SceneManager::SetSceneChange(std::make_unique<TitleScene>(), 1, false);
-					fadeSprite_->set_state(Fade::FadeState::FadeIN);
+				if (!isSceneChenge_) {
+					if (Input::IsReleaseKey(KeyID::Space) || Input::IsReleasePad(PadID::A)) {
+						SceneManager::SetSceneChange(std::make_unique<GameScene>(), 1, false);
+						fadeSprite_->set_state(Fade::FadeState::FadeIN);
+						GameState::getInstance().setCurrentWave(0);
+						clickAudio_->restart();
+						clickAudio_->play();
+						isSceneChenge_ = true;
+					}
+					if (Input::IsReleaseKey(KeyID::Escape)) {
+						SceneManager::SetSceneChange(std::make_unique<TitleScene>(), 1, false);
+						fadeSprite_->set_state(Fade::FadeState::FadeIN);
+						clickAudio_->restart();
+						clickAudio_->play();
+						isSceneChenge_ = true;
+					}
 				}
 			}
 		}
