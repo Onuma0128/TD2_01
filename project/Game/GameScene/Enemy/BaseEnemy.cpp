@@ -5,6 +5,7 @@
 #include "Engine/DirectX/DirectXCommand/DirectXCommand.h"
 #include <Engine/Math/Definition.h>
 #include <Engine/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h>
+#include <Engine/Math/Easing.h>
 
 #include "Game/GameScene/Player/PlayerBullet.h"
 #include "Game/GameScene/Player/PlayerHPManager.h"
@@ -464,12 +465,19 @@ std::weak_ptr<SphereCollider> BaseEnemy::get_melee_collider() {
 // ---------- スポーン処理 ----------
 void BaseEnemy::spawn_initialize() {
 	behaviorTimer = 0;
+	ghostMesh->get_transform().set_scale({ 0,0,0 });
 }
 
 void BaseEnemy::spawn_update() {
 	behaviorTimer += WorldClock::DeltaSeconds();
+	if (behaviorTimer < 1.0f) {
+		float t = Easing::Out::Back(behaviorTimer);
+		t = std::clamp(t, 0.0f, 1.5f);
+		ghostMesh->get_transform().set_scale({ t,t,t });
+	}
 	if (behaviorTimer >= 3) {
 		behavior.request(EnemyBehavior::Approach);
+		ghostMesh->get_transform().set_scale({ 1,1,1 });
 	}
 }
 
