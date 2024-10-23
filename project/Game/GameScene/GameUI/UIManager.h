@@ -33,6 +33,8 @@ public:
 
 	void gameOver();
 
+	void allGameClear();
+
 	WaveSprite* get_waveSprite()const { return waveSprite_.get(); }
 
 private:
@@ -47,8 +49,12 @@ private:
 	bool isBeatComment_ = false;
 	float beatCommentFrame_ = 0;
 	std::unique_ptr<SpriteObject> beatCommentSprite_ = nullptr;
+	std::unique_ptr<SpriteObject> retrySprite_ = nullptr;
+	std::unique_ptr<SpriteObject> titleSprite_ = nullptr;
 
 	float gameOverFrame_ = 1;
+	float gameClearFrame_ = 1;
+	float gameAllClearFrame_ = 1;
 
 public:
 

@@ -49,6 +49,8 @@ public:
 
 	WaveState get_state()const { return state_; }
 
+	int get_waveNumber()const { return waveNumber_; }
+
 	/*========== イージング関数 ==========*/
 
 	float easeInExpo(float t);
@@ -67,6 +69,7 @@ private:
 	int waveNumber_ = 0;
 	bool isAddWave_ = false;
 	bool isClearSpriteMove_ = false;
+	bool isSceneChenge_ = false;
 
 	float clearCheckerFrame_ = 0;
 	float clearWaveFrame_ = 0;
@@ -80,6 +83,7 @@ private:
 
 	std::unique_ptr<AudioPlayer> clearAudio_ = nullptr;
 	std::unique_ptr<AudioPlayer> allClearAudio_ = nullptr;
+	std::unique_ptr<AudioPlayer> clickAudio_ = nullptr;
 
 public:
     inline static Timeline* timeline_;
