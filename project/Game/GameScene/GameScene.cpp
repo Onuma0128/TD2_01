@@ -82,8 +82,6 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/hp_numbers", "hp_10.png");
 	// GameSprite
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "fade.png");
-	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "title.png");
-	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "titleBack.png");
 	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "allclear.png");
 }
 

@@ -8,6 +8,7 @@
 #include <Engine/Module/PolygonMesh/PolygonMeshManager.h>
 #include <Engine/Utility/SmartPointer.h>
 #include <Engine/Application/Input/Input.h>
+#include <Engine/Module/TextureManager/TextureManager.h>
 
 #include "Game/GlobalValues/GlobalValues.h"
 #include "Game/GameScene/GameScene.h"
@@ -22,6 +23,10 @@ TitleScene::TitleScene() = default;
 TitleScene::~TitleScene() = default;
 
 void TitleScene::load() {
+	std::string ResourceDirectory = "./Resources/GameScene/";
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "fade.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "title.png");
+	TextureManager::RegisterLoadQue(ResourceDirectory + "Textures/gameSprite", "titleBack.png");
 }
 
 void TitleScene::initialize() {
@@ -35,6 +40,8 @@ void TitleScene::initialize() {
 		Quaternion::EulerDegree(49,0,0),
 		{0,23,-21}
 		});
+
+	Camera2D::Initialize();
 
 	/*==================== シーン ====================*/
 
