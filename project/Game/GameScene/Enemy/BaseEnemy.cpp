@@ -171,6 +171,7 @@ void BaseEnemy::update() {
 	if (markingTimer >= markingTime) {
 		markingTimer = 0;
 		beatManager->recovery(this);
+		enemyManager->create_revive_effect(this);
 		// 回復
 		hitpoint += globalValues.get_value<int>("Enemy", "AbsorptionAmount") * markedCount;
 		// 上限を超えないようにする

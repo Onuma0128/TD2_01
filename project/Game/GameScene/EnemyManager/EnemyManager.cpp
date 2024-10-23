@@ -88,7 +88,7 @@ void EnemyManager::create_revive_effect(const BaseEnemy* enemy) {
 
 	auto&& emitter = eps::CreateUnique<ReviveEmitter>();
 	if (enemy) {
-		emitter->get_transform().set_translate(enemy->world_position());
+		emitter->set_parent(*enemy);
 	}
 
 	auto&& movements = eps::CreateUnique<ReviveParticleMvements>();
