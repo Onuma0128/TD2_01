@@ -185,6 +185,7 @@ void BaseEnemy::update() {
 		enemyManager->create_revive_effect(this);
 		// 回復
 		hitpoint += globalValues.get_value<int>("Enemy", "AbsorptionAmount") * markedCount;
+		enemy_resetObject();
 		// 上限を超えないようにする
 		hitpoint = std::min(maxHitpoint, hitpoint);
 		markedCount = 0;
