@@ -12,7 +12,7 @@ const std::int32_t kClientWidth = 1280;
 const std::int32_t kClientHight = 720;
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-	WinApp::Initialize("DirectXGame", kClientWidth, kClientHight);
+	WinApp::Initialize("2103_ハートビート", kClientWidth, kClientHight);
 
 #ifdef _DEBUG
 	WorldClock::IsFixDeltaTime(true);
