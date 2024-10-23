@@ -75,6 +75,7 @@ void TitleScene::initialize() {
 
 	clickAudio_ = std::make_unique<AudioPlayer>();
 	clickAudio_->initialize("click.wav");
+	clickAudio_->set_volume(0.2f);
 }
 
 void TitleScene::poped() {
