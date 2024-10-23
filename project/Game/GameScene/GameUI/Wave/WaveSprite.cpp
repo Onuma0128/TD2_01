@@ -143,11 +143,16 @@ void WaveSprite::WaveTextureNumbers()
 void WaveSprite::Normal()
 {
 	isAddWave_ = true;
-	for (auto& enemy : enemyManager_->get_enemies()) {
-		if (enemy.get_hp() > 0 || enemy.get_now_behavior() == EnemyBehavior::Revive || enemy.get_now_behavior() == EnemyBehavior::Beating) {
-			isAddWave_ = false;
-			break;
+	if (timeline_->is_all_enemy_poped()) {
+		for (auto& enemy : enemyManager_->get_enemies()) {
+			if (enemy.get_hp() > 0 || enemy.get_now_behavior() == EnemyBehavior::Revive || enemy.get_now_behavior() == EnemyBehavior::Beating) {
+				isAddWave_ = false;
+				break;
+			}
 		}
+	}
+	else {
+		isAddWave_ = false;
 	}
 	if (isAddWave_) {
 		clearCheckerFrame_ += WorldClock::DeltaSeconds();

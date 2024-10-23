@@ -47,6 +47,7 @@ private:
 	void ResetNowWave();
 
 public:
+	bool is_all_enemy_poped() const;
 	bool IsEndWaveAll() { return nowWave == waveData.end(); };
 	void SetEnemyManager(EnemyManager* enemyManager_) { enemyManager = enemyManager_; };
 	void SetPlayer(Player* player_) { player = player_; }
