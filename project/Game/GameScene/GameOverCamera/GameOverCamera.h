@@ -22,6 +22,8 @@ public:
 		Stop,
 		GameOverSprite,
 	};
+	GameOverCamera();
+	~GameOverCamera();
 
 	void initialize();
 

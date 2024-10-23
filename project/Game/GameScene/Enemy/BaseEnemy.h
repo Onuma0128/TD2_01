@@ -35,6 +35,9 @@ public:
 public: // Contsructor/Destructor
 
 public: // Member function
+	BaseEnemy();
+	~BaseEnemy();
+
 	void initialize(const Vector3& transform, const Vector3& forward, Type type_);
 	void begin();
 	void update();

@@ -14,6 +14,13 @@
 #include "Game/GameScene/GameScene.h"
 
 
+GameOverCamera::GameOverCamera() = default;
+
+GameOverCamera::~GameOverCamera()
+{
+	clickAudio_->finalize();
+}
+
 void GameOverCamera::initialize()
 {
 	globalValues.add_value<Vector3>("gameOverCamera", "CameraOffset", { 0.0f,2.0f,9.0f });

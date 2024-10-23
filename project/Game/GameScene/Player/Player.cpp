@@ -18,6 +18,16 @@
 #include "imgui.h"
 #endif // _DEBUG
 
+Player::Player() = default;
+
+Player::~Player()
+{
+	for (const std::unique_ptr<AudioPlayer>& audio : throwAudios_) {
+		audio->finalize();
+	}
+	damageAudio_->finalize();
+}
+
 void Player::initialize() {
 	globalValues.add_value<Vector3>("Player", "FieldSize", Vector3{ 6.6f,0,9.53f });
 

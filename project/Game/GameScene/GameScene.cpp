@@ -29,7 +29,9 @@
 
 GameScene::GameScene() = default;
 
-GameScene::~GameScene() = default;
+GameScene::~GameScene() {
+	gameBGM_->finalize();
+}
 
 void GameScene::load() {
 	std::string ResourceDirectory = "./Resources/GameScene/";
